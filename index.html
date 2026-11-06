@@ -7,20 +7,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Inter:wght@100..900&family=Poppins:wght@400;700&family=Playfair+Display:wght@400..900&family=Roboto+Mono:wght@100..700&family=Caveat:wght@400..700&family=Pacifico&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script defer src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
   :root {
     --ease: cubic-bezier(.22, 1, .36, 1);
     --spring: cubic-bezier(.34, 1.35, .5, 1);
     --glass: rgba(0, 0, 0, .52);
     --glass-border: rgba(0, 0, 0, .4);
-    --grid: 40px;
+    --grid: 20px;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; width: 100%; height: 100%; }
   body {
     font-family: 'Montserrat', system-ui, sans-serif;
     background-color: #fff;
-    background-image: radial-gradient(circle at center, #cdd0da 2px, transparent 2.6px);
+    background-image: radial-gradient(circle at center, #cdd0da 1.7px, transparent 2.3px);
     background-size: var(--grid) var(--grid);
     background-position: calc(var(--grid) / -2) calc(var(--grid) / -2);
     overflow: hidden;
@@ -66,10 +67,10 @@
   .audio .name.unlinked { color: #8a8a8a; }
   .audio .name[contenteditable="true"] { text-overflow: clip; cursor: text; }
   .audio .kebab {
-    width: 16px; height: 22px; border: 0; background: none; padding: 0; cursor: pointer;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 999px;
+    width: 14px; height: 30px; border: 0; background: none; padding: 7px 0 8px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 3px; border-radius: 999px;
   }
-  .audio .kebab i { width: 3px; height: 3px; border-radius: 50%; background: #fff; }
+  .audio .kebab i { width: 3px; height: 3px; border-radius: 50%; background: #fff; flex: none; }
   .audio .kebab:hover { background: rgba(255,255,255,.14); }
 
   /* image */
@@ -164,7 +165,7 @@
 
   /* ---------- popovers: font list + colour picker ---------- */
   .pop {
-    position: fixed; z-index: 130; border-radius: 22px; background: rgba(0,0,0,.74); border: 2px solid rgba(0,0,0,.35); background-clip: padding-box;
+    position: fixed; z-index: 280; border-radius: 22px; background: rgba(0,0,0,.74); border: 2px solid rgba(0,0,0,.35); background-clip: padding-box;
     -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff;
     opacity: 0; transform: translateY(-8px) scale(.95); transform-origin: top left; pointer-events: none;
     transition: opacity .22s ease, transform .4s var(--ease);
@@ -219,15 +220,20 @@
 
   /* ---------- add dock ---------- */
   .dock {
-    position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 100;
+    position: fixed; top: 20px; left: 50%; transform: translateX(calc(-50% + var(--ox, 0px))); z-index: 100;
     width: 40px; height: 40px; border-radius: 20px;
     background: var(--glass); background-clip: padding-box; border: 2px solid var(--glass-border);
     -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
     overflow: hidden; cursor: pointer; outline: none;
-    transition: width .55s var(--ease), height .75s var(--spring), border-radius .65s var(--ease), transform .2s;
+    transition: width .55s var(--ease), height .75s var(--spring), border-radius .65s var(--ease), transform .45s var(--ease), opacity .3s ease;
   }
-  .dock:not(.open):hover { transform: translateX(-50%) scale(1.08); }
-  .dock:not(.open):active { transform: translateX(-50%) scale(.94); }
+  #dock { --ox: -24px; } #shareDock { --ox: 24px; }
+  #dock.open, #shareDock.open { --ox: 0px; }
+  .dock:not(.open):hover { transform: translateX(calc(-50% + var(--ox, 0px))) scale(1.08); }
+  .dock:not(.open):active { transform: translateX(calc(-50% + var(--ox, 0px))) scale(.94); }
+  .dock.away { opacity: 0; pointer-events: none; transform: translateX(calc(-50% + var(--ox, 0px))) scale(.4); }
+  .dock.live:not(.open)::after { content: ''; position: absolute; right: 5px; bottom: 5px; width: 9px; height: 9px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 2px rgba(0,0,0,.6); animation: livePulse 2s ease-in-out infinite; }
+  @keyframes livePulse { 50% { box-shadow: 0 0 0 2px rgba(0,0,0,.6), 0 0 0 6px rgba(52,211,153,.25); } }
   .dock:focus-visible { box-shadow: 0 0 0 3px #4c7dff; }
   .dock.open { width: min(calc(100vw - 48px), 1400px); height: 236px; border-radius: 30px; cursor: default; }
   .dock .plus {
@@ -256,6 +262,80 @@
   .card svg { width: 92px; height: 92px; margin-bottom: 4px; }
   .card b { font-size: 24px; font-weight: 500; }
   .card small { font-size: 12.5px; font-weight: 400; opacity: .95; }
+
+  /* ---------- share panel ---------- */
+  .dock.share .plus { width: 22px; height: 22px; margin: -11px 0 0 -11px; }
+  .dock.share.open { height: 286px; }
+  .sharein {
+    position: absolute; left: 26px; right: 84px; top: 22px; bottom: 22px; display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(210px, 340px); grid-template-rows: minmax(0, 1fr) 44px; gap: 14px;
+    opacity: 0; transform: translateY(14px) scale(.97); transform-origin: top left; pointer-events: none; transition: opacity .15s, transform .15s;
+  }
+  .dock.open .sharein { opacity: 1; transform: none; pointer-events: auto; transition: opacity .3s .22s, transform .5s .22s var(--ease); }
+  .codecard, .users { background: rgba(0,0,0,.4); border-radius: 22px; position: relative; min-height: 0; }
+  .codecard { grid-row: 1 / 3; display: grid; place-items: center; overflow: hidden; }
+  .code {
+    font-family: 'Roboto Mono', monospace; font-weight: 300; font-size: clamp(34px, 7vw, 104px); letter-spacing: .16em; padding-left: .16em;
+    color: #fff; white-space: nowrap; user-select: text; -webkit-user-select: text; cursor: text; line-height: 1;
+  }
+  .ctools { position: absolute; top: 12px; right: 14px; display: flex; gap: 6px; }
+  .ctools button { width: 34px; height: 34px; border: 0; border-radius: 10px; background: none; padding: 0; cursor: pointer; display: grid; place-items: center; transition: background .2s ease, transform .25s var(--spring); }
+  .ctools button:hover { background: rgba(255,255,255,.18); }
+  .ctools button:active { transform: scale(.88); }
+  .ctools svg { width: 22px; height: 22px; }
+  .users { padding: 14px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; justify-content: center; text-align: center; font: 600 14px 'Montserrat', sans-serif; color: #fff; }
+  .users::-webkit-scrollbar { display: none; }
+  .users .idle p { margin: 0 0 12px; line-height: 1.45; }
+  .dock.live .users .idle { display: none; }
+  .dock:not(.live) .users .ulist { display: none; }
+  .joinrow { display: flex; gap: 8px; justify-content: center; }
+  .joinrow input { width: 120px; height: 34px; border: 0; border-radius: 17px; background: rgba(255,255,255,.14); color: #fff; text-align: center; text-transform: uppercase; letter-spacing: .18em; font: 600 14px 'Montserrat', sans-serif; outline: none; transition: background .2s; }
+  .joinrow input:focus { background: rgba(255,255,255,.26); }
+  .joinrow input::placeholder { color: rgba(255,255,255,.45); letter-spacing: .1em; }
+  .joinrow button { height: 34px; padding: 0 16px; border: 0; border-radius: 17px; background: #fff; color: #000; font-weight: 700; font-size: 13px; cursor: pointer; transition: transform .25s var(--spring), opacity .2s; }
+  .joinrow button:active { transform: scale(.92); }
+  .ulist { list-style: none; margin: 0; padding: 0; text-align: left; width: 100%; align-self: flex-start; }
+  .ulist li { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 12px; animation: itemIn .35s var(--spring) both; }
+  .ulist li i { width: 14px; height: 14px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 2px rgba(255,255,255,.6); flex: none; }
+  .ulist li small { margin-left: auto; opacity: .6; font-weight: 500; }
+  .srow { display: flex; gap: 14px; }
+  .srow button { position: relative; overflow: hidden; white-space: nowrap; font-family: 'Montserrat', sans-serif; flex: 1; border: 0; border-radius: 22px; font-weight: 600; font-size: 14px; cursor: pointer; background: rgba(0,0,0,.4); color: #fff; transition: transform .25s var(--spring), opacity .25s ease, background .25s ease; }
+  .srow button:hover:not(:disabled) { background: rgba(0,0,0,.6); }
+  .srow button:active:not(:disabled) { transform: scale(.95); }
+  .srow button:disabled { opacity: .45; cursor: default; }
+  .srow .stop { background: #ff3030; user-select: none; -webkit-user-select: none; touch-action: none; -webkit-touch-callout: none; }
+  .srow .stop span { position: relative; }
+  .srow .stop .ring { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .srow .stop .ring rect { fill: none; stroke: #fff; stroke-width: 3; stroke-dasharray: 100; stroke-dashoffset: 100; opacity: 0; transition: stroke-dashoffset .3s ease, opacity .25s ease; }
+  .srow .stop.holding .ring rect { stroke-dashoffset: 0; opacity: 1; transition: stroke-dashoffset 2s linear, opacity .15s ease; }
+  .srow #startShare { transition: flex-grow .5s var(--ease), opacity .3s ease, margin .5s var(--ease), padding .5s var(--ease), transform .25s var(--spring), background .25s ease; }
+  .dock.guest #startShare { flex-grow: 0; opacity: 0; margin-right: -14px; padding: 0; pointer-events: none; }
+  .code { transition: opacity .5s ease; }
+  .code.empty { opacity: .22; }
+  .dock:not(.live) .ctools { opacity: .35; }
+  .ctools { transition: opacity .3s ease; }
+  .srow .stop:hover:not(:disabled) { background: #ff5252; }
+  .bigcode { color: #fff; font: 300 clamp(48px, 15vw, 240px) 'Roboto Mono', monospace; letter-spacing: .16em; padding-left: .16em; }
+  #codeOverlay { background: rgba(0,0,0,.92); cursor: pointer; z-index: 250; }
+
+  /* other people's cursors */
+  .rcur { position: fixed; z-index: 55; left: 0; top: 0; pointer-events: none; transition: left .08s linear, top .08s linear, opacity .4s ease; --c: #f43f5e; }
+  .rcur svg { width: 24px; height: 24px; margin: -4px 0 0 -4px; transform: scaleX(-1); fill: var(--c); filter: drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+  .rcur b { position: absolute; left: 18px; top: 20px; background: var(--c); color: #fff; font: 600 11px 'Montserrat', sans-serif; padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+    opacity: 0; transform: translateY(-4px) scale(.9); transform-origin: left top; transition: opacity .2s ease, transform .35s var(--spring); }
+  .rcur.hover b { opacity: 1; transform: none; }
+  .rcur.host { mix-blend-mode: difference; }                 /* the host's cursor inverts whatever is under it */
+  .rcur.host svg { fill: #fff; filter: none; }
+  .rcur.host b { background: #fff; color: #000; }
+  .rcur.idle { opacity: .35; }
+
+  /* join dialog */
+  .dialog input[type=text] { width: 100%; height: 44px; margin-top: 8px; border: 2px solid #ddd; border-radius: 12px; padding: 0 12px; font: 600 15px 'Montserrat', sans-serif; outline: none; transition: border-color .2s; }
+  .dialog input[type=text]:focus { border-color: #000; }
+  .dialog .pfrow { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; font-size: 13px; font-weight: 600; }
+  .dialog .swatch { width: 44px; height: 44px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px #ddd; background: var(--c, #3b82f6); cursor: pointer; padding: 0; transition: transform .25s var(--spring), background .2s; }
+  .dialog .swatch:hover { transform: scale(1.1); }
+  .dialog p.err { color: #c62828; font-weight: 600; }
 
   /* ---------- save controls ---------- */
   .save { position: fixed; right: 16px; bottom: 16px; z-index: 90; display: flex; gap: 8px; }
@@ -368,6 +448,40 @@
   </div>
 </div>
 
+<div class="dock share" id="shareDock" role="button" tabindex="0" aria-label="Share live" aria-expanded="false">
+  <svg class="plus" viewBox="0 0 24 24"><path d="M4,13.52L6.53,11L4,8.48L1.48,11L4,13.52ZM17.5,13L20,9l2.5,4h-5ZM12,12q-1.25,0-2.13-0.88T9,9Q9,7.72 9.88,6.86T12,6q1.28,0 2.14,0.86Q15,7.72 15,9q0,1.25-0.86,2.13T12,12ZM0,17V16.43q0-1.1 1.11-1.76T4,14q0.33,0 0.63,0.01T5.2,14.08q-0.35,0.5-0.53,1.08T4.5,16.38V18H1q-0.42,0-0.71-0.29Q0,17.43 0,17Zm6,0V16.38q0-1.63 1.66-2.63t4.34-1q2.7,0 4.35,1T18,16.38V17q0,0.43-0.29,0.71T17,18H7q-0.42,0-0.71-0.29Q6,17.43 6,17Zm14-3q1.8,0 2.9,0.66T24,16.43V17q0,0.43-0.29,0.71T23,18H19.5V16.38q0-0.65-0.16-1.22t-0.49-1.08q0.27-0.05 0.56-0.06T20,14Z"/></svg>
+  <button class="collapse" id="shareCollapse" aria-label="Close"><svg viewBox="0 0 24 24"><polyline points="6,15 12,9 18,15"/></svg></button>
+  <div class="sharein">
+    <div class="codecard">
+      <div class="ctools">
+        <button id="codeFull" title="Show code full screen"><svg viewBox="0 0 24 24"><path d="M4,21q-0.42,0-0.71-0.29Q3,20.43 3,20V14q0-0.43 0.29-0.71T4,13t0.71,0.29T5,14v3.6L17.6,5H14q-0.42,0-0.71-0.29T13,4q0-0.43 0.29-0.71T14,3h6q0.43,0 0.71,0.29T21,4v6q0,0.42-0.29,0.71T20,11t-0.71-0.29Q19,10.43 19,10V6.4L6.4,19H10q0.43,0 0.71,0.29T11,20t-0.29,0.71T10,21H4Z"/></svg></button>
+        <button id="codeCopy" title="Copy invite link"><svg viewBox="0 0 24 24"><path d="M9,18q-0.82,0-1.41-0.59T7,16V4Q7,3.17 7.59,2.59T9,2h9q0.82,0 1.41,0.59T20,4V16q0,0.82-0.59,1.41T18,18H9ZM5,22q-0.83,0-1.41-0.59T3,20V7Q3,6.57 3.29,6.29T4,6T4.71,6.29T5,7V20H15q0.43,0 0.71,0.29T16,21t-0.29,0.71T15,22H5Z"/></svg></button>
+      </div>
+      <div class="code" id="codeText">------</div>
+    </div>
+    <div class="users" id="usersCard">
+      <div class="idle">
+        <p>Press Start Sharing to open a live room, or join someone else’s with their code.</p>
+        <div class="joinrow"><input id="joinCode" maxlength="6" placeholder="CODE" spellcheck="false" autocomplete="off"><button id="joinBtn">Join</button></div>
+      </div>
+      <ul class="ulist" id="ulist"></ul>
+    </div>
+    <div class="srow"><button id="startShare">Start Sharing</button><button class="stop" id="stopShare" disabled><svg class="ring"><rect pathLength="100"/></svg><span id="stopLbl">Stop</span></button></div>
+  </div>
+</div>
+
+<div class="overlay" id="joinOverlay">
+  <div class="dialog">
+    <h3>Join room <span id="jcode"></span></h3>
+    <p id="jmsg"></p>
+    <label class="lbl" style="margin-top:0">Your name<input type="text" id="pfName" maxlength="24" placeholder="Name" autocomplete="off" spellcheck="false"></label>
+    <div class="pfrow"><span>Cursor colour</span><button class="swatch" id="pfColor" type="button" aria-label="Choose colour"></button></div>
+    <div class="row"><button id="pfCancel">Cancel</button><button class="go" id="pfGo">Join</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="codeOverlay"><div class="bigcode" id="bigCode"></div></div>
+
 <div class="save">
   <button id="copy">Copy save</button>
   <button id="paste">Paste save</button>
@@ -434,7 +548,7 @@
   };
   const SAFE_SRC = /^data:(image|audio)\/[a-z0-9.+-]+;base64,/i;
   let items = [], els = {}, players = {}, selId = null, placing = null, editingId = null, pickFor = null, ro;
-  const GRID = 40;                                   // keep in sync with --grid in the CSS
+  const GRID = 20;                                   // keep in sync with --grid in the CSS
   const snap = v => Math.round(v / GRID) * GRID;
   const FONTS = [
     { n: 'Montserrat', fb: 'sans-serif' }, { n: 'Inter', fb: 'sans-serif' }, { n: 'Poppins', fb: 'sans-serif' },
@@ -445,13 +559,19 @@
   const fam = n => { const f = FONTS.find(x => x.n === n); return "'" + n + "', " + (f ? f.fb : 'sans-serif'); };
   const uid = () => Math.random().toString(36).slice(2, 9);
   const get = id => items.find(i => i.id === id);
+  const net = { role: null, peer: null, conn: null, conns: new Set(), me: null, users: [], code: '', pending: '', joinCode: '', joining: false, backup: null };
+  const lastSent = new Map();
+  let applying = false;
 
   let toastT;
   function toast(msg) { toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('show'), 2200); }
 
   /* ---------- persistence ---------- */
   const serialize = () => JSON.stringify({ v: 1, items });
-  function save() { try { localStorage.setItem('cueboard', serialize()); } catch (e) { /* too big or blocked: copy/paste still works */ } }
+  function save() {
+    if (net.role !== 'guest') { try { localStorage.setItem('cueboard', serialize()); } catch (e) { /* too big or blocked: copy/paste still works */ } }
+    netSync();
+  }
 
   const ALLOWED = new Set(['B', 'I', 'U', 'STRONG', 'EM', 'BR', 'DIV', 'SPAN', 'P']);
   function clean(html) {
@@ -471,6 +591,7 @@
   function normalize(raw) {
     if (!raw || !DEF[raw.type]) return null;
     const it = Object.assign({ id: uid(), x: 40, y: 280 }, DEF[raw.type], { type: raw.type });
+    if (typeof raw.id === 'string' && /^[a-z0-9]{3,16}$/.test(raw.id)) it.id = raw.id;
     ['x', 'y', 'w', 'h', 'fs', 'trimStart', 'trimEnd', 'speed'].forEach(k => { if (typeof raw[k] === 'number' && isFinite(raw[k])) it[k] = raw[k]; });
     if (raw.type === 'audio') { it.name = String(raw.name || it.name).slice(0, 80); it.loop = !!raw.loop; it.custom = !!raw.custom; it.speed = Math.max(0.25, Math.min(4, it.speed || 1)); it.keepPitch = raw.keepPitch !== false; it.src = SAFE_SRC.test(raw.src) ? raw.src : ''; }
     if (raw.type === 'image') it.src = SAFE_SRC.test(raw.src) ? raw.src : '';
@@ -605,7 +726,7 @@
     const c = document.createElement('div'); c.className = 'content'; c.innerHTML = it.html;
     el.appendChild(c); styleText(it, el);
     c.addEventListener('blur', () => { it.html = clean(c.innerHTML) || 'Text'; c.contentEditable = 'false'; editingId = null; save(); });
-    c.addEventListener('input', () => { syncSel(); });
+    c.addEventListener('input', () => { it.html = c.innerHTML; syncSel(); netLive(); });
     c.addEventListener('keydown', e => { if (e.key === 'Escape') c.blur(); e.stopPropagation(); });
     el.addEventListener('dblclick', () => startEdit(it.id));
   }
@@ -635,19 +756,25 @@
     syncSel();
   }
 
+  // the frame's corners always land on grid dots (at least 6px clear of the element)
+  function frameBox(l, t, w, h) {
+    const G = GRID, m = 6;
+    const fl = Math.floor((l - m) / G) * G, ft = Math.floor((t - m) / G) * G;
+    const fr = Math.ceil((l + w + m) / G) * G, fb = Math.ceil((t + h + m) / G) * G;
+    return { l: fl - 1, t: ft - 1, w: fr - fl + 2, h: fb - ft + 2, fl, ft, fr, fb };
+  }
   function syncSel() {
     const el = els[selId]; if (!el) { sel.classList.remove('show'); bar.classList.remove('show'); return; }
-    const it = get(selId), r = el.getBoundingClientRect(), pad = it.type === 'audio' ? 5 : 10;
-    sel.style.left = r.left - pad + 'px'; sel.style.top = r.top - pad + 'px';
-    sel.style.width = r.width + pad * 2 + 'px'; sel.style.height = r.height + pad * 2 + 'px';
+    const it = get(selId), r = el.getBoundingClientRect(), f = frameBox(r.left, r.top, r.width, r.height);
+    sel.style.left = f.l + 'px'; sel.style.top = f.t + 'px'; sel.style.width = f.w + 'px'; sel.style.height = f.h + 'px';
     sel.classList.toggle('resizable', it.type !== 'audio'); sel.classList.toggle('is-text', it.type === 'text');
     sel.classList.add('show');
     const showBar = it.type !== 'audio';
     bar.classList.toggle('show', showBar && !drag);
     if (showBar) {
       const bh = bar.offsetHeight, est = it.type === 'text' ? 480 : 230;
-      let top = r.top - pad - bh - 12; if (top < 8) top = r.bottom + pad + 14;
-      const left = Math.max(8, Math.min(innerWidth - est - 8, r.left - pad));
+      let top = f.ft - bh - 10; if (top < 8) top = f.fb + 12;
+      const left = Math.max(8, Math.min(innerWidth - est - 8, f.fl));
       bar.style.top = top + 'px'; bar.style.left = left + 'px';
     }
   }
@@ -677,7 +804,7 @@
     sel.classList.add('nt'); bar.classList.remove('show');
   }));
   addEventListener('pointermove', e => {
-    if (placing) { const d = DEF[placing]; ghost.style.left = Math.max(0, snap(e.clientX - d.w / 2)) - 12 + 'px'; ghost.style.top = Math.max(0, snap(e.clientY - d.h / 2)) - 12 + 'px'; ghost.classList.add('show'); return; }
+    if (placing) { setGhost(e.clientX, e.clientY); return; }
     if (!drag) return;
     const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy, it = drag.it;
     if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
@@ -686,7 +813,7 @@
       it.x = snap(Math.max(0, Math.min(innerWidth - 40, drag.ox + dx))); it.y = snap(Math.max(0, Math.min(innerHeight - 40, drag.oy + dy)));
       position(it, drag.el);
     } else {
-      const dir = drag.dir, MIN = it.type === 'text' ? GRID * 2 : GRID;
+      const dir = drag.dir, MIN = GRID * 2;
       let L = drag.ox, T = drag.oy, R = drag.ox + drag.ow, B = drag.oy + drag.oh;
       if (dir.includes('e')) R = Math.max(L + MIN, snap(R + dx));
       if (dir.includes('w')) L = Math.min(R - MIN, snap(L + dx));
@@ -707,7 +834,7 @@
         position(it, drag.el);
       }
     }
-    syncSel();
+    syncSel(); netLive();
   });
   addEventListener('pointerup', () => {
     if (!drag) return;
@@ -717,8 +844,8 @@
   });
 
   /* ---------- add dock ---------- */
-  function openDock() { dock.classList.add('open'); dock.setAttribute('aria-expanded', 'true'); select(null); }
-  function closeDock() { dock.classList.remove('open'); dock.setAttribute('aria-expanded', 'false'); }
+  function openDock() { shareDock.classList.add('away'); dock.classList.add('open'); dock.setAttribute('aria-expanded', 'true'); select(null); }
+  function closeDock() { shareDock.classList.remove('away'); dock.classList.remove('open'); dock.setAttribute('aria-expanded', 'false'); }
   dock.addEventListener('click', e => { if (!dock.classList.contains('open')) openDock(); });
   dock.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && !dock.classList.contains('open')) { e.preventDefault(); openDock(); } });
   $('#collapse').addEventListener('click', e => { e.stopPropagation(); closeDock(); });
@@ -726,10 +853,14 @@
     e.stopPropagation(); startPlacing(c.dataset.type);
   }));
 
+  function setGhost(cx, cy) {
+    const d = DEF[placing], x = Math.max(0, snap(cx - d.w / 2)), y = Math.max(0, snap(cy - d.h / 2)), f = frameBox(x, y, d.w, d.h);
+    ghost.style.left = f.l + 'px'; ghost.style.top = f.t + 'px'; ghost.style.width = f.w + 'px'; ghost.style.height = f.h + 'px';
+    ghost.classList.add('show');
+  }
   function startPlacing(type) {
     placing = type; closeDock(); document.body.classList.add('placing');
-    const d = DEF[type]; ghost.style.width = d.w + 24 + 'px'; ghost.style.height = d.h + 24 + 'px';
-    ghost.style.left = Math.max(0, snap(innerWidth / 2 - d.w / 2)) - 12 + 'px'; ghost.style.top = Math.max(0, snap(innerHeight / 2 - d.h / 2)) - 12 + 'px'; ghost.classList.add('show');
+    setGhost(innerWidth / 2, innerHeight / 2);
     toast('Click anywhere to place it  ·  Esc to cancel');
   }
   function stopPlacing() { placing = null; document.body.classList.remove('placing'); ghost.classList.remove('show'); }
@@ -946,7 +1077,7 @@
     let top = r.bottom + 10; if (top + h > innerHeight - 8) top = Math.max(8, r.top - h - 10);
     pop.style.top = top + 'px';
   }
-  function closePops() { fmenu.classList.remove('show'); picker.classList.remove('show'); fbtn.classList.remove('open'); }
+  function closePops() { fmenu.classList.remove('show'); picker.classList.remove('show'); fbtn.classList.remove('open'); pickCb = null; }
   fbtn.addEventListener('mousedown', e => e.preventDefault());
   fbtn.addEventListener('click', () => {
     const open = fmenu.classList.contains('show'); closePops(); if (open) return;
@@ -957,7 +1088,7 @@
 
   /* colour wheel + picker */
   const wheel = $('#wheel'), hueH = $('#hueH'), svH = $('#svH'), hexIn = $('#hex'), cr = $('#cr'), cg = $('#cg'), cb = $('#cb');
-  let H = 0, S = 0, V = 0, pk = null;
+  let H = 0, S = 0, V = 0, pk = null, pickCb = null;
   const hsv2rgb = (h, s, v) => { const f = n => { const k = (n + h / 60) % 6; return v - v * s * Math.max(0, Math.min(k, 4 - k, 1)); }; return [f(5), f(3), f(1)].map(x => Math.round(x * 255)); };
   const rgb2hsv = (r, g, b) => { r /= 255; g /= 255; b /= 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; let h = 0;
     if (d) { if (mx === r) h = ((g - b) / d + 6) % 6; else if (mx === g) h = (b - r) / d + 2; else h = (r - g) / d + 4; h *= 60; } return [h, mx ? d / mx : 0, mx]; };
@@ -974,7 +1105,8 @@
     return h;
   }
   function commitColor(skip, live) {
-    const h = pickerRender(skip), it = get(selId); if (!it || it.type !== 'text') return;
+    const h = pickerRender(skip); if (pickCb) { pickCb(h); return; }
+    const it = get(selId); if (!it || it.type !== 'text') return;
     it.color = h; const c = els[it.id].querySelector('.content');
     if (live) c.style.transition = 'opacity .14s ease';      // no lag while dragging
     c.style.color = h; cbtn.style.setProperty('--c', h); save();
@@ -1012,7 +1144,7 @@
 
   /* ---------- keyboard ---------- */
   addEventListener('keydown', e => {
-    if (e.key === 'Escape') { if (placing) stopPlacing(); else if (dock.classList.contains('open')) closeDock(); else if (!editingId) select(null); closeMenu(); $('#overlay').classList.remove('show'); if (lenOverlay.classList.contains('show')) closeLength(); if (spdOverlay.classList.contains('show')) closeSpeed(); }
+    if (e.key === 'Escape') { if (placing) stopPlacing(); else if (dock.classList.contains('open')) closeDock(); else if (shareDock.classList.contains('open')) closeShare(); else if (!editingId) select(null); closeMenu(); $('#overlay').classList.remove('show'); if (lenOverlay.classList.contains('show')) closeLength(); if (spdOverlay.classList.contains('show')) closeSpeed(); codeOverlay.classList.remove('show'); if (joinOverlay.classList.contains('show')) $('#pfCancel').click(); }
     const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || editingId || document.activeElement.isContentEditable;
     if ((e.key === 'Delete' || e.key === 'Backspace') && selId && !typing) { e.preventDefault(); removeItem(selId); }
   });
@@ -1034,6 +1166,274 @@
       if (!data || !Array.isArray(data.items)) throw 0;
       loadItems(data.items); save(); overlay.classList.remove('show'); toast('Loaded ' + items.length + ' element' + (items.length === 1 ? '' : 's'));
     } catch (e) { toast('That doesn’t look like a valid save'); }
+  });
+
+  /* ---------- live sharing (peer-to-peer via WebRTC; PeerJS public broker) ---------- */
+  const shareDock = $('#shareDock'), codeText = $('#codeText'), ulist = $('#ulist'), codeOverlay = $('#codeOverlay');
+  const COLORS = ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#ef4444'];
+  const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const genCode = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), b => ALPHA[b % ALPHA.length]).join('');
+  const CODE_RE = /^[A-Z0-9]{6}$/;
+  let cursors = {};
+  const curSvg = '<svg viewBox="0 0 24 24"><path d="M10.05,13.95L3.58,11.33Q3.25,11.2 3.1,10.94T2.95,10.4q0-0.27 0.16-0.54T3.6,9.48l15.35-5.7q0.3-0.13 0.58-0.05T20,4t0.28,0.47T20.23,5.05L14.53,20.4q-0.13,0.33-0.39,0.49T13.6,21.05T13.06,20.9t-0.39-0.47l-2.63-6.48Z"/></svg>';
+
+  function openShare() { dock.classList.add('away'); shareDock.classList.add('open'); shareDock.setAttribute('aria-expanded', 'true'); select(null); }
+  function closeShare() { dock.classList.remove('away'); shareDock.classList.remove('open'); shareDock.setAttribute('aria-expanded', 'false'); }
+  shareDock.addEventListener('click', () => { if (!shareDock.classList.contains('open')) openShare(); });
+  shareDock.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && !shareDock.classList.contains('open') && e.target === shareDock) { e.preventDefault(); openShare(); } });
+  $('#shareCollapse').addEventListener('click', e => { e.stopPropagation(); closeShare(); });
+
+  function newCode() { net.pending = genCode(); codeText.textContent = '– – – – – –'; codeText.classList.add('empty'); }
+  const currentCode = () => net.role ? net.code : '';
+
+  function renderUsers() {
+    ulist.innerHTML = '';
+    net.users.forEach(u => {
+      const li = document.createElement('li'), d = document.createElement('i'), n = document.createElement('span'), t = document.createElement('small');
+      d.style.setProperty('--c', u.color); n.textContent = u.name;
+      t.textContent = (net.me && u.id === net.me.id ? 'you' : '') + (u.id === 'host' ? (net.me && u.id === net.me.id ? ' · host' : 'host') : '');
+      li.append(d, n, t); ulist.appendChild(li);
+    });
+    Object.keys(cursors).forEach(id => { if (!net.users.some(u => u.id === id)) { cursors[id].remove(); delete cursors[id]; } });
+  }
+  function live(on) {
+    const guest = on && net.role === 'guest', stopB = $('#stopShare');
+    shareDock.classList.toggle('live', on); shareDock.classList.toggle('guest', guest);
+    $('#startShare').disabled = on; stopB.disabled = !on; $('#joinBtn').disabled = on;
+    $('#stopLbl').textContent = guest ? 'Leave' : 'Stop';
+    stopB.title = guest ? 'Leave this room' : on ? 'Hold for 2 seconds to stop sharing' : '';
+    renderUsers();
+  }
+  function cleanUsers(list) {
+    return (Array.isArray(list) ? list : []).slice(0, 16).map(u => ({ id: String(u.id).slice(0, 80), name: String(u.name).slice(0, 24), color: /^#[0-9a-f]{6}$/i.test(u.color) ? u.color : '#888888' }));
+  }
+  const snap1 = it => { const { src, ...rest } = it; return JSON.stringify(rest); };
+  function resetLast() { lastSent.clear(); items.forEach(it => lastSent.set(it.id, { j: snap1(it), src: it.src })); }
+
+  function send(m) {
+    if (net.role === 'host') net.conns.forEach(c => { if (c.open) c.send(m); });
+    else if (net.role === 'guest' && net.conn && net.conn.open) net.conn.send(m);
+  }
+  function relay(m, from) { net.conns.forEach(c => { if (c !== from && c.open) c.send(m); }); }
+
+  function netSync() {                       // send only what changed since last time
+    if (!net.role || applying) return;
+    const seen = new Set();
+    items.forEach(it => {
+      seen.add(it.id);
+      const j = snap1(it), prev = lastSent.get(it.id);
+      if (!prev || prev.j !== j || prev.src !== it.src) {
+        const out = Object.assign({}, it); if (prev && prev.src === it.src) delete out.src;   // missing src = unchanged
+        lastSent.set(it.id, { j, src: it.src }); send({ t: 'item', item: out });
+      }
+    });
+    lastSent.forEach((v, id) => { if (!seen.has(id)) { lastSent.delete(id); send({ t: 'del', id }); } });
+  }
+  let netT = 0;
+  function netLive() { const n = performance.now(); if (net.role && n - netT > 40) { netT = n; netSync(); } }
+
+  function applyItem(raw) {
+    if (!raw) return;
+    applying = true;
+    try {
+      const n = normalize(raw); if (!n) return;
+      const ex = get(n.id);
+      if (!('src' in raw) && ex) n.src = ex.src;
+      if (!ex) { items.push(n); build(n); }
+      else {
+        const keepHtml = editingId === n.id ? ex.html : null, srcChanged = n.src !== ex.src;
+        Object.assign(ex, n); if (keepHtml !== null) ex.html = keepHtml;
+        refreshItem(ex, srcChanged);
+      }
+      const cur = get(n.id); lastSent.set(n.id, { j: snap1(cur), src: cur.src });
+      if (selId === n.id) { syncSel(); if (cur.type === 'text') syncBar(cur); }
+    } finally { applying = false; }
+  }
+  function refreshItem(it, srcChanged) {
+    const el = els[it.id]; if (!el) return; position(it, el);
+    if (it.type === 'image') { el.style.width = it.w + 'px'; el.style.height = it.h + 'px'; if (srcChanged) renderImage(it, el); }
+    if (it.type === 'text') { const c = el.querySelector('.content'); if (editingId !== it.id) c.innerHTML = it.html; styleText(it, el); }
+    if (it.type === 'audio') {
+      refreshName(it, el);
+      const p = players[it.id];
+      if (srcChanged) { if (p) { p.pause(); delete players[it.id]; } setPlayIcon(it.id, false); }
+      else if (p) { p.playbackRate = it.speed || 1; p.preservesPitch = p.mozPreservesPitch = p.webkitPreservesPitch = it.keepPitch !== false; }
+      updateSeek(it);
+    }
+  }
+
+  function showCursor(m) {
+    const u = net.users.find(x => x.id === m.u); if (!u || (net.me && u.id === net.me.id)) return;
+    if (typeof m.x !== 'number' || typeof m.y !== 'number') return;
+    let el = cursors[u.id];
+    if (!el) { el = document.createElement('div'); el.className = 'rcur'; el.innerHTML = curSvg + '<b></b>'; document.body.appendChild(el); cursors[u.id] = el; }
+    el.style.setProperty('--c', u.color); el.querySelector('b').textContent = u.name; el.classList.toggle('host', u.id === 'host');
+    el.style.left = m.x + 'px'; el.style.top = m.y + 'px'; el.classList.remove('idle');
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.add('idle'), 6000);
+  }
+  addEventListener('pointermove', e => {
+    for (const el of Object.values(cursors)) {
+      const r = el.firstChild.getBoundingClientRect();
+      el.classList.toggle('hover', e.clientX >= r.left - 8 && e.clientX <= r.right + 8 && e.clientY >= r.top - 8 && e.clientY <= r.bottom + 8);
+    }
+  });
+  let curT = 0;
+  addEventListener('pointermove', e => {
+    if (!net.role || !net.me) return; const n = performance.now(); if (n - curT < 40) return; curT = n;
+    send({ t: 'cur', u: net.me.id, x: e.clientX, y: e.clientY });
+  });
+
+  const rgbOf = h => { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+  const colorClash = (c, list) => list.some(u => u.id !== 'host' && Math.hypot(...rgbOf(c).map((v, i) => v - rgbOf(u.color)[i])) < 60);
+
+  function onMsg(m, from) {
+    if (!m || typeof m !== 'object') return;
+    if (net.role === 'host' && from && !from._u && m.t !== 'hello') return;        // guests must introduce themselves first
+    if (m.t === 'hello' && net.role === 'host' && from) {
+      const name = String(m.name || 'Guest').replace(/[\u0000-\u001f]/g, '').trim().slice(0, 24) || 'Guest';
+      const color = typeof m.color === 'string' && /^#[0-9a-f]{6}$/i.test(m.color) ? m.color.toLowerCase() : null;
+      if (!color || colorClash(color, net.users.filter(u => u !== from._u))) { from.send({ t: 'colortaken' }); return; }
+      if (from._u) { Object.assign(from._u, { name, color }); }
+      else { from._u = { id: from.peer, name, color }; net.conns.add(from); net.users.push(from._u); toast(name + ' joined'); }
+      from.send({ t: 'welcome', you: from._u, users: net.users, items: JSON.parse(JSON.stringify(items)) });
+      relay({ t: 'users', users: net.users }, from); renderUsers();
+    }
+    else if (m.t === 'colortaken' && net.joining) { openProfile(net.joinCode, 'That colour is too close to someone else’s. Pick another one.'); }
+    else if (m.t === 'item') { applyItem(m.item); if (net.role === 'host') relay(m, from); }
+    else if (m.t === 'del' && typeof m.id === 'string') {
+      lastSent.delete(m.id);
+      if (get(m.id)) { applying = true; removeItem(m.id); applying = false; }
+      if (net.role === 'host') relay(m, from);
+    }
+    else if (m.t === 'cur') { showCursor(m); if (net.role === 'host') relay(m, from); }
+    else if (m.t === 'users' && net.role === 'guest') { net.users = cleanUsers(m.users); renderUsers(); }
+    else if (m.t === 'welcome' && net.joining) {
+      net.role = 'guest'; net.joining = false; net.code = net.joinCode; codeText.textContent = net.joinCode; codeText.classList.remove('empty');
+      net.me = cleanUsers([m.you])[0]; net.users = cleanUsers(m.users);
+      net.backup = JSON.parse(JSON.stringify(items));                 // your own board comes back when you leave
+      applying = true; loadItems(Array.isArray(m.items) ? m.items : []); applying = false;
+      resetLast(); live(true); toast('Joined room ' + net.joinCode);
+    }
+  }
+
+  function startHost() {
+    if (!window.Peer) { toast('Sharing needs an internet connection'); return; }
+    const code = net.pending, peer = new Peer('cueboard-' + code);
+    net.peer = peer;
+    peer.on('open', () => {
+      net.role = 'host'; net.code = code; net.me = { id: 'host', name: 'Host', color: '#ffffff' }; net.users = [net.me];
+      codeText.textContent = code; codeText.classList.remove('empty');
+      resetLast(); live(true); toast('Sharing started — send people the code');
+    });
+    peer.on('connection', hostConn);
+    peer.on('error', e => {
+      if (e.type === 'unavailable-id') { newCode(); toast('That code was taken, press Start Sharing again'); }
+      else toast('Sharing error: ' + e.type);
+      stopShare(true);
+    });
+  }
+  function hostConn(c) {
+    c.on('data', m => onMsg(m, c));
+    const drop = () => {
+      if (!c._u || !net.conns.has(c)) return; net.conns.delete(c); net.users = net.users.filter(u => u !== c._u);
+      send({ t: 'users', users: net.users }); renderUsers(); toast(c._u.name + ' left');
+    };
+    c.on('close', drop); c.on('error', drop);
+  }
+
+  function startJoin(code) {
+    net.joining = true; toast('Connecting…');
+    const peer = new Peer(); net.peer = peer;
+    peer.on('open', () => {
+      const c = peer.connect('cueboard-' + code, { reliable: true, serialization: 'json' }); net.conn = c;
+      c.on('open', () => c.send({ t: 'hello', name: profile.name, color: profile.color }));
+      c.on('data', m => onMsg(m, c));
+      c.on('close', () => { if (net.role === 'guest') { toast('The host ended the session'); stopShare(true); } });
+    });
+    peer.on('error', e => { toast(e.type === 'peer-unavailable' ? 'No room with that code' : 'Could not connect: ' + e.type); closeProfile(); stopShare(true); });
+    setTimeout(() => { if (net.peer === peer && net.joining && !(net.conn && net.conn.open)) { toast('Could not reach that room'); stopShare(true); } }, 12000);
+  }
+
+  function stopShare(silent) {
+    const was = net.role;
+    net.conns.forEach(c => { try { c.close(); } catch (e) {} }); net.conns.clear();
+    if (net.conn) { try { net.conn.close(); } catch (e) {} }
+    if (net.peer) { try { net.peer.destroy(); } catch (e) {} }
+    Object.values(cursors).forEach(el => el.remove()); cursors = {};
+    const backup = net.backup;
+    net.role = null; net.peer = null; net.conn = null; net.me = null; net.users = []; net.joining = false; net.backup = null;
+    lastSent.clear();
+    if (was === 'guest' && backup) { applying = true; loadItems(backup); applying = false; save(); }
+    live(false); newCode();
+    if (!silent && was) toast(was === 'host' ? 'Sharing stopped' : 'Left the room');
+  }
+
+  /* join dialog: name + a colour of your own choosing */
+  const joinOverlay = $('#joinOverlay'), pfName = $('#pfName'), pfColor = $('#pfColor');
+  const profile = { name: '', color: COLORS[1] };
+  try { profile.name = localStorage.getItem('cuename') || ''; const c = localStorage.getItem('cuecolor'); if (/^#[0-9a-f]{6}$/i.test(c)) profile.color = c; } catch (e) {}
+  function setPfColor(c) { profile.color = c; pfColor.style.setProperty('--c', c); }
+  function openProfile(code, msg) {
+    $('#jcode').textContent = code; const m = $('#jmsg');
+    m.textContent = msg || 'Pick a name and a colour. Others will see your cursor in that colour.'; m.classList.toggle('err', !!msg);
+    pfName.value = profile.name; setPfColor(profile.color); joinOverlay.classList.add('show'); setTimeout(() => pfName.focus(), 60);
+  }
+  function closeProfile() { joinOverlay.classList.remove('show'); closePops(); }
+  function joinFlow(code) {
+    if (net.role || net.joining) return;
+    if (!window.Peer) { toast('Sharing needs an internet connection'); return; }
+    if (!CODE_RE.test(code)) { toast('Codes are 6 letters or numbers'); return; }
+    net.joinCode = code; openProfile(code, '');
+  }
+  pfColor.addEventListener('click', () => {
+    const open = picker.classList.contains('show'); closePops(); if (open) return;
+    [H, S, V] = rgb2hsv(...fromHex(profile.color)); pickCb = c => setPfColor(c); pickerRender(); placePop(picker, pfColor); picker.classList.add('show');
+  });
+  $('#pfCancel').addEventListener('click', () => { closeProfile(); if (net.joining) stopShare(true); });
+  $('#pfGo').addEventListener('click', () => {
+    profile.name = pfName.value.replace(/[\u0000-\u001f]/g, '').trim().slice(0, 24) || 'Guest';
+    try { localStorage.setItem('cuename', profile.name); localStorage.setItem('cuecolor', profile.color); } catch (e) {}
+    closeProfile();
+    if (net.conn && net.conn.open) net.conn.send({ t: 'hello', name: profile.name, color: profile.color });
+    else startJoin(net.joinCode);
+  });
+  pfName.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') $('#pfGo').click(); });
+
+  /* Stop = hold for 2 seconds (the border fills); Leave = instant */
+  const stopBtn = $('#stopShare'), ring = stopBtn.querySelector('svg'), ringRect = ring.querySelector('rect');
+  function layoutRing() {
+    const w = stopBtn.clientWidth, h = stopBtn.clientHeight; if (!w) return;
+    ring.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    ringRect.setAttribute('x', 2); ringRect.setAttribute('y', 2); ringRect.setAttribute('width', w - 4); ringRect.setAttribute('height', h - 4); ringRect.setAttribute('rx', (h - 4) / 2);
+  }
+  let holdT = 0;
+  function holdStart() { if (stopBtn.disabled || net.role !== 'host' || holdT) return; layoutRing(); stopBtn.classList.add('holding'); holdT = setTimeout(() => { holdT = 0; stopBtn.classList.remove('holding'); stopShare(); }, 2000); }
+  function holdEnd() { clearTimeout(holdT); holdT = 0; stopBtn.classList.remove('holding'); }
+  stopBtn.addEventListener('pointerdown', e => { if (net.role === 'host') { e.preventDefault(); holdStart(); } });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => stopBtn.addEventListener(ev, holdEnd));
+  stopBtn.addEventListener('click', () => { if (net.role === 'guest') stopShare(); });
+  stopBtn.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) { e.preventDefault(); if (net.role === 'host') holdStart(); else if (net.role === 'guest') stopShare(); } });
+  stopBtn.addEventListener('keyup', holdEnd);
+
+  $('#startShare').addEventListener('click', startHost);
+  $('#joinBtn').addEventListener('click', () => joinFlow($('#joinCode').value.trim().toUpperCase()));
+  $('#joinCode').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') $('#joinBtn').click(); });
+  $('#joinCode').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
+  $('#codeFull').addEventListener('click', () => { if (!net.role) { toast('Press Start Sharing to get a code'); return; } $('#bigCode').textContent = currentCode(); codeOverlay.classList.add('show'); });
+  codeOverlay.addEventListener('click', () => codeOverlay.classList.remove('show'));
+  $('#codeCopy').addEventListener('click', async () => {
+    if (!net.role) { toast('Press Start Sharing to get a code'); return; }
+    const url = location.href.split('#')[0] + '#join=' + currentCode();
+    try { await navigator.clipboard.writeText(url); }
+    catch (e) { const t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+    toast('Invite link copied');
+  });
+  newCode(); live(false);
+  addEventListener('resize', layoutRing);
+  addEventListener('load', () => {
+    const m = /join=([A-Za-z0-9]{6})/.exec(location.hash); if (!m) return;
+    history.replaceState(null, '', location.pathname + location.search);
+    openShare(); $('#joinCode').value = m[1].toUpperCase(); joinFlow(m[1].toUpperCase());
   });
 
   /* ---------- boot ---------- */
