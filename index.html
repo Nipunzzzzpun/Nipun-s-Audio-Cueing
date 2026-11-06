@@ -90,13 +90,13 @@
     transition: left .3s var(--ease), top .3s var(--ease), width .3s var(--ease), height .3s var(--ease), opacity .25s, transform .3s var(--ease); }
   .sel.show { opacity: 1; transform: scale(1); }
   .sel.nt { transition: opacity .25s, transform .3s var(--ease); }
-  .sel i { position: absolute; width: 18px; height: 18px; border: 0 solid #bdbdbd; }
-  .sel .tl { top: 0; left: 0; border-top-width: 3px; border-left-width: 3px; border-top-left-radius: 16px; }
-  .sel .tr { top: 0; right: 0; border-top-width: 3px; border-right-width: 3px; border-top-right-radius: 16px; }
-  .sel .bl { bottom: 0; left: 0; border-bottom-width: 3px; border-left-width: 3px; border-bottom-left-radius: 16px; }
-  .sel .br { bottom: 0; right: 0; border-bottom-width: 3px; border-right-width: 3px; border-bottom-right-radius: 16px; }
+  .sel i { position: absolute; width: 12px; height: 12px; border: 0 solid #bdbdbd; }
+  .sel .tl { top: 0; left: 0; border-top-width: 2px; border-left-width: 2px; border-top-left-radius: 10px; }
+  .sel .tr { top: 0; right: 0; border-top-width: 2px; border-right-width: 2px; border-top-right-radius: 10px; }
+  .sel .bl { bottom: 0; left: 0; border-bottom-width: 2px; border-left-width: 2px; border-bottom-left-radius: 10px; }
+  .sel .br { bottom: 0; right: 0; border-bottom-width: 2px; border-right-width: 2px; border-bottom-right-radius: 10px; }
   .sel .rh {
-    position: absolute; right: -9px; bottom: -9px; width: 20px; height: 20px; border-radius: 50%;
+    position: absolute; right: -8px; bottom: -8px; width: 16px; height: 16px; border-radius: 50%;
     background: #fff; border: 2px solid #8a8a8a; pointer-events: auto; cursor: nwse-resize; display: none; touch-action: none;
     transition: transform .15s var(--spring);
   }
@@ -340,7 +340,7 @@
     if (!raw || !DEF[raw.type]) return null;
     const it = Object.assign({ id: uid(), x: 40, y: 280 }, DEF[raw.type], { type: raw.type });
     ['x', 'y', 'w', 'h', 'fs', 'trimStart', 'trimEnd'].forEach(k => { if (typeof raw[k] === 'number' && isFinite(raw[k])) it[k] = raw[k]; });
-    if (raw.type === 'audio') { it.name = String(raw.name || it.name).slice(0, 80); it.loop = !!raw.loop; it.src = SAFE_SRC.test(raw.src) ? raw.src : ''; }
+    if (raw.type === 'audio') { it.name = String(raw.name || it.name).slice(0, 80); it.loop = !!raw.loop; it.custom = !!raw.custom; it.src = SAFE_SRC.test(raw.src) ? raw.src : ''; }
     if (raw.type === 'image') it.src = SAFE_SRC.test(raw.src) ? raw.src : '';
     if (raw.type === 'text') {
       it.html = clean(String(raw.html || '')); 
@@ -450,7 +450,7 @@
   function restartPlay(it) {
     const p = player(it);
     if (!p) { pickFor = it.id; fileAudio.click(); return; }
-    p.currentTime = it.trimStart || 0; p.play().catch(() => toast('Could not play this file'));
+    p.currentTime = it.trimStart || 0; updateSeek(it);   // rewind only; keeps playing if it already was
   }
 
   function buildImage(it, el) {
@@ -499,7 +499,7 @@
 
   function syncSel() {
     const el = els[selId]; if (!el) { sel.classList.remove('show'); bar.classList.remove('show'); return; }
-    const it = get(selId), r = el.getBoundingClientRect(), pad = it.type === 'audio' ? 7 : 12;
+    const it = get(selId), r = el.getBoundingClientRect(), pad = it.type === 'audio' ? 5 : 10;
     sel.style.left = r.left - pad + 'px'; sel.style.top = r.top - pad + 'px';
     sel.style.width = r.width + pad * 2 + 'px'; sel.style.height = r.height + pad * 2 + 'px';
     sel.classList.toggle('resizable', it.type !== 'audio');
@@ -609,7 +609,7 @@
   }
   function removeFile(it) {
     const p = players[it.id]; if (p) { p.pause(); delete players[it.id]; }
-    it.src = ''; it.name = 'Audio Name'; it.trimStart = 0; it.trimEnd = 0; refreshName(it); setPlayIcon(it.id, false); updateSeek(it); save(); syncSel(); toast('File removed');
+    it.src = ''; it.name = 'Audio Name'; it.custom = false; it.trimStart = 0; it.trimEnd = 0; refreshName(it); setPlayIcon(it.id, false); updateSeek(it); save(); syncSel(); toast('File removed');
   }
 
   /* ---------- edit length ---------- */
@@ -650,7 +650,7 @@
     if (!it.src) { toast('Add a file first'); return; }
     const n = els[it.id].querySelector('.name'); n.contentEditable = 'true'; n.focus();
     const r = document.createRange(); r.selectNodeContents(n); const s = getSelection(); s.removeAllRanges(); s.addRange(r);
-    const done = () => { n.contentEditable = 'false'; it.name = (n.textContent.trim() || 'Audio Name').slice(0, 80); refreshName(it); save(); syncSel(); n.removeEventListener('blur', done); };
+    const done = () => { n.contentEditable = 'false'; const nn = (n.textContent.trim() || 'Audio Name').slice(0, 80); if (nn !== it.name) it.custom = true; it.name = nn; refreshName(it); save(); syncSel(); n.removeEventListener('blur', done); };
     n.addEventListener('blur', done);
     n.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') { e.preventDefault(); n.blur(); } });
   }
@@ -669,7 +669,7 @@
   fileAudio.addEventListener('change', () => {
     const f = fileAudio.files[0], it = get(pickFor); fileAudio.value = ''; if (!f || !it) return;
     readFile(f, url => {
-      it.src = url; it.trimStart = 0; it.trimEnd = 0; if (it.name === 'Audio Name') it.name = f.name.replace(/\.[^.]+$/, '').slice(0, 80);
+      it.src = url; it.trimStart = 0; it.trimEnd = 0; if (!it.custom) it.name = f.name.replace(/\.[^.]+$/, '').slice(0, 80);
       refreshName(it); player(it); save(); syncSel();
       if (f.size > 4e6) toast('Big file: use Copy save to keep it (browser autosave may skip it)');
     });
