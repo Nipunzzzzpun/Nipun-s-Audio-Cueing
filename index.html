@@ -13,15 +13,16 @@
     --spring: cubic-bezier(.34, 1.35, .5, 1);
     --glass: rgba(0, 0, 0, .52);
     --glass-border: rgba(0, 0, 0, .4);
+    --grid: 40px;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; width: 100%; height: 100%; }
   body {
     font-family: 'Montserrat', system-ui, sans-serif;
     background-color: #fff;
-    background-image: radial-gradient(circle at center, #d6d6d6 1.5px, transparent 2px);
-    background-size: 26px 26px;
-    background-position: -3px 6px;
+    background-image: radial-gradient(circle at center, #cdd0da 2px, transparent 2.6px);
+    background-size: var(--grid) var(--grid);
+    background-position: calc(var(--grid) / -2) calc(var(--grid) / -2);
     overflow: hidden;
     position: relative;
     user-select: none;
@@ -37,19 +38,29 @@
   .item:not(.text) { cursor: grab; }
 
   /* audio cue */
-  .audio { display: flex; gap: 6px; height: 30px; }
-  .audio .play {
+  .audio { display: flex; flex-direction: column; gap: 6px; }
+  .audio .row { display: flex; gap: 6px; height: 30px; }
+  .audio .seek { height: 30px; border-radius: 999px; background: #000; padding: 0 14px; display: flex; align-items: center; cursor: pointer; touch-action: none; }
+  .audio .track { position: relative; flex: 1; height: 3px; border-radius: 3px; background: #4a4a4a; --p: 0%; --b: 0%; }
+  .audio .track .buf, .audio .track .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; }
+  .audio .track .buf { width: var(--b); background: #7a7a7a; }
+  .audio .track .fill { width: var(--p); background: #fff; }
+  .audio .track .knob { position: absolute; top: 50%; left: var(--p); width: 12px; height: 12px; border-radius: 50%; background: #fff; transform: translate(-50%, -50%); }
+  .audio .play, .audio .restart {
     width: 30px; height: 30px; border-radius: 50%; border: 0; padding: 0;
     background: #000; cursor: pointer; flex: none; transition: transform .15s var(--spring);
   }
-  .audio .play:active { transform: scale(.9); }
-  .audio .play svg { width: 100%; height: 100%; transform: scale(1.05); }
+  .audio .play:active, .audio .restart:active { transform: scale(.9); }
+  .audio .play.is-playing svg { transform: scale(.58); }
+  .audio .restart svg { width: 100%; height: 100%; transform: scale(.62); }
+  .audio .play svg { width: 100%; height: 100%; transform: scale(.6); }
   .audio .pill {
     display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 6px 0 13px;
-    background: #000; color: #fff; border-radius: 999px; font-size: 12px; font-weight: 500;
+    background: #000; color: #fff; border-radius: 999px; font-size: 11px; font-weight: 500;
     min-width: 90px; max-width: 220px;
   }
   .audio .name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; outline: none; user-select: text; -webkit-user-select: text; }
+  .audio .name.unlinked { color: #8a8a8a; }
   .audio .name[contenteditable="true"] { text-overflow: clip; cursor: text; }
   .audio .kebab {
     width: 16px; height: 22px; border: 0; background: none; padding: 0; cursor: pointer;
@@ -281,6 +292,7 @@
     image: '<svg viewBox="0 0 24 24"><path d="M5.8,19.7q-0.65,0-1.08-0.43T4.3,18.2V5.8q0-0.65 0.43-1.08T5.8,4.3H18.2q0.65,0 1.08,0.43T19.7,5.8V18.2q0,0.65-0.43,1.07T18.2,19.7H5.8Zm0-0.7H18.2q0.3,0 0.55-0.25T19,18.2V5.8q0-0.3-0.25-0.55T18.2,5H5.8Q5.5,5 5.25,5.25T5,5.8V18.2q0,0.3 0.25,0.55T5.8,19ZM5,19q0,0 0-0.25T5,18.2V5.8Q5,5.5 5,5.25T5,5Q5,5 5,5.25T5,5.8V18.2q0,0.3 0,0.55T5,19Zm3.7-2.65h6.8q0.23,0 0.33-0.2t-0.03-0.4L14,13.33q-0.13-0.15-0.3-0.15t-0.3,0.15l-2.2,2.73l-1.3-1.5q-0.13-0.13-0.29-0.13T9.33,14.58l-0.9,1.18q-0.15,0.2-0.05,0.4t0.33,0.2Z"/></svg>',
     audio: '<svg viewBox="0 0 24 24"><path d="M18.6,11.98q0-2.04-1.11-3.73T14.5,5.72q-0.15-0.07-0.22-0.2T14.27,5.27q0.08-0.14 0.26-0.17t0.35,0.05q2,0.95 3.21,2.77t1.21,4.05t-1.21,4.05T14.88,18.8q-0.17,0.07-0.35,0.05t-0.26-0.17q-0.07-0.13 0.01-0.26t0.22-0.2q1.87-0.84 2.99-2.52t1.11-3.73ZM7.95,13.7H5.45q-0.32,0-0.53-0.22T4.7,12.95v-1.9q0-0.32 0.22-0.53T5.45,10.3h2.5l2.5-2.5q0.17-0.18 0.41-0.08T11.1,8.05v7.9q0,0.24-0.24,0.33T10.45,16.2l-2.5-2.5ZM15.6,12q0,0.75-0.25,1.42t-0.72,1.19q-0.15,0.13-0.34,0.06T14.1,14.4V9.55q0-0.2 0.19-0.28t0.34,0.05q0.47,0.52 0.72,1.22T15.6,12ZM10.4,8.85L8.25,11H5.4v2H8.25l2.15,2.15V8.85ZM7.9,12Z"/></svg>',
     text: '<svg viewBox="0 0 24 24"><path d="M8.31,18.6Q8.2,18.5 8.2,18.35V6.02H3.68q-0.16,0-0.27-0.11T3.3,5.65T3.4,5.4T3.65,5.3h9.8q0.16,0 0.27,0.1t0.11,0.25t-0.1,0.26T13.48,6.02H8.93v12.3q0,0.16-0.1,0.27T8.57,18.7T8.31,18.6Zm8.84,0q-0.1-0.1-0.1-0.25V10.9H14.48q-0.16,0-0.27-0.11T14.1,10.53t0.1-0.25t0.25-0.1h5.88q0.16,0 0.27,0.1t0.11,0.25t-0.1,0.26T20.35,10.9h-2.6v7.45q0,0.15-0.1,0.25T17.4,18.7t-0.25-0.1Z"/></svg>',
+    restart: '<svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z"/></svg>',
     play: '<svg viewBox="0 0 24 24"><path d="M8,17.18V6.82Q8,6.4 8.3,6.11Q8.6,5.82 9,5.82q0.13,0 0.26,0.04T9.53,5.97l8.15,5.18q0.23,0.15 0.34,0.38q0.11,0.23 0.11,0.48t-0.11,0.47t-0.34,0.38L9.53,18.02Q9.4,18.1 9.26,18.14Q9.13,18.18 9,18.18q-0.4,0-0.7-0.29T8,17.18Z"/></svg>',
     pause: '<svg viewBox="0 0 24 24"><path d="M16,19q-0.82,0-1.41-0.59T14,17V7q0-0.82 0.59-1.41T16,5q0.82,0 1.41,0.59Q18,6.18 18,7V17q0,0.82-0.59,1.41T16,19ZM8,19q-0.82,0-1.41-0.59T6,17V7Q6,6.18 6.59,5.59T8,5Q8.83,5 9.41,5.59Q10,6.18 10,7V17q0,0.82-0.59,1.41Q8.83,19 8,19Z"/></svg>'
   };
@@ -291,12 +303,14 @@
   const world = $('#world'), sel = $('#sel'), ghost = $('#ghost'), bar = $('#bar'), dock = $('#dock'), menu = $('#menu');
   const toastEl = $('#toast'), fileAudio = $('#fileAudio'), fileImg = $('#fileImg');
   const DEF = {
-    audio: { w: 160, h: 30, name: 'Audio Name', src: '', loop: false, trimStart: 0, trimEnd: 0 },
+    audio: { w: 200, h: 66, name: 'Audio Name', src: '', loop: false, trimStart: 0, trimEnd: 0 },
     image: { w: 260, h: 190, src: '' },
     text:  { w: 280, h: 40, html: 'Text', font: 'Montserrat', fs: 32, color: '#111111' }
   };
   const SAFE_SRC = /^data:(image|audio)\/[a-z0-9.+-]+;base64,/i;
   let items = [], els = {}, players = {}, selId = null, placing = null, editingId = null, pickFor = null, ro;
+  const GRID = 40;                                   // keep in sync with --grid in the CSS
+  const snap = v => Math.round(v / GRID) * GRID;
   const uid = () => Math.random().toString(36).slice(2, 9);
   const get = id => items.find(i => i.id === id);
 
@@ -358,12 +372,43 @@
   }
 
   function buildAudio(it, el) {
-    el.innerHTML = '<button class="play" aria-label="Play / stop"></button><div class="pill"><span class="name"></span><button class="kebab" aria-label="Options"><i></i><i></i><i></i></button></div>';
+    el.innerHTML = '<div class="row"><button class="restart" aria-label="Restart"></button><button class="play" aria-label="Play / stop"></button><div class="pill"><span class="name"></span><button class="kebab" aria-label="Options"><i></i><i></i><i></i></button></div></div><div class="seek"><div class="track"><div class="buf"></div><div class="fill"></div><div class="knob"></div></div></div>';
+    el.querySelector('.restart').innerHTML = ICON.restart;
     el.querySelector('.play').innerHTML = ICON.play;
-    el.querySelector('.name').textContent = it.name;
+    el.querySelector('.restart').addEventListener('click', () => restartPlay(it));
+    refreshName(it, el);
     el.querySelector('.play').addEventListener('click', () => togglePlay(it));
     el.querySelector('.name').addEventListener('dblclick', () => renameAudio(it));
     el.querySelector('.kebab').addEventListener('click', e => { e.stopPropagation(); openMenu(it); });
+    const seek = el.querySelector('.seek'), track = el.querySelector('.track');
+    let seeking = false;
+    const seekTo = e => {
+      const p = player(it); if (!p || !isFinite(p.duration) || !p.duration) return;
+      const r = track.getBoundingClientRect(), f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+      const a = it.trimStart || 0, b = it.trimEnd || p.duration; p.currentTime = a + f * (b - a); updateSeek(it);
+    };
+    seek.addEventListener('pointerdown', e => { seeking = true; seek.setPointerCapture(e.pointerId); seekTo(e); });
+    seek.addEventListener('pointermove', e => { if (seeking) seekTo(e); });
+    seek.addEventListener('pointerup', () => { seeking = false; });
+    seek.addEventListener('pointercancel', () => { seeking = false; });
+  }
+
+  function refreshName(it, el) {
+    const n = (el || els[it.id]).querySelector('.name');
+    n.textContent = it.src ? it.name : 'No files linked';
+    n.classList.toggle('unlinked', !it.src);
+  }
+
+  function updateSeek(it) {
+    const el = els[it.id]; if (!el) return;
+    const track = el.querySelector('.track'), p = players[it.id];
+    let f = 0, bf = 0;
+    if (p && isFinite(p.duration) && p.duration) {
+      const a = it.trimStart || 0, b = it.trimEnd || p.duration, len = Math.max(0.01, b - a);
+      f = Math.max(0, Math.min(1, (p.currentTime - a) / len));
+      if (p.buffered.length) bf = Math.max(0, Math.min(1, (p.buffered.end(p.buffered.length - 1) - a) / len));
+    }
+    track.style.setProperty('--p', f * 100 + '%'); track.style.setProperty('--b', bf * 100 + '%');
   }
 
   function player(it) {
@@ -374,6 +419,7 @@
       p = new Audio(it.src); p._src = it.src; p.preload = 'auto';
       p.addEventListener('ended', () => { if (it.loop) { p.currentTime = it.trimStart || 0; p.play(); } else setPlayIcon(it.id, false); });
       p.addEventListener('pause', () => setPlayIcon(it.id, false));
+      ['loadedmetadata', 'progress', 'seeked', 'pause', 'ended', 'timeupdate'].forEach(ev => p.addEventListener(ev, () => updateSeek(it)));
       p.addEventListener('play', () => { setPlayIcon(it.id, true); watch(it, p); });
       players[it.id] = p;
     }
@@ -383,6 +429,7 @@
   function watch(it, p) {
     cancelAnimationFrame(p._raf);
     const tick = () => {
+      updateSeek(it);
       if (p.paused) return;
       if (it.trimEnd && p.currentTime >= it.trimEnd) {
         if (it.loop) p.currentTime = it.trimStart || 0;
@@ -392,12 +439,18 @@
     };
     p._raf = requestAnimationFrame(tick);
   }
-  function setPlayIcon(id, playing) { const b = els[id] && els[id].querySelector('.play'); if (b) b.innerHTML = playing ? ICON.pause : ICON.play; }
+  function setPlayIcon(id, playing) { const b = els[id] && els[id].querySelector('.play'); if (b) { b.innerHTML = playing ? ICON.pause : ICON.play; b.classList.toggle('is-playing', playing); } }
   function togglePlay(it) {
     const p = player(it);
     if (!p) { pickFor = it.id; fileAudio.click(); return; }
     if (p.paused) { p.currentTime = it.trimStart || 0; p.play().catch(() => toast('Could not play this file')); }
     else { p.pause(); p.currentTime = it.trimStart || 0; }          // second press = stop
+  }
+
+  function restartPlay(it) {
+    const p = player(it);
+    if (!p) { pickFor = it.id; fileAudio.click(); return; }
+    p.currentTime = it.trimStart || 0; p.play().catch(() => toast('Could not play this file'));
   }
 
   function buildImage(it, el) {
@@ -472,7 +525,7 @@
     const it = get(el.dataset.id);
     if (e.target.closest('[contenteditable="true"]')) { select(it.id); return; }
     select(it.id);
-    if (e.target.closest('button')) return;
+    if (e.target.closest('button, .seek')) return;
     e.preventDefault();
     drag = { mode: 'move', it, el, sx: e.clientX, sy: e.clientY, ox: it.x, oy: it.y, moved: false };
     sel.classList.add('nt'); el.style.cursor = 'grabbing';
@@ -484,17 +537,17 @@
     sel.classList.add('nt'); bar.classList.remove('show');
   });
   addEventListener('pointermove', e => {
-    if (placing) { const d = DEF[placing]; ghost.style.left = e.clientX - d.w / 2 - 12 + 'px'; ghost.style.top = e.clientY - d.h / 2 - 12 + 'px'; ghost.classList.add('show'); return; }
+    if (placing) { const d = DEF[placing]; ghost.style.left = Math.max(0, snap(e.clientX - d.w / 2)) - 12 + 'px'; ghost.style.top = Math.max(0, snap(e.clientY - d.h / 2)) - 12 + 'px'; ghost.classList.add('show'); return; }
     if (!drag) return;
     const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy, it = drag.it;
     if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
     if (drag.mode === 'move') {
       if (!drag.moved) return;
-      it.x = Math.max(0, Math.min(innerWidth - 40, drag.ox + dx)); it.y = Math.max(0, Math.min(innerHeight - 40, drag.oy + dy));
+      it.x = snap(Math.max(0, Math.min(innerWidth - 40, drag.ox + dx))); it.y = snap(Math.max(0, Math.min(innerHeight - 40, drag.oy + dy)));
       position(it, drag.el);
     } else {
-      if (it.type === 'image') { it.w = Math.max(60, drag.ow + dx); it.h = Math.max(60, drag.oh + dy); drag.el.style.width = it.w + 'px'; drag.el.style.height = it.h + 'px'; }
-      if (it.type === 'text') { it.w = Math.max(60, drag.ow + dx); it.fs = Math.max(8, drag.ofs * it.w / drag.ow); styleText(it, drag.el); $('#fs').value = Math.round(it.fs); }
+      if (it.type === 'image') { it.w = Math.max(GRID, snap(drag.ow + dx)); it.h = Math.max(GRID, snap(drag.oh + dy)); drag.el.style.width = it.w + 'px'; drag.el.style.height = it.h + 'px'; }
+      if (it.type === 'text') { it.w = Math.max(GRID * 2, snap(drag.ow + dx)); it.fs = Math.max(8, drag.ofs * it.w / drag.ow); styleText(it, drag.el); $('#fs').value = Math.round(it.fs); }
     }
     syncSel();
   });
@@ -518,13 +571,13 @@
   function startPlacing(type) {
     placing = type; closeDock(); document.body.classList.add('placing');
     const d = DEF[type]; ghost.style.width = d.w + 24 + 'px'; ghost.style.height = d.h + 24 + 'px';
-    ghost.style.left = innerWidth / 2 - d.w / 2 - 12 + 'px'; ghost.style.top = innerHeight / 2 - d.h / 2 - 12 + 'px'; ghost.classList.add('show');
+    ghost.style.left = Math.max(0, snap(innerWidth / 2 - d.w / 2)) - 12 + 'px'; ghost.style.top = Math.max(0, snap(innerHeight / 2 - d.h / 2)) - 12 + 'px'; ghost.classList.add('show');
     toast('Click anywhere to place it  ·  Esc to cancel');
   }
   function stopPlacing() { placing = null; document.body.classList.remove('placing'); ghost.classList.remove('show'); }
   function place(e) {
     const type = placing, d = DEF[type]; stopPlacing();
-    const it = Object.assign({ id: uid(), type, x: Math.max(0, e.clientX - d.w / 2), y: Math.max(0, e.clientY - d.h / 2) }, JSON.parse(JSON.stringify(d)));
+    const it = Object.assign({ id: uid(), type, x: Math.max(0, snap(e.clientX - d.w / 2)), y: Math.max(0, snap(e.clientY - d.h / 2)) }, JSON.parse(JSON.stringify(d)));
     items.push(it); build(it); select(it.id); save();
     if (type === 'text') startEdit(it.id, true);
   }
@@ -556,7 +609,7 @@
   }
   function removeFile(it) {
     const p = players[it.id]; if (p) { p.pause(); delete players[it.id]; }
-    it.src = ''; it.trimStart = 0; it.trimEnd = 0; setPlayIcon(it.id, false); save(); syncSel(); toast('File removed');
+    it.src = ''; it.name = 'Audio Name'; it.trimStart = 0; it.trimEnd = 0; refreshName(it); setPlayIcon(it.id, false); updateSeek(it); save(); syncSel(); toast('File removed');
   }
 
   /* ---------- edit length ---------- */
@@ -581,7 +634,7 @@
     if (from === 'end' && e < s + 0.05) { e = Math.min(lenDur, s + 0.05); lenEnd.value = e; }
     $('#lenS').textContent = fmtT(s); $('#lenE').textContent = fmtT(e);
     const it = get(lenId); if (!it) return;
-    it.trimStart = s; it.trimEnd = e >= lenDur - 0.01 ? 0 : e;
+    it.trimStart = s; it.trimEnd = e >= lenDur - 0.01 ? 0 : e; updateSeek(it);
   }
   lenStart.addEventListener('input', () => updLen('start'));
   lenEnd.addEventListener('input', () => updLen('end'));
@@ -594,9 +647,10 @@
   addEventListener('pointerdown', e => { if (!menu.contains(e.target) && !e.target.closest('.kebab')) closeMenu(); });
 
   function renameAudio(it) {
+    if (!it.src) { toast('Add a file first'); return; }
     const n = els[it.id].querySelector('.name'); n.contentEditable = 'true'; n.focus();
     const r = document.createRange(); r.selectNodeContents(n); const s = getSelection(); s.removeAllRanges(); s.addRange(r);
-    const done = () => { n.contentEditable = 'false'; it.name = (n.textContent.trim() || 'Audio Name').slice(0, 80); n.textContent = it.name; save(); syncSel(); n.removeEventListener('blur', done); };
+    const done = () => { n.contentEditable = 'false'; it.name = (n.textContent.trim() || 'Audio Name').slice(0, 80); refreshName(it); save(); syncSel(); n.removeEventListener('blur', done); };
     n.addEventListener('blur', done);
     n.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') { e.preventDefault(); n.blur(); } });
   }
@@ -616,7 +670,7 @@
     const f = fileAudio.files[0], it = get(pickFor); fileAudio.value = ''; if (!f || !it) return;
     readFile(f, url => {
       it.src = url; it.trimStart = 0; it.trimEnd = 0; if (it.name === 'Audio Name') it.name = f.name.replace(/\.[^.]+$/, '').slice(0, 80);
-      els[it.id].querySelector('.name').textContent = it.name; player(it); save(); syncSel();
+      refreshName(it); player(it); save(); syncSel();
       if (f.size > 4e6) toast('Big file: use Copy save to keep it (browser autosave may skip it)');
     });
   });
