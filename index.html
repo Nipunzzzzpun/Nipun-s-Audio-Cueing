@@ -6,7 +6,7 @@
 <title>Cue Board</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Inter:wght@100..900&family=Poppins:wght@400;700&family=Playfair+Display:wght@400..900&family=Roboto+Mono:wght@100..700&family=Caveat:wght@400..700&family=Pacifico&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Inter:wght@100..900&family=Poppins:wght@400;700&family=Playfair+Display:wght@400..900&family=Roboto+Mono:wght@100..700&family=Caveat:wght@400..700&family=Pacifico&family=Bebas+Neue&family=Major+Mono+Display&display=swap" rel="stylesheet">
 <script defer src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
   :root {
@@ -15,6 +15,7 @@
     --glass: rgba(0, 0, 0, .52);
     --glass-border: rgba(0, 0, 0, .4);
     --grid: 20px;
+    --mono: 'Major Mono Display', 'Roboto Mono', monospace;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; width: 100%; height: 100%; }
@@ -275,7 +276,7 @@
   .codecard, .users { background: rgba(0,0,0,.4); border-radius: 22px; position: relative; min-height: 0; }
   .codecard { grid-row: 1 / 3; display: grid; place-items: center; overflow: hidden; }
   .code {
-    font-family: 'Roboto Mono', monospace; font-weight: 300; font-size: clamp(34px, 7vw, 104px); letter-spacing: .16em; padding-left: .16em;
+    font-family: var(--mono); font-weight: 400; font-size: clamp(30px, 6.4vw, 96px); letter-spacing: .06em; padding-left: .06em; text-transform: lowercase;
     color: #fff; white-space: nowrap; user-select: text; -webkit-user-select: text; cursor: text; line-height: 1;
   }
   .ctools { position: absolute; top: 12px; right: 14px; display: flex; gap: 6px; }
@@ -283,23 +284,23 @@
   .ctools button:hover { background: rgba(255,255,255,.18); }
   .ctools button:active { transform: scale(.88); }
   .ctools svg { width: 22px; height: 22px; }
-  .users { padding: 14px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; justify-content: center; text-align: center; font: 600 14px 'Montserrat', sans-serif; color: #fff; }
+  .users { padding: 14px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; justify-content: center; text-align: center; font: 600 13px/1.6 'Montserrat', sans-serif; color: #fff; }
   .users::-webkit-scrollbar { display: none; }
   .users .idle p { margin: 0 0 12px; line-height: 1.45; }
   .dock.live .users .idle { display: none; }
   .dock:not(.live) .users .ulist { display: none; }
   .joinrow { display: flex; gap: 8px; justify-content: center; }
-  .joinrow input { width: 120px; height: 34px; border: 0; border-radius: 17px; background: rgba(255,255,255,.14); color: #fff; text-align: center; text-transform: uppercase; letter-spacing: .18em; font: 600 14px 'Montserrat', sans-serif; outline: none; transition: background .2s; }
+  .joinrow input { width: 120px; height: 34px; border: 0; border-radius: 17px; background: rgba(255,255,255,.14); color: #fff; text-align: center; letter-spacing: .08em; font: 600 14px 'Montserrat', sans-serif; outline: none; transition: background .2s; }
   .joinrow input:focus { background: rgba(255,255,255,.26); }
   .joinrow input::placeholder { color: rgba(255,255,255,.45); letter-spacing: .1em; }
-  .joinrow button { height: 34px; padding: 0 16px; border: 0; border-radius: 17px; background: #fff; color: #000; font-weight: 700; font-size: 13px; cursor: pointer; transition: transform .25s var(--spring), opacity .2s; }
+  .joinrow button { height: 34px; padding: 0 16px; border: 0; border-radius: 17px; background: #fff; color: #000; font: 600 12px 'Montserrat', sans-serif; cursor: pointer; transition: transform .25s var(--spring), opacity .2s; }
   .joinrow button:active { transform: scale(.92); }
   .ulist { list-style: none; margin: 0; padding: 0; text-align: left; width: 100%; align-self: flex-start; }
   .ulist li { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 12px; animation: itemIn .35s var(--spring) both; }
   .ulist li i { width: 14px; height: 14px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 2px rgba(255,255,255,.6); flex: none; }
   .ulist li small { margin-left: auto; opacity: .6; font-weight: 500; }
   .srow { display: flex; gap: 14px; }
-  .srow button { position: relative; overflow: hidden; white-space: nowrap; font-family: 'Montserrat', sans-serif; flex: 1; border: 0; border-radius: 22px; font-weight: 600; font-size: 14px; cursor: pointer; background: rgba(0,0,0,.4); color: #fff; transition: transform .25s var(--spring), opacity .25s ease, background .25s ease; }
+  .srow button { position: relative; overflow: hidden; white-space: nowrap; font-family: 'Montserrat', sans-serif; flex: 1; border: 0; border-radius: 22px; font-weight: 600; font-size: 13px; cursor: pointer; background: rgba(0,0,0,.4); color: #fff; transition: transform .25s var(--spring), opacity .25s ease, background .25s ease; }
   .srow button:hover:not(:disabled) { background: rgba(0,0,0,.6); }
   .srow button:active:not(:disabled) { transform: scale(.95); }
   .srow button:disabled { opacity: .45; cursor: default; }
@@ -315,7 +316,7 @@
   .dock:not(.live) .ctools { opacity: .35; }
   .ctools { transition: opacity .3s ease; }
   .srow .stop:hover:not(:disabled) { background: #ff5252; }
-  .bigcode { color: #fff; font: 300 clamp(48px, 15vw, 240px) 'Roboto Mono', monospace; letter-spacing: .16em; padding-left: .16em; }
+  .bigcode { color: #fff; font: 400 clamp(40px, 12vw, 200px) var(--mono); letter-spacing: .06em; padding-left: .06em; text-transform: lowercase; }
   #codeOverlay { background: rgba(0,0,0,.92); cursor: pointer; z-index: 250; }
 
   /* other people's cursors */
@@ -462,7 +463,7 @@
     <div class="users" id="usersCard">
       <div class="idle">
         <p>Press Start Sharing to open a live room, or join someone else’s with their code.</p>
-        <div class="joinrow"><input id="joinCode" maxlength="6" placeholder="CODE" spellcheck="false" autocomplete="off"><button id="joinBtn">Join</button></div>
+        <div class="joinrow"><input id="joinCode" maxlength="6" placeholder="Code" spellcheck="false" autocomplete="off"><button id="joinBtn">Join</button></div>
       </div>
       <ul class="ulist" id="ulist"></ul>
     </div>
@@ -472,9 +473,9 @@
 
 <div class="overlay" id="joinOverlay">
   <div class="dialog">
-    <h3>Join room <span id="jcode"></span></h3>
+    <h3>join room <span id="jcode"></span></h3>
     <p id="jmsg"></p>
-    <label class="lbl" style="margin-top:0">Your name<input type="text" id="pfName" maxlength="24" placeholder="Name" autocomplete="off" spellcheck="false"></label>
+    <label class="lbl" style="margin-top:0">Your name<input type="text" id="pfName" maxlength="24" placeholder="name" autocomplete="off" spellcheck="false"></label>
     <div class="pfrow"><span>Cursor colour</span><button class="swatch" id="pfColor" type="button" aria-label="Choose colour"></button></div>
     <div class="row"><button id="pfCancel">Cancel</button><button class="go" id="pfGo">Join</button></div>
   </div>
@@ -1171,9 +1172,9 @@
   /* ---------- live sharing (peer-to-peer via WebRTC; PeerJS public broker) ---------- */
   const shareDock = $('#shareDock'), codeText = $('#codeText'), ulist = $('#ulist'), codeOverlay = $('#codeOverlay');
   const COLORS = ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#ef4444'];
-  const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const ALPHA = 'abcdefghjkmnpqrstuvwxyz23456789';
   const genCode = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), b => ALPHA[b % ALPHA.length]).join('');
-  const CODE_RE = /^[A-Z0-9]{6}$/;
+  const CODE_RE = /^[a-z0-9]{6}$/;
   let cursors = {};
   const curSvg = '<svg viewBox="0 0 24 24"><path d="M10.05,13.95L3.58,11.33Q3.25,11.2 3.1,10.94T2.95,10.4q0-0.27 0.16-0.54T3.6,9.48l15.35-5.7q0.3-0.13 0.58-0.05T20,4t0.28,0.47T20.23,5.05L14.53,20.4q-0.13,0.33-0.39,0.49T13.6,21.05T13.06,20.9t-0.39-0.47l-2.63-6.48Z"/></svg>';
 
@@ -1416,9 +1417,9 @@
   stopBtn.addEventListener('keyup', holdEnd);
 
   $('#startShare').addEventListener('click', startHost);
-  $('#joinBtn').addEventListener('click', () => joinFlow($('#joinCode').value.trim().toUpperCase()));
+  $('#joinBtn').addEventListener('click', () => joinFlow($('#joinCode').value.trim().toLowerCase()));
   $('#joinCode').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') $('#joinBtn').click(); });
-  $('#joinCode').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
+  $('#joinCode').addEventListener('input', e => { e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''); });
   $('#codeFull').addEventListener('click', () => { if (!net.role) { toast('Press Start Sharing to get a code'); return; } $('#bigCode').textContent = currentCode(); codeOverlay.classList.add('show'); });
   codeOverlay.addEventListener('click', () => codeOverlay.classList.remove('show'));
   $('#codeCopy').addEventListener('click', async () => {
@@ -1433,7 +1434,7 @@
   addEventListener('load', () => {
     const m = /join=([A-Za-z0-9]{6})/.exec(location.hash); if (!m) return;
     history.replaceState(null, '', location.pathname + location.search);
-    openShare(); $('#joinCode').value = m[1].toUpperCase(); joinFlow(m[1].toUpperCase());
+    const code = m[1].toLowerCase(); openShare(); $('#joinCode').value = code; joinFlow(code);
   });
 
   /* ---------- boot ---------- */
