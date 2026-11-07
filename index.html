@@ -347,8 +347,9 @@
   .anode.big .ip[data-p="0"] { top: 30px; } .anode.big .ip[data-p="1"] { top: 62px; }
   .anode.big .il { left: 22px; } .anode.big .il.l0 { top: 24px; } .anode.big .il.l1 { top: 56px; }
   .anode.big .ol { top: 40px; right: 25px; }
-  .anode.t-audio .ip[data-p="2"] { left: calc(66px + (100% - 130px) * .25); top: 0; margin: -8px 0 0 -8px; }
+  .anode.t-audio .ip[data-p="2"] { left: calc(66px + (100% - 130px) * .25); top: 100%; margin: -8px 0 0 -8px; }
   .anode.t-audio .ip[data-p="3"] { left: calc(66px + (100% - 130px) * .75); top: 100%; margin: -8px 0 0 -8px; }
+  .anode .ni.driven { background: rgba(224,168,240,.3); color: #fff; pointer-events: none; }
   .anode.t-value .cc { color: #fff; font-weight: 600; font-size: 13px; }
   .anode .il { position: absolute; left: 14px; font-size: 10px; font-weight: 600; color: rgba(255,255,255,.45); }
   .anode .nk { border: 0; height: 22px; min-width: 30px; padding: 0 8px; border-radius: 11px; background: rgba(255,255,255,.16); color: rgba(255,255,255,.65); font: 600 11px 'Montserrat', sans-serif; cursor: pointer; }
@@ -403,7 +404,7 @@
   .dock.live .users .idle { display: none; }
   .dock:not(.live) .users .ulist { display: none; }
   .joinrow { display: flex; gap: 8px; justify-content: center; }
-  .joinrow input { width: 120px; height: 34px; border: 0; border-radius: 17px; background: rgba(255,255,255,.14); color: #fff; text-align: center; letter-spacing: .08em; font: 600 14px 'Montserrat', sans-serif; outline: none; transition: background .2s; }
+  .joinrow input { width: 120px; height: 34px; border: 0; border-radius: 17px; background: rgba(255,255,255,.14); color: #fff; text-align: center; text-transform: uppercase; letter-spacing: .08em; font: 600 14px 'Montserrat', sans-serif; outline: none; transition: background .2s; }
   .joinrow input:focus { background: rgba(255,255,255,.26); }
   .joinrow input::placeholder { color: rgba(255,255,255,.45); letter-spacing: .1em; }
   .joinrow button { height: 34px; padding: 0 16px; border: 0; border-radius: 17px; background: #fff; color: #000; font: 600 12px 'Montserrat', sans-serif; cursor: pointer; transition: transform .25s var(--spring), opacity .2s; }
@@ -1774,7 +1775,7 @@
       if (n.t === 'audio') {
         const it = get(n.cue);
         el.querySelector('.nm').textContent = it ? it.name : 'Choose a cue'; el.classList.toggle('dim', !it || !it.src);
-        const av = el.querySelector('.av'), ap = el.querySelector('.ap'); if (document.activeElement !== av) av.value = n.vol; if (document.activeElement !== ap) ap.value = n.pitch;
+        const av = el.querySelector('.av'), ap = el.querySelector('.ap'); if (document.activeElement !== av && !av.classList.contains('driven')) av.value = n.vol; if (document.activeElement !== ap && !ap.classList.contains('driven')) ap.value = n.pitch;
       } else if (n.t === 'key') {
         const nk = el.querySelector('.nk'), b = auto.btns.find(x => x.id === n.btn); nk.textContent = b ? b.name : 'link a button'; nk.classList.toggle('set', !!b);
       } else if (n.t === 'counter') { const ni = el.querySelector('.ni'); if (document.activeElement !== ni) ni.value = n.n; updCounter(n); }
@@ -1832,7 +1833,7 @@
   const outPos = (id, fp) => { const el = nodeEls[id], pt = el && el.querySelectorAll('.port')[fp || 0]; return pt ? [v.x + (parseFloat(el.style.left) + el.offsetWidth) * v.z, v.y + (parseFloat(el.style.top) + pt.offsetTop + pt.offsetHeight / 2) * v.z] : null; };
   function inPos(to, p, W) {
     const el = nodeEls[to], ip = el && el.querySelectorAll('.ip')[p]; if (!ip) return null;
-    const dir = el.classList.contains('t-audio') ? (p === 2 ? 't' : p === 3 ? 'b' : 'l') : 'l';
+    const dir = el.classList.contains('t-audio') && p >= 2 ? 'b' : 'l';
     return [v.x + (parseFloat(el.style.left) + ip.offsetLeft + ip.offsetWidth / 2) * v.z, v.y + (parseFloat(el.style.top) + ip.offsetTop + ip.offsetHeight / 2) * v.z, dir];
   }
   function drawWires() {
@@ -2044,7 +2045,16 @@
     auto.nodes.forEach(n => {
       const el = nodeEls[n.id]; if (!el) return;
       if (n.t === 'light') el.querySelector('.lamp').classList.toggle('on', pin(n.id, 0, new Set()) || (n.lit || 0) > now);
-      else if (n.t === 'audio') { const p = players[n.cue], it = get(n.cue), on = !!(p && !p.paused); el.classList.toggle('live', on); if (on && it) applyAudio(n, it, p); }
+      else if (n.t === 'audio') {
+        const p = players[n.cue], it = get(n.cue), on = !!(p && !p.paused); el.classList.toggle('live', on); if (on && it) applyAudio(n, it, p);
+        // when a wire drives volume / pitch, the box shows the live value coming in
+        [['.av', 2, 0, 100, n.vol], ['.ap', 3, -24, 24, n.pitch]].forEach(([sel, pn, lo, hi, own]) => {
+          const box = el.querySelector(sel), l = inputsL(n.id, pn)[0];
+          box.classList.toggle('driven', !!l); box.readOnly = !!l;
+          const str = String(l ? Math.round(Math.max(lo, Math.min(hi, +numOf(l[0], new Set([n.id])) || 0)) * 10) / 10 : own);
+          if (document.activeElement !== box && box.value !== str) box.value = str;
+        });
+      }
       else if (n.t === 'key') el.classList.toggle('live', !!n.btn && isHeld(n.btn));
     });
     lightRaf = requestAnimationFrame(lightTick);
