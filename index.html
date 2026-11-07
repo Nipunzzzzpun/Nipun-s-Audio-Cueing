@@ -383,11 +383,11 @@
   .popwrap { position: fixed; left: 50%; bottom: 72px; transform: translateX(-50%); z-index: 400; display: flex; flex-direction: column-reverse; align-items: center; gap: 8px; pointer-events: none; width: max-content; max-width: calc(100vw - 32px); }
   .popmsg { pointer-events: auto; cursor: pointer; display: flex; justify-content: center; overflow: hidden; border-radius: 999px; background: rgba(0,0,0,.74); border: 2px solid rgba(0,0,0,.35); background-clip: padding-box; color: #fff;
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 8px 26px rgba(0,0,0,.25); opacity: 0; transform: translateY(46px);
-    transition: opacity .3s ease, transform .5s var(--spring), width .42s var(--ease); }
+    transition: opacity .3s ease, transform .55s var(--ease), width .6s var(--ease); }
   .popmsg.up { opacity: 1; transform: none; }
-  .popmsg.down { opacity: 0; transform: translateY(18px); transition: opacity .3s ease, transform .35s ease, width .38s var(--ease); }
-  .popmsg span { flex: none; display: block; box-sizing: border-box; max-width: calc(100vw - 60px); padding: 11px 22px; font: 600 14px 'Montserrat', sans-serif; text-align: center; overflow-wrap: anywhere; opacity: 0; transition: opacity .25s ease; }
-  .popmsg.read span { opacity: 1; transition-delay: .12s; }
+  .popmsg.down { opacity: 0; transform: translateY(18px); transition: opacity .35s ease .12s, transform .45s var(--ease), width .45s var(--ease); }
+  .popmsg span { flex: none; display: block; box-sizing: border-box; max-width: calc(100vw - 60px); padding: 11px 22px; font: 600 14px 'Montserrat', sans-serif; text-align: center; overflow-wrap: anywhere; opacity: 0; transition: opacity .2s ease; }
+  .popmsg.read span { opacity: 1; transition: opacity .35s ease .18s; }
   .anode.t-loop { min-width: 432px; }
   .anode.t-loop .r2 { grid-template-columns: auto auto auto; justify-content: space-between; gap: 10px; }
   .anode.t-loop .nk { flex: none; min-width: 124px; padding: 0 18px; white-space: nowrap; text-align: center; }
@@ -1998,14 +1998,13 @@
     const w = sp.offsetWidth, h = sp.offsetHeight, c = Math.min(w, h);   // c: the starting circle
     el.style.width = c + 'px'; void el.offsetWidth;
     el.classList.add('up');                                              // 1. floats up as a circle
-    setTimeout(() => { if (!el.isConnected) return; el.style.width = w + 'px'; el.classList.add('read'); }, 420);   // 2. widens, text fades in
-    setTimeout(() => { if (el.isConnected && !el.classList.contains('read')) el.classList.add('read'); }, 900);
+    requestAnimationFrame(() => requestAnimationFrame(() => { if (!el.isConnected) return; el.style.width = w + 'px'; el.classList.add('read'); }));   // 2. widens while still rising, text fades in as it opens
     let gone = false;
     const bye = () => {                                                  // reverse: text out, shrinks to a circle, floats away
       if (gone || !el.isConnected) return; gone = true;
       el.classList.remove('read'); el.style.width = c + 'px';
-      setTimeout(() => { el.classList.remove('up'); el.classList.add('down'); }, 380);
-      setTimeout(() => el.remove(), 760);
+      el.classList.remove('up'); el.classList.add('down');
+      setTimeout(() => el.remove(), 750);
     };
     el.addEventListener('click', bye); setTimeout(bye, 3200);
   }
@@ -2169,16 +2168,20 @@
     return i >= 0 && i < auto.btns.length && Math.abs(y - rowY(i)) <= 22 ? i : -1;
   }
   const SNAP = 24;                                              // px: how close a dragged wire must get to a pin before it snaps (hold Ctrl to switch snapping off)
-  function targetAt(cx, cy, snap, fromId) {
-    const ip = document.elementsFromPoint(cx, cy).find(e => e.classList && e.classList.contains('ip') && !e.classList.contains('soon'));   // wires can sit on top of pins
+  function targetAt(cx, cy, snap, fromId, prev) {
+    const ip = document.elementsFromPoint(cx, cy).find(e => e.classList && e.classList.contains('ip') && !e.classList.contains('soon') && !e.classList.contains('off'));   // wires can sit on top of pins
     if (ip) return { to: ip.closest('.anode').dataset.id, p: +ip.dataset.p, el: ip };
     if (!snap) return null;
-    let best = null, bd = SNAP * SNAP;
+    const R = SNAP * Math.min(1, Math.max(.5, v.z));               // pins sit closer together when zoomed out, so the reach shrinks with them
+    const dist = pin => { const r = pin.getBoundingClientRect(); return Math.hypot(cx - (r.left + r.width / 2), cy - (r.top + r.height / 2)); };
+    const mk = pin => ({ to: pin.closest('.anode').dataset.id, p: +pin.dataset.p, el: pin, snapped: true });
+    if (prev && prev.isConnected && !prev.classList.contains('off') && dist(prev) < R * 1.5) return mk(prev);   // stay on the pin we're already snapped to (no flicker at the edge)
+    let best = null, bd = R;
     aworld.querySelectorAll('.ip:not(.soon):not(.off)').forEach(pin => {
       if (pin.closest('.anode').dataset.id === fromId) return;
-      const r = pin.getBoundingClientRect(), dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2), d = dx * dx + dy * dy; if (d < bd) { bd = d; best = pin; }
+      const d = dist(pin); if (d < bd) { bd = d; best = pin; }
     });
-    return best ? { to: best.closest('.anode').dataset.id, p: +best.dataset.p, el: best, snapped: true } : null;
+    return best ? mk(best) : null;
   }
   const markHot = el => { aworld.querySelectorAll('.ip.hot').forEach(x => x !== el && x.classList.remove('hot')); minner.querySelectorAll('.mrow.drop').forEach(x => x !== el && x.classList.remove('drop')); if (el) el.classList.add(el.classList.contains('ip') ? 'hot' : 'drop'); };
   function downstream(from, target) {           // does 'from' (a node) eventually feed 'target'?
@@ -2220,7 +2223,7 @@
     if (wd) {
       const r = acanvas.getBoundingClientRect(); wd.px = e.clientX - r.left; wd.py = e.clientY - r.top;
       if (Math.abs(e.clientX - wd.sx) + Math.abs(e.clientY - wd.sy) > 4) wd.moved = true;
-      const t = wd.moved ? targetAt(e.clientX, e.clientY, !e.ctrlKey && !e.metaKey, wd.id) : null; markHot(t && t.el);
+      const t = wd.moved ? targetAt(e.clientX, e.clientY, !e.ctrlKey && !e.metaKey, wd.id, wd.snapEl) : null; markHot(t && t.el); wd.snapEl = t && t.snapped ? t.el : null;
       wd.snapB = t && t.snapped ? inPos(t.to, t.p, acanvas.offsetWidth + GAPX) : null; drawWires();
     } else if (nd) {
       const dx = e.clientX - nd.sx, dy = e.clientY - nd.sy; if (Math.abs(dx) + Math.abs(dy) > 4) nd.moved = true; if (!nd.moved) return;
@@ -2234,7 +2237,7 @@
     if (wd) {
       const d = wd, up = e && e.type === 'pointerup'; wd = null; markHot(null);
       if (up && !d.moved) openPinPicker(nodeById(d.id), outKey(d.fp), d.el);                       // a plain click on a pin picks its colour
-      else if (up) { const t = targetAt(e.clientX, e.clientY, !e.ctrlKey && !e.metaKey, d.id); if (t) addLink(d.id, t.to, t.p, d.fp); }
+      else if (up) { const t = targetAt(e.clientX, e.clientY, !e.ctrlKey && !e.metaKey, d.id, d.snapEl); if (t) addLink(d.id, t.to, t.p, d.fp); }
       drawWires();
     }
     if (nd) {
