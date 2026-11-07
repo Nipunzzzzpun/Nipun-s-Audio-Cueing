@@ -269,7 +269,7 @@
 
   /* ---------- automation panel ---------- */
   .dock.auto .plus { width: 24px; height: 24px; margin: -12px 0 0 -12px; }
-  .dock.auto.open { height: 270px; }
+  .dock.auto.open { height: 316px; }
   .autoin { position: absolute; left: 26px; right: 84px; top: 22px; bottom: 22px; display: flex; gap: 12px; user-select: none; -webkit-user-select: none;
     opacity: 0; transform: translateY(14px) scale(.97); transform-origin: top left; pointer-events: none; transition: opacity .15s, transform .15s; }
   .dock.open .autoin { opacity: 1; transform: none; pointer-events: auto; transition: opacity .3s .22s, transform .5s .22s var(--ease); }
@@ -287,8 +287,8 @@
     background: #e0a8f0; border: 3.5px solid #fff; cursor: crosshair; transition: transform .25s var(--spring); }
   .anode .port:hover { transform: scale(1.35); }
   .awires { position: absolute; left: 0; top: 0; pointer-events: none; overflow: hidden; }
-  .awires .vis, .awires .tmp { fill: none; stroke: #e0a8f0; stroke-width: 4.5; stroke-linecap: round; transition: stroke .2s ease; }
-  .awires .tmp { opacity: .75; stroke-dasharray: 2 9; }
+  .awires .vis, .awires .tmp { fill: none; stroke: var(--wc, #e0a8f0); stroke-width: 4.5; stroke-linecap: round; transition: stroke .2s ease; }
+  .awires .tmp { opacity: .8; stroke-dasharray: 2 9; }
   .awires .hit { fill: none; stroke: transparent; stroke-width: 16; pointer-events: stroke; cursor: pointer; }
   .awires .wg:hover .vis { stroke: #ff8a8a; }
   .azoom { position: absolute; top: 12px; right: 14px; display: flex; align-items: center; gap: 8px; z-index: 2; }
@@ -298,8 +298,16 @@
   .azoom .zp { background: #000; color: #fff; font: 600 11px 'Montserrat', sans-serif; padding: 3px 12px; border-radius: 999px; min-width: 52px; text-align: center; }
   .aempty { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; color: rgba(255,255,255,.5); font: 500 13px/1.5 'Montserrat', sans-serif; pointer-events: none; opacity: 0; transition: opacity .3s; padding: 0 30px; }
   .aempty.show { opacity: 1; }
-  .amaps { position: relative; flex: none; width: 190px; }
-  .apal { flex: none; width: 168px; border-radius: 22px; background: rgba(0,0,0,.28); padding: 12px 10px; display: flex; flex-direction: column; gap: 9px; }
+  .amaps { position: relative; flex: none; width: 190px; display: flex; flex-direction: column; gap: 8px; }
+  .mlist { position: relative; flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain; }
+  .mlist::-webkit-scrollbar { display: none; }
+  .minner { position: relative; width: 100%; }
+  .mctl { flex: none; height: 34px; display: flex; gap: 8px; }
+  .mctl button { flex: 1; border: 0; border-radius: 17px; background: rgba(0,0,0,.4); cursor: pointer; display: grid; place-items: center; transition: background .2s, transform .25s var(--spring), opacity .2s; }
+  .mctl button:hover { background: rgba(0,0,0,.6); } .mctl button:active { transform: scale(.92); } .mctl button:disabled { opacity: .35; cursor: default; }
+  .mctl svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2.6; stroke-linecap: round; }
+  .apal { flex: none; width: 168px; border-radius: 22px; background: rgba(0,0,0,.28); padding: 12px 10px; display: flex; flex-direction: column; gap: 9px; overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain; }
+  .apal::-webkit-scrollbar { display: none; }
   .apal button { height: 36px; flex: none; border: 0; border-radius: 18px; background: rgba(255,255,255,.14); color: #fff; font: 600 13px 'Montserrat', sans-serif; cursor: pointer; transition: background .2s, transform .25s var(--spring); }
   .apal button:hover { background: rgba(255,255,255,.24); } .apal button:active { transform: scale(.94); }
   .apick { position: absolute; z-index: 20; min-width: 190px; max-height: 190px; overflow-y: auto; padding: 6px; border-radius: 16px; background: rgba(20,20,20,.96); display: flex; flex-direction: column; gap: 2px; animation: itemIn .25s var(--spring) both; scrollbar-width: none; }
@@ -311,6 +319,14 @@
   .anode .ip.hot { transform: scale(1.5); background: #e0a8f0; }
   .anode.t-if { height: 58px; padding-left: 40px; } .anode.t-if .ip[data-p="0"] { top: 17px; margin-top: -8px; } .anode.t-if .ip[data-p="1"] { top: 41px; margin-top: -8px; }
   .anode.t-and { padding-left: 24px; }
+  .anode.tall { height: 58px; padding-left: 38px; }
+  .anode.tall .ip[data-p="0"] { top: 17px; } .anode.tall .ip[data-p="1"] { top: 41px; }
+  .anode.t-counter, .anode.t-random, .anode.t-light { padding-left: 24px; }
+  .anode .ni { width: 44px; height: 22px; border: 0; border-radius: 11px; background: rgba(255,255,255,.16); color: #fff; text-align: center; font: 600 12px 'Montserrat', sans-serif; outline: none; -moz-appearance: textfield; padding: 0; }
+  .anode .ni::-webkit-inner-spin-button, .anode .ni::-webkit-outer-spin-button { display: none; }
+  .anode .lamp { width: 18px; height: 18px; flex: none; border-radius: 50%; background: rgba(255,255,255,.16); transition: background .18s, box-shadow .18s; }
+  .anode .lamp.on { background: var(--lc, #ffd84d); box-shadow: 0 0 14px 3px var(--lc, #ffd84d); }
+  .anode .cc { min-width: 26px; text-align: center; }
   .anode .il { position: absolute; left: 14px; font-size: 10px; font-weight: 600; color: rgba(255,255,255,.45); }
   .anode .nk { border: 0; height: 22px; min-width: 30px; padding: 0 8px; border-radius: 11px; background: rgba(255,255,255,.16); color: rgba(255,255,255,.65); font: 600 11px 'Montserrat', sans-serif; cursor: pointer; }
   .anode .nk.set { color: #fff; background: rgba(255,255,255,.3); } .anode .nk.wait { color: #000; background: #e0a8f0; animation: livePulse 1.2s ease-in-out infinite; }
@@ -519,13 +535,13 @@
     <div class="awrap">
       <div class="acanvas" id="acanvas">
         <div class="aworld" id="aworld"></div>
-        <div class="aempty" id="aempty">Add nodes from the list on the right, then drag from a node’s dot to a mapped button.</div>
+        <div class="aempty" id="aempty">Add nodes from the list on the right. Press + under the buttons to add a mapped button, then drag from a node’s dot to it.</div>
         <div class="azoom"><button id="azoom" title="Reset zoom"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21M10.5 8v5M8 10.5h5"/></svg></button><span class="zp" id="azp">100%</span></div>
       </div>
       <svg class="awires" id="awires"></svg>
     </div>
-    <div class="amaps" id="amaps"></div>
-    <div class="apal" id="apal"><button data-t="audio">Audio</button><button data-t="and">AND</button><button data-t="if">IF</button><button data-t="key">Button Input</button></div>
+    <div class="amaps" id="amaps"><div class="mlist" id="mlist"><div class="minner" id="minner"></div></div><div class="mctl"><button id="mminus" title="Remove the last mapped button"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><button id="mplus" title="Add a mapped button"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></svg></button></div></div>
+    <div class="apal" id="apal"><button data-t="audio">Audio</button><button data-t="key">Button Input</button><button data-t="counter">Counter</button><button data-t="and">AND</button><button data-t="if">IF</button><button data-t="nor">NOR</button><button data-t="or">OR</button><button data-t="xor">XOR</button><button data-t="xand">XAND</button><button data-t="random">RANDOM</button><button data-t="light">LIGHT</button></div>
   </div>
 </div>
 
@@ -1549,27 +1565,42 @@
 
 
   /* ---------- automations: a small node graph that runs when a mapped button is pressed ---------- */
-  const autoDock = $('#autoDock'), acanvas = $('#acanvas'), aworld = $('#aworld'), awires = $('#awires'), amaps = $('#amaps'), azp = $('#azp'), autoin = autoDock.querySelector('.autoin');
-  const RY0 = 24, RPITCH = 46, NB = 5, GAPX = 12, NT = ['audio', 'and', 'if', 'key'];
+  const autoDock = $('#autoDock'), acanvas = $('#acanvas'), aworld = $('#aworld'), awires = $('#awires'), amaps = $('#amaps'), mlist = $('#mlist'), minner = $('#minner'), azp = $('#azp'), autoin = autoDock.querySelector('.autoin');
+  const RY0 = 24, RPITCH = 46, GAPX = 12, MAXB = 200, PURPLE = '#e0a8f0', DARK = '#3d3d3d';
+  const SPEC = {
+    audio: { ins: 0, out: true }, key: { ins: 0, out: true }, counter: { ins: 1, out: true, multi: true },
+    and: { ins: 2, out: true, gate: true }, or: { ins: 2, out: true, gate: true }, nor: { ins: 2, out: true, gate: true }, xor: { ins: 2, out: true, gate: true }, xand: { ins: 2, out: true, gate: true },
+    if: { ins: 2, out: true }, random: { ins: 1, out: true, multi: true }, light: { ins: 1, out: false }
+  };
+  const GATE = { and: (a, b) => a && b, or: (a, b) => a || b, nor: (a, b) => !(a || b), xor: (a, b) => a !== b, xand: (a, b) => a === b };
   const idOk = x => typeof x === 'string' && /^[a-z0-9]{3,16}$/.test(x);
-  const defaultAuto = () => ({ btns: Array.from({ length: NB }, (_, i) => ({ id: uid(), name: 'Mapped Button ' + (i + 1), key: '' })), nodes: [], links: [] });
+  const HEX = /^#[0-9a-f]{6}$/i;
+  const mkBtn = n => ({ id: uid(), name: 'Mapped Button ' + n, key: '' });
+  const defaultAuto = () => ({ btns: [], nodes: [], links: [] });
   let auto = defaultAuto(), autoOpen = false, binding = null;
   const num = (x, lim) => Math.max(-lim, Math.min(lim, +x));
   function loadAuto(a) {
     const out = defaultAuto();
     if (a && typeof a === 'object') {
-      if (Array.isArray(a.btns)) a.btns.slice(0, NB).forEach((x, i) => { if (!x) return; if (idOk(x.id)) out.btns[i].id = x.id; out.btns[i].name = String(x.name || out.btns[i].name).slice(0, 30); out.btns[i].key = typeof x.key === 'string' ? x.key.slice(0, 12) : ''; });
+      if (Array.isArray(a.btns)) {
+        const seen = new Set();
+        out.btns = a.btns.slice(0, MAXB).filter(x => x).map((x, i) => ({ id: idOk(x.id) ? x.id : uid(), name: String(x.name || 'Mapped Button ' + (i + 1)).slice(0, 30), key: typeof x.key === 'string' ? x.key.slice(0, 12) : '' }))
+          .filter(x => !seen.has(x.id) && seen.add(x.id));
+      }
       const seenN = new Set();
-      if (Array.isArray(a.nodes)) a.nodes.slice(0, 80).forEach(n => {
-        if (!n || !idOk(n.id) || !NT.includes(n.t) || seenN.has(n.id) || out.btns.some(b => b.id === n.id)) return; seenN.add(n.id);
-        out.nodes.push({ id: n.id, t: n.t, x: isFinite(n.x) ? num(n.x, 5000) : 30, y: isFinite(n.y) ? num(n.y, 5000) : 30, cue: idOk(n.cue) ? n.cue : '', key: typeof n.key === 'string' ? n.key.slice(0, 12) : '' });
+      if (Array.isArray(a.nodes)) a.nodes.slice(0, 120).forEach(n => {
+        if (!n || !idOk(n.id) || !SPEC[n.t] || seenN.has(n.id) || out.btns.some(b => b.id === n.id)) return; seenN.add(n.id);
+        const pc = {}; if (n.pc && typeof n.pc === 'object') ['o', '0', '1'].forEach(k => { if (HEX.test(n.pc[k])) pc[k] = n.pc[k]; });
+        out.nodes.push({ id: n.id, t: n.t, x: isFinite(n.x) ? num(n.x, 5000) : 30, y: isFinite(n.y) ? num(n.y, 5000) : 30, cue: idOk(n.cue) ? n.cue : '', btn: idOk(n.btn) ? n.btn : '',
+          n: Math.max(1, Math.min(99, Math.round(+n.n) || 2)), pc });
       });
       if (Array.isArray(a.links)) {
         const seen = new Set();
-        a.links.slice(0, 400).forEach(l => {
-          if (!Array.isArray(l) || !seenN.has(l[0])) return;
-          const tn = out.nodes.find(n => n.id === l[1]), tb = out.btns.some(b => b.id === l[1]), p = l[2] === 1 ? 1 : 0;
-          if (!tb && !(tn && (tn.t === 'and' || tn.t === 'if'))) return; if ((tb || tn.t === 'and') && p) return; if (l[0] === l[1]) return;
+        a.links.slice(0, 600).forEach(l => {
+          if (!Array.isArray(l) || !seenN.has(l[0]) || l[0] === l[1]) return;
+          const from = out.nodes.find(n => n.id === l[0]); if (!SPEC[from.t].out) return;
+          const tn = out.nodes.find(n => n.id === l[1]), tb = out.btns.some(b => b.id === l[1]), p = l[2] | 0;
+          if (!tb && !tn) return; if (tb && p) return; if (tn && (p < 0 || p >= SPEC[tn.t].ins)) return;
           const k = l[0] + l[1] + p; if (seen.has(k)) return; seen.add(k); out.links.push([l[0], l[1], p]);
         });
       }
@@ -1581,6 +1612,7 @@
   const norm = k => k.length === 1 ? k.toLowerCase() : k;
   const keyLabel = k => !k ? 'key' : k.length === 1 ? k.toUpperCase() : ({ ' ': 'Space', ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→', Control: 'Ctrl' }[k] || k);
   const rowY = i => RY0 + i * RPITCH;
+  const pinColor = (n, k) => (n && n.pc && n.pc[k]) || (k === 'o' ? PURPLE : DARK);
   function autoDropCue(id) {
     const gone = auto.nodes.filter(n => n.t === 'audio' && n.cue === id).map(n => n.id);
     if (!gone.length) return;
@@ -1611,35 +1643,47 @@
   $('#azoom').addEventListener('click', () => { vt = { x: 0, y: 0, z: 1 }; kickView(); applyView(); });
 
   /* nodes */
-  const nodeEls = {}, SVG_X = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>', SVG_PEN = '<svg viewBox="0 0 24 24"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19z"/></svg>';
+  const nodeEls = {}, cnt = {}, SVG_X = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>', SVG_PEN = '<svg viewBox="0 0 24 24"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19z"/></svg>';
+  const LABEL = { and: 'AND', or: 'OR', nor: 'NOR', xor: 'XOR', xand: 'XAND', if: 'IF', random: 'RANDOM', counter: 'Counter', light: 'LIGHT', key: 'Button Input' };
   function reachBtns(id) {
     const seen = new Set(), out = new Set();
     (function go(c) { if (seen.has(c)) return; seen.add(c); auto.links.forEach(l => { if (l[0] !== c) return; const bi = auto.btns.findIndex(b => b.id === l[1]); if (bi >= 0) out.add(bi + 1); else go(l[1]); }); })(id);
     return [...out].sort((a, b) => a - b);
   }
   function buildNodeEl(n) {
-    const el = document.createElement('div'); el.className = 'anode t-' + n.t; el.dataset.id = n.id;
+    const sp = SPEC[n.t], el = document.createElement('div'); el.className = 'anode t-' + n.t + (sp.ins === 2 ? ' tall' : ''); el.dataset.id = n.id;
     let h = '';
-    if (n.t === 'audio') h = '<span class="nm"></span><small></small>';
-    else if (n.t === 'and') h = '<i class="ip" data-p="0"></i><span class="nm">AND</span>';
-    else if (n.t === 'if') h = '<i class="ip" data-p="0"></i><i class="ip" data-p="1"></i><small class="il" style="top:11px">if</small><small class="il" style="top:35px">then</small><span class="nm">IF</span>';
-    else h = '<span class="nm">Button Input</span><button class="nk" title="Set the key to watch"></button>';
-    el.innerHTML = h + '<i class="port"></i><button class="ndel" title="Remove">' + SVG_X + '</button>';
+    for (let i = 0; i < sp.ins; i++) h += '<i class="ip" data-p="' + i + '"></i>';
+    if (n.t === 'if') h += '<small class="il" style="top:11px">if</small><small class="il" style="top:35px">then</small>';
+    if (n.t === 'audio') h += '<span class="nm"></span><small></small>';
+    else if (n.t === 'key') h += '<span class="nm">Button Input</span><button class="nk" title="Choose which mapped button this watches"></button>';
+    else if (n.t === 'counter') h += '<span class="nm">Counter</span><input class="ni" type="number" min="1" max="99" title="Runs what is wired in every Nth press"><small class="cc"></small>';
+    else if (n.t === 'light') h += '<span class="lamp"></span><span class="nm">LIGHT</span>';
+    else h += '<span class="nm">' + LABEL[n.t] + '</span>';
+    if (sp.out) h += '<i class="port"></i>';
+    el.innerHTML = h + '<button class="ndel" title="Remove">' + SVG_X + '</button>';
     el.querySelector('.ndel').addEventListener('click', e => { e.stopPropagation(); removeNode(n.id); });
-    const nk = el.querySelector('.nk'); if (nk) nk.addEventListener('click', e => { e.stopPropagation(); binding = { t: 'node', id: n.id }; nk.textContent = 'press a key'; nk.classList.add('wait'); nk.classList.remove('set'); });
+    const nk = el.querySelector('.nk'); if (nk) nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, auto.btns.map((b, i) => ({ id: b.id, sm: i + 1, label: b.name })), id => { n.btn = id; save(); }); });
+    const ni = el.querySelector('.ni'); if (ni) { ni.addEventListener('input', () => { n.n = Math.max(1, Math.min(99, Math.round(+ni.value) || 1)); cnt[n.id] = 0; updCounter(n); }); ni.addEventListener('change', () => save()); ni.addEventListener('keydown', e => e.stopPropagation()); }
     aworld.appendChild(el); return el;
   }
+  const updCounter = n => { const el = nodeEls[n.id], cc = el && el.querySelector('.cc'); if (cc) cc.textContent = (cnt[n.id] || 0) + '/' + n.n; };
   function syncNodes() {
     const live = new Set(auto.nodes.map(n => n.id));
     Object.keys(nodeEls).forEach(id => { if (!live.has(id)) { nodeEls[id].remove(); delete nodeEls[id]; } });
     auto.nodes.forEach(n => {
       const el = nodeEls[n.id] || (nodeEls[n.id] = buildNodeEl(n));
       el.style.left = n.x + 'px'; el.style.top = n.y + 'px';
+      el.querySelectorAll('.ip').forEach(ip => { ip.style.background = n.pc && n.pc[ip.dataset.p] ? n.pc[ip.dataset.p] : ''; });
+      const pt = el.querySelector('.port'); if (pt) pt.style.background = n.pc && n.pc.o ? n.pc.o : '';
       if (n.t === 'audio') {
         const it = get(n.cue), ns = reachBtns(n.id);
         el.querySelector('.nm').textContent = it ? it.name : 'Choose a cue'; el.classList.toggle('dim', !it || !it.src);
         el.querySelector('small').textContent = ns.length ? '(Connected ' + ns.join(', ') + ')' : '(Not connected)';
-      } else if (n.t === 'key') { const nk = el.querySelector('.nk'); nk.textContent = keyLabel(n.key); nk.classList.toggle('set', !!n.key); nk.classList.remove('wait'); }
+      } else if (n.t === 'key') {
+        const nk = el.querySelector('.nk'), b = auto.btns.find(x => x.id === n.btn); nk.textContent = b ? b.name : 'link a button'; nk.classList.toggle('set', !!b);
+      } else if (n.t === 'counter') { const ni = el.querySelector('.ni'); if (document.activeElement !== ni) ni.value = n.n; updCounter(n); }
+      else if (n.t === 'light') el.querySelector('.lamp').style.setProperty('--lc', n.pc && n.pc['0'] ? n.pc['0'] : '#ffd84d');
     });
     $('#aempty').classList.toggle('show', !auto.nodes.length);
     drawWires();
@@ -1648,34 +1692,44 @@
   function removeNode(id) { auto.nodes = auto.nodes.filter(n => n.id !== id); auto.links = auto.links.filter(l => l[0] !== id && l[1] !== id); save(); }
   function addNode(t, cue) {
     const n = auto.nodes.length, col = n % 2, row = Math.floor(n / 2) % 3;     // drop new nodes on a loose grid so they never stack
-    auto.nodes.push({ id: uid(), t, x: Math.round((30 - v.x) / v.z + col * 280), y: Math.round((24 - v.y) / v.z + row * 70), cue: cue || '', key: '' }); save();
+    auto.nodes.push({ id: uid(), t, x: Math.round((30 - v.x) / v.z + col * 280 + Math.floor(n / 6) * 26), y: Math.round((24 - v.y) / v.z + row * 70 + Math.floor(n / 6) * 26), cue: cue || '', btn: '', n: 2, pc: {} }); save();
   }
 
-  /* cue picker */
+  /* pop-up list (cue / button chooser) */
   let pickEl = null;
   function closePick() { if (pickEl) { pickEl.remove(); pickEl = null; } }
-  function pickCue(anchor, cb) {
+  function pickList(anchor, entries, cb) {
     closePick();
-    const cues = items.filter(i => i.type === 'audio');
-    if (!cues.length) { toast('Add an audio cue to the board first'); return; }
+    if (!entries.length) { toast('Nothing to choose from yet'); return; }
     const box = document.createElement('div'); box.className = 'apick';
-    cues.forEach((it, i) => { const b = document.createElement('button'); b.innerHTML = '<small>' + (i + 1) + '</small>'; b.appendChild(document.createTextNode(it.name)); b.addEventListener('click', () => { closePick(); cb(it.id); }); box.appendChild(b); });
+    entries.forEach(en => { const b = document.createElement('button'); b.innerHTML = '<small>' + en.sm + '</small>'; b.appendChild(document.createTextNode(en.label)); b.addEventListener('click', () => { closePick(); cb(en.id); }); box.appendChild(b); });
     autoin.appendChild(box); pickEl = box;
     const a = anchor.getBoundingClientRect(), c = autoin.getBoundingClientRect();
     box.style.left = Math.max(0, Math.min(c.width - 200, a.left - c.left)) + 'px'; box.style.top = Math.max(0, Math.min(c.height - box.offsetHeight, a.bottom - c.top + 6)) + 'px';
   }
-  addEventListener('pointerdown', e => { if (pickEl && !e.target.closest('.apick') && !e.target.closest('.apal [data-t=audio]')) closePick(); }, true);
+  const pickCue = (anchor, cb) => { const cues = items.filter(i => i.type === 'audio'); if (!cues.length) { toast('Add an audio cue to the board first'); return; } pickList(anchor, cues.map((it, i) => ({ id: it.id, sm: i + 1, label: it.name })), cb); };
+  addEventListener('pointerdown', e => { if (pickEl && !e.target.closest('.apick') && !e.target.closest('.apal [data-t=audio]') && !e.target.closest('.nk')) closePick(); }, true);
   $('#apal').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return; const t = b.dataset.t;
     if (t === 'audio') pickCue(b, id => addNode('audio', id)); else addNode(t);
   });
+
+  /* pin colours (opens the colour wheel) */
+  let pcT = 0;
+  function openPinPicker(n, key, anchor) {
+    closePops(); closePick();
+    [H, S, V] = rgb2hsv(...fromHex(pinColor(n, key))); syncT();
+    pickCb = c => { n.pc = n.pc || {}; n.pc[key] = c; syncNodes(); clearTimeout(pcT); pcT = setTimeout(save, 400); };
+    pickerRender(); placePop(picker, anchor); picker.classList.add('show');
+  }
 
   /* wires */
   let wd = null, nd = null, pn = null;
   const wirePath = (x1, y1, x2, y2) => { const k = Math.max(50, Math.abs(x2 - x1) * .5); return 'M' + x1 + ' ' + y1 + ' C' + (x1 + k) + ' ' + y1 + ',' + (x2 - k) + ' ' + y2 + ',' + x2 + ' ' + y2; };
   const outPos = id => { const el = nodeEls[id]; return el ? [v.x + (parseFloat(el.style.left) + el.offsetWidth) * v.z, v.y + (parseFloat(el.style.top) + el.offsetHeight / 2) * v.z] : null; };
   function inPos(to, p, W) {
-    const bi = auto.btns.findIndex(b => b.id === to); if (bi >= 0) return [W, rowY(bi)];
+    const bi = auto.btns.findIndex(b => b.id === to);
+    if (bi >= 0) return [W, Math.max(6, Math.min(mlist.clientHeight - 6, rowY(bi) - mlist.scrollTop))];
     const el = nodeEls[to], ip = el && el.querySelectorAll('.ip')[p]; if (!ip) return null;
     return [v.x + parseFloat(el.style.left) * v.z, v.y + (parseFloat(el.style.top) + ip.offsetTop + ip.offsetHeight / 2) * v.z];
   }
@@ -1686,83 +1740,107 @@
     let s = '';
     auto.links.forEach((l, n) => {
       const a = outPos(l[0]), b = inPos(l[1], l[2], W); if (!a || !b) return;
-      const d = wirePath(a[0], a[1], b[0], b[1]); s += '<g class="wg" data-n="' + n + '"><path class="hit" d="' + d + '"/><path class="vis" d="' + d + '"/></g>';
+      const d = wirePath(a[0], a[1], b[0], b[1]);
+      s += '<g class="wg" data-n="' + n + '" style="--wc:' + pinColor(nodeById(l[0]), 'o') + '"><path class="hit" d="' + d + '"/><path class="vis" d="' + d + '"/></g>';
     });
-    if (wd) { const a = outPos(wd.id); if (a) s += '<path class="tmp" d="' + wirePath(a[0], a[1], wd.px, wd.py) + '"/>'; }
+    if (wd) { const a = outPos(wd.id); if (a) s += '<path class="tmp" style="--wc:' + pinColor(nodeById(wd.id), 'o') + '" d="' + wirePath(a[0], a[1], wd.px, wd.py) + '"/>'; }
     awires.innerHTML = s;
   }
   new ResizeObserver(drawWires).observe(acanvas);
+  mlist.addEventListener('scroll', drawWires);
   awires.addEventListener('click', e => { const g = e.target.closest('.wg'); if (!g) return; auto.links.splice(+g.dataset.n, 1); save(); toast('Disconnected'); });
 
   function rowAt(cx, cy) {
-    const r = amaps.getBoundingClientRect();
-    if (cx < r.left - 70 || cx > r.right + 10) return -1;
-    const y = cy - r.top, i = Math.round((y - RY0) / RPITCH);
+    const r = mlist.getBoundingClientRect();
+    if (cx < r.left - 70 || cx > r.right + 10 || cy < r.top || cy > r.bottom) return -1;
+    const y = cy - r.top + mlist.scrollTop, i = Math.round((y - RY0) / RPITCH);
     return i >= 0 && i < auto.btns.length && Math.abs(y - rowY(i)) <= 22 ? i : -1;
   }
   function targetAt(cx, cy) {
     const hit = document.elementFromPoint(cx, cy), ip = hit && hit.closest && hit.closest('.ip');
     if (ip) return { to: ip.closest('.anode').dataset.id, p: +ip.dataset.p, el: ip };
-    const i = rowAt(cx, cy); if (i >= 0) return { to: auto.btns[i].id, p: 0, el: amaps.querySelectorAll('.mrow')[i] };
+    const i = rowAt(cx, cy); if (i >= 0) return { to: auto.btns[i].id, p: 0, el: minner.querySelectorAll('.mrow')[i] };
     return null;
   }
-  const markHot = el => { aworld.querySelectorAll('.ip.hot').forEach(x => x !== el && x.classList.remove('hot')); amaps.querySelectorAll('.mrow.drop').forEach(x => x !== el && x.classList.remove('drop')); if (el) el.classList.add(el.classList.contains('ip') ? 'hot' : 'drop'); };
+  const markHot = el => { aworld.querySelectorAll('.ip.hot').forEach(x => x !== el && x.classList.remove('hot')); minner.querySelectorAll('.mrow.drop').forEach(x => x !== el && x.classList.remove('drop')); if (el) el.classList.add(el.classList.contains('ip') ? 'hot' : 'drop'); };
   function downstream(from, target) {           // does 'from' (a node) eventually feed 'target'?
     const seen = new Set(); let hit = false;
     (function go(c) { if (hit || seen.has(c)) return; if (c === target) { hit = true; return; } seen.add(c); auto.links.forEach(l => { if (l[0] === c) go(l[1]); }); })(from);
     return hit;
   }
   function addLink(from, to, p) {
-    if (from === to || !nodeById(from)) return;
+    const fn = nodeById(from); if (from === to || !fn || !SPEC[fn.t].out) return;
     const tn = nodeById(to);
-    if (tn && (tn.t === 'audio' || tn.t === 'key')) return;
+    if (tn && p >= SPEC[tn.t].ins) return;
     if (tn && downstream(to, from)) { toast('That would make a loop'); return; }
-    if (tn && tn.t === 'if') auto.links = auto.links.filter(l => !(l[1] === to && l[2] === p));   // 'if' and 'then' take one wire each
+    if (tn && !SPEC[tn.t].multi) auto.links = auto.links.filter(l => !(l[1] === to && l[2] === p));   // one wire per pin
     if (auto.links.some(l => l[0] === from && l[1] === to && l[2] === p)) return;
     auto.links.push([from, to, p]); save();
   }
 
   acanvas.addEventListener('pointerdown', e => {
-    if (e.target.closest('.azoom, button')) return;
+    if (e.target.closest('.azoom, button, input')) return;
     const port = e.target.closest('.port'), node = e.target.closest('.anode'), r = acanvas.getBoundingClientRect();
-    if (port) { e.preventDefault(); wd = { id: node.dataset.id, px: e.clientX - r.left, py: e.clientY - r.top }; drawWires(); }
+    if (port) { e.preventDefault(); wd = { id: node.dataset.id, px: e.clientX - r.left, py: e.clientY - r.top, sx: e.clientX, sy: e.clientY, moved: false, el: port }; drawWires(); }
     else if (node) {
       e.preventDefault(); const n = nodeById(node.dataset.id); if (!n) return;
-      nd = { n, el: node, sx: e.clientX, sy: e.clientY, ox: n.x, oy: n.y, moved: false, onName: n.t === 'audio' && !!e.target.closest('.nm, small') }; node.style.cursor = 'grabbing';
+      const ip = e.target.closest('.ip');
+      nd = { n, el: node, sx: e.clientX, sy: e.clientY, ox: n.x, oy: n.y, moved: false, onName: n.t === 'audio' && !!e.target.closest('.nm, small'), ip: ip || null }; node.style.cursor = 'grabbing';
     } else { e.preventDefault(); pn = { sx: e.clientX, sy: e.clientY, ox: v.x, oy: v.y }; acanvas.classList.add('pan'); }
   });
   addEventListener('pointermove', e => {
-    if (wd) { const r = acanvas.getBoundingClientRect(); wd.px = e.clientX - r.left; wd.py = e.clientY - r.top; const t = targetAt(e.clientX, e.clientY); markHot(t && t.el); drawWires(); }
-    else if (nd) {
+    if (wd) {
+      const r = acanvas.getBoundingClientRect(); wd.px = e.clientX - r.left; wd.py = e.clientY - r.top;
+      if (Math.abs(e.clientX - wd.sx) + Math.abs(e.clientY - wd.sy) > 4) wd.moved = true;
+      const t = wd.moved ? targetAt(e.clientX, e.clientY) : null; markHot(t && t.el); drawWires();
+    } else if (nd) {
       const dx = e.clientX - nd.sx, dy = e.clientY - nd.sy; if (Math.abs(dx) + Math.abs(dy) > 4) nd.moved = true; if (!nd.moved) return;
       nd.n.x = nd.ox + dx / v.z; nd.n.y = nd.oy + dy / v.z; nd.el.style.left = nd.n.x + 'px'; nd.el.style.top = nd.n.y + 'px'; drawWires();
     } else if (pn) { vt.x = v.x = pn.ox + e.clientX - pn.sx; vt.y = v.y = pn.oy + e.clientY - pn.sy; applyView(); drawWires(); }
   });
   const endPointer = e => {
-    if (wd) { const id = wd.id, t = e && e.type === 'pointerup' ? targetAt(e.clientX, e.clientY) : null; wd = null; markHot(null); if (t) addLink(id, t.to, t.p); drawWires(); }
+    if (wd) {
+      const d = wd, up = e && e.type === 'pointerup'; wd = null; markHot(null);
+      if (up && !d.moved) openPinPicker(nodeById(d.id), 'o', d.el);                       // a plain click on a pin picks its colour
+      else if (up) { const t = targetAt(e.clientX, e.clientY); if (t) addLink(d.id, t.to, t.p); }
+      drawWires();
+    }
     if (nd) {
       const d = nd; nd = null; d.el.style.cursor = '';
-      if (d.moved) save(); else if (d.onName) pickCue(d.el, id => { d.n.cue = id; save(); });
+      if (d.moved) save();
+      else if (d.ip) openPinPicker(d.n, d.ip.dataset.p, d.ip);
+      else if (d.onName) pickCue(d.el, id => { d.n.cue = id; save(); });
     }
     if (pn) { pn = null; acanvas.classList.remove('pan'); }
   };
   addEventListener('pointerup', endPointer); addEventListener('pointercancel', endPointer);
 
-  /* mapped buttons */
+  /* mapped buttons (any number, scrollable) */
   function renderRows() {
-    amaps.innerHTML = '';
+    minner.innerHTML = ''; minner.style.height = auto.btns.length ? rowY(auto.btns.length - 1) + 30 + 'px' : '0';
     auto.btns.forEach((b, i) => {
       const row = document.createElement('div'); row.className = 'mrow'; row.dataset.id = b.id; row.style.top = rowY(i) - 17 + 'px';
-      row.innerHTML = '<span class="mn"></span><button class="mk" title="Set a keyboard shortcut"></button><button class="mi me" title="Rename">' + SVG_PEN + '</button>';
+      row.innerHTML = '<span class="mn"></span><button class="mk" title="Set a keyboard shortcut"></button><button class="mi me" title="Rename">' + SVG_PEN + '</button><button class="mi mx" title="Remove">' + SVG_X + '</button>';
       row.querySelector('.mn').textContent = b.name;
       const mk = row.querySelector('.mk'); mk.textContent = keyLabel(b.key); mk.classList.toggle('set', !!b.key);
-      row.addEventListener('click', e => { if (!e.target.closest('button, input')) runBtn(b); });
-      mk.addEventListener('click', e => { e.stopPropagation(); binding = { t: 'btn', id: b.id }; mk.textContent = 'press a key'; mk.classList.add('wait'); mk.classList.remove('set'); });
+      row.addEventListener('pointerdown', e => { if (e.target.closest('button, input')) return; pHeld.add(b.id); runBtn(b); });
+      mk.addEventListener('click', e => { e.stopPropagation(); binding = { id: b.id }; mk.textContent = 'press a key'; mk.classList.add('wait'); mk.classList.remove('set'); });
       row.querySelector('.me').addEventListener('click', e => { e.stopPropagation(); renameRow(row, b); });
-      amaps.appendChild(row);
+      row.querySelector('.mx').addEventListener('click', e => { e.stopPropagation(); removeBtn(b.id); });
+      minner.appendChild(row);
     });
+    $('#mminus').disabled = !auto.btns.length;
     syncNodes();
   }
+  function removeBtn(id) {
+    auto.btns = auto.btns.filter(b => b.id !== id); auto.links = auto.links.filter(l => l[1] !== id); renderRows(); save();
+  }
+  $('#mplus').addEventListener('click', () => {
+    if (auto.btns.length >= MAXB) return;
+    let n = auto.btns.length + 1; while (auto.btns.some(x => x.name === 'Mapped Button ' + n)) n++;
+    auto.btns.push(mkBtn(n)); renderRows(); save(); mlist.scrollTo({ top: mlist.scrollHeight, behavior: 'smooth' });
+  });
+  $('#mminus').addEventListener('click', () => { if (auto.btns.length) removeBtn(auto.btns[auto.btns.length - 1].id); });
   function renameRow(row, b) {
     const mn = row.querySelector('.mn'), inp = document.createElement('input'); inp.value = b.name; inp.maxLength = 30; mn.replaceWith(inp); inp.focus(); inp.select();
     let done = false;
@@ -1772,41 +1850,54 @@
   }
 
   /* running the graph: pressing a mapped button pulls on everything wired into it */
-  const held = new Set();
+  const pHeld = new Set(), kHeld = new Set();                 // mapped buttons currently held by pointer / by key
+  const isHeld = id => pHeld.has(id) || kHeld.has(id);
   function flash(id) { const el = nodeEls[id]; if (el) { el.classList.add('fire'); setTimeout(() => el.classList.remove('fire'), 450); } }
-  function truthy(id, seen) {
+  function val(id, seen) {
     const n = nodeById(id); if (!n || seen.has(id)) return false; seen = new Set(seen).add(id);
     if (n.t === 'audio') { const p = players[n.cue]; return !!(p && !p.paused); }
-    if (n.t === 'key') return !!n.key && held.has(n.key);
-    if (n.t === 'and') { const ins = inputs(id, 0); return ins.length > 0 && ins.every(s => truthy(s, seen)); }
+    if (n.t === 'key') return !!n.btn && isHeld(n.btn);
+    if (n.t === 'counter') return (cnt[id] || 0) > 0;
+    if (n.t === 'random') return !!n.rv;
+    if (SPEC[n.t].gate) { if (!inputs(id, 0).length && !inputs(id, 1).length) return false; return !!GATE[n.t](pin(id, 0, seen), pin(id, 1, seen)); }
     return false;
   }
+  const pin = (id, p, seen) => inputs(id, p).some(s => val(s, seen));
   function exec(id, seen, st) {
     const n = nodeById(id); if (!n || seen.has(id)) return; seen = new Set(seen).add(id); flash(id);
     if (n.t === 'audio') {
       const it = get(n.cue), p = it && player(it);
       if (!p) { st.miss++; return; }
       p.pause(); p.currentTime = it.trimStart || 0; p.play().catch(() => toast('Could not play this file')); st.played++;
-    } else if (n.t === 'and') inputs(id, 0).forEach(s => exec(s, seen, st));
-    else if (n.t === 'if') { const c = inputs(id, 0); if (c.length && c.every(s => truthy(s, seen))) inputs(id, 1).forEach(s => exec(s, seen, st)); }
+    } else if (n.t === 'if') { if (inputs(id, 0).length && pin(id, 0, seen)) inputs(id, 1).forEach(s => exec(s, seen, st)); }
+    else if (n.t === 'counter') { cnt[id] = (cnt[id] || 0) + 1; if (cnt[id] >= n.n) { cnt[id] = 0; inputs(id, 0).forEach(s => exec(s, seen, st)); } updCounter(n); }
+    else if (n.t === 'random') { const ins = inputs(id, 0); if (ins.length) exec(ins[Math.floor(Math.random() * ins.length)], seen, st); }
+    else if (n.t === 'light') n.lit = performance.now() + 600;
   }
   function runBtn(b) {
-    const st = { played: 0, miss: 0 }; inputs(b.id, 0).forEach(s => exec(s, new Set(), st));
-    if (!st.played) toast(st.miss ? 'That cue has no audio file yet' : inputs(b.id, 0).length ? 'Nothing played (an IF may be false)' : 'Nothing is connected to ' + b.name);
-    const row = amaps.querySelector('.mrow[data-id="' + b.id + '"]'); if (row) { row.classList.remove('ran'); void row.offsetWidth; row.classList.add('ran'); }
+    auto.nodes.forEach(n => { if (n.t === 'random') n.rv = Math.random() < .5; });
+    const st = { played: 0, miss: 0 }, ins = inputs(b.id, 0); ins.forEach(s => exec(s, new Set(), st));
+    if (!st.played && !ins.some(s => ['light', 'counter'].includes((nodeById(s) || {}).t))) toast(st.miss ? 'That cue has no audio file yet' : ins.length ? 'Nothing played (a condition may be false)' : 'Nothing is connected to ' + b.name);
+    const row = minner.querySelector('.mrow[data-id="' + b.id + '"]'); if (row) { row.classList.remove('ran'); void row.offsetWidth; row.classList.add('ran'); }
   }
-  addEventListener('blur', () => held.clear());
-  addEventListener('keyup', e => held.delete(norm(e.key)), true);
+  let lightRaf = 0;
+  function lightTick() {
+    if (!autoOpen) { lightRaf = 0; return; }
+    const now = performance.now();
+    auto.nodes.forEach(n => { if (n.t !== 'light') return; const el = nodeEls[n.id]; if (el) el.querySelector('.lamp').classList.toggle('on', pin(n.id, 0, new Set()) || (n.lit || 0) > now); });
+    lightRaf = requestAnimationFrame(lightTick);
+  }
+  addEventListener('pointerup', () => pHeld.clear()); addEventListener('pointercancel', () => pHeld.clear());
+  addEventListener('blur', () => { pHeld.clear(); kHeld.clear(); });
+  addEventListener('keyup', e => { const k = norm(e.key); auto.btns.forEach(b => { if (b.key === k) kHeld.delete(b.id); }); }, true);
   addEventListener('keydown', e => {
-    held.add(norm(e.key));
     if (binding) {
-      const isMod = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(e.key);
-      if (isMod && binding.t === 'btn') return;
+      if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) return;
       e.preventDefault(); e.stopImmediatePropagation();
-      const bd = binding, tgt = bd.t === 'btn' ? auto.btns.find(x => x.id === bd.id) : nodeById(bd.id); binding = null;
-      if (tgt && e.key !== 'Escape') {
-        if (e.key === 'Backspace' || e.key === 'Delete') tgt.key = '';
-        else { const k = norm(e.key); if (bd.t === 'btn') auto.btns.forEach(o => { if (o.key === k) o.key = ''; }); tgt.key = k; }
+      const b = auto.btns.find(x => x.id === binding.id); binding = null;
+      if (b && e.key !== 'Escape') {
+        if (e.key === 'Backspace' || e.key === 'Delete') b.key = '';
+        else { const k = norm(e.key); auto.btns.forEach(o => { if (o.key === k) o.key = ''; }); b.key = k; }
         save();
       }
       renderRows(); return;
@@ -1814,13 +1905,13 @@
     if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
     if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || editingId || document.activeElement.isContentEditable) return;
     const k = norm(e.key), b = auto.btns.find(x => x.key && x.key === k);
-    if (b) { e.preventDefault(); runBtn(b); }
+    if (b) { e.preventDefault(); kHeld.add(b.id); runBtn(b); }
   }, true);
 
   /* open / close */
   function openAuto() {
     dock.classList.add('away'); shareDock.classList.add('away'); autoDock.classList.add('open'); autoDock.setAttribute('aria-expanded', 'true'); select(null);
-    autoOpen = true; renderRows(); applyView();
+    autoOpen = true; renderRows(); applyView(); if (!lightRaf) lightRaf = requestAnimationFrame(lightTick);
   }
   function closeAuto() {
     closePick(); dock.classList.remove('away'); shareDock.classList.remove('away'); autoDock.classList.remove('open'); autoDock.setAttribute('aria-expanded', 'false');
