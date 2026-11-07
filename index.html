@@ -499,6 +499,15 @@
   .gh:hover { background: rgba(0,0,0,.72); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.28), 0 0 0 2px rgba(224,168,240,.7), 0 0 20px rgba(224,168,240,.45); }
   .gh:hover svg { transform: rotate(-12deg) scale(1.12); } .gh:hover::after { transform: translateX(120%); }
   .gh:active { transform: scale(.95); }
+  .dtip { position: fixed; z-index: 101; left: 0; top: 0; pointer-events: none; padding: 7px 20px; border-radius: 20px; background: var(--glass); background-clip: padding-box; border: 2px solid var(--glass-border);
+    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); color: #fff; font: 500 15px 'Montserrat', sans-serif; white-space: nowrap; opacity: 0; transform: translateY(-6px) scale(.92); transform-origin: var(--cx, 50%) -10px;
+    transition: opacity .18s ease, transform .3s var(--spring); }
+  .dtip.show { opacity: 1; transform: none; }
+  .dtip::before { content: ''; position: absolute; left: var(--cx, 50%); top: -13px; width: 18px; height: 11px; margin-left: -9px; background: var(--glass-border); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+  .dtip::after { content: ''; position: absolute; left: var(--cx, 50%); top: -9px; width: 12px; height: 7px; margin-left: -6px; background: #747474; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+  .recenter { position: fixed; right: 16px; bottom: 68px; z-index: 90; width: 44px; height: 44px; padding: 0; border: 0; background: none; cursor: pointer;
+    -webkit-backdrop-filter: invert(1); backdrop-filter: invert(1);                                   /* the icon shape just inverts whatever is behind it */
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13.5,13.5v1.75q0,0.32-0.21,0.54T12.75,16t-0.54-0.21T12,15.25V13.5q0-0.63 0.44-1.06T13.5,12h1.75q0.33,0 0.54,0.21Q16,12.43 16,12.75t-0.21,0.54T15.25,13.5H13.5Zm0,7h1.75q0.33,0 0.54,0.21Q16,20.93 16,21.25t-0.21,0.54T15.25,22H13.5q-0.63,0-1.06-0.44T12,20.5V18.75q0-0.32 0.21-0.54T12.75,18t0.54,0.21q0.21,0.21 0.21,0.54V20.5Zm7-7H18.75q-0.32,0-0.54-0.21T18,12.75t0.21-0.54T18.75,12H20.5q0.63,0 1.06,0.44T22,13.5v1.75q0,0.32-0.21,0.54T21.25,16q-0.32,0-0.54-0.21T20.5,15.25V13.5Zm0,7V18.75q0-0.32 0.21-0.54T21.25,18t0.54,0.21Q22,18.43 22,18.75V20.5q0,0.63-0.44,1.06T20.5,22H18.75q-0.32,0-0.54-0.21T18,21.25t0.21-0.54t0.54-0.21H20.5ZM12,5Q9.08,5 7.04,7.04T5,12q0,1.8 0.81,3.3T8,17.75V16q0-0.43 0.29-0.71Q8.58,15 9,15q0.43,0 0.71,0.29T10,16v4q0,0.43-0.29,0.71T9,21H5q-0.42,0-0.71-0.29Q4,20.43 4,20t0.29-0.71T5,19H6.35Q4.8,17.75 3.9,15.94T3,12q0-1.88 0.71-3.51T5.64,5.64Q6.85,4.42 8.49,3.71T12,3q2.85,0 5.1,1.56t3.25,4.06q0.15,0.4 0,0.77T19.8,9.92t-0.79,0q-0.39-0.15-0.54-0.55Q17.7,7.43 15.96,6.21T12,5Z'/%3E%3C/svg%3E") center / 30px 30px no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13.5,13.5v1.75q0,0.32-0.21,0.54T12.75,16t-0.54-0.21T12,15.25V13.5q0-0.63 0.44-1.06T13.5,12h1.75q0.33,0 0.54,0.21Q16,12.43 16,12.75t-0.21,0.54T15.25,13.5H13.5Zm0,7h1.75q0.33,0 0.54,0.21Q16,20.93 16,21.25t-0.21,0.54T15.25,22H13.5q-0.63,0-1.06-0.44T12,20.5V18.75q0-0.32 0.21-0.54T12.75,18t0.54,0.21q0.21,0.21 0.21,0.54V20.5Zm7-7H18.75q-0.32,0-0.54-0.21T18,12.75t0.21-0.54T18.75,12H20.5q0.63,0 1.06,0.44T22,13.5v1.75q0,0.32-0.21,0.54T21.25,16q-0.32,0-0.54-0.21T20.5,15.25V13.5Zm0,7V18.75q0-0.32 0.21-0.54T21.25,18t0.54,0.21Q22,18.43 22,18.75V20.5q0,0.63-0.44,1.06T20.5,22H18.75q-0.32,0-0.54-0.21T18,21.25t0.21-0.54t0.54-0.21H20.5ZM12,5Q9.08,5 7.04,7.04T5,12q0,1.8 0.81,3.3T8,17.75V16q0-0.43 0.29-0.71Q8.58,15 9,15q0.43,0 0.71,0.29T10,16v4q0,0.43-0.29,0.71T9,21H5q-0.42,0-0.71-0.29Q4,20.43 4,20t0.29-0.71T5,19H6.35Q4.8,17.75 3.9,15.94T3,12q0-1.88 0.71-3.51T5.64,5.64Q6.85,4.42 8.49,3.71T12,3q2.85,0 5.1,1.56t3.25,4.06q0.15,0.4 0,0.77T19.8,9.92t-0.79,0q-0.39-0.15-0.54-0.55Q17.7,7.43 15.96,6.21T12,5Z'/%3E%3C/svg%3E") center / 30px 30px no-repeat; }
   .save { position: fixed; right: 16px; bottom: 16px; z-index: 90; display: flex; gap: 8px; }
   .save button {
     height: 40px; padding: 0 16px; border-radius: 20px; border: 2px solid var(--glass-border);
@@ -661,6 +670,8 @@
 <div class="overlay" id="codeOverlay"><div class="bigcode" id="bigCode"></div></div>
 
 <a class="gh" id="gh" href="https://github.com/" target="_blank" rel="noopener" title="View the source on GitHub"><svg viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg>GitHub</a>
+
+<button class="recenter" id="recenter" title="Reset the view to the centre" aria-label="Reset the view"></button>
 
 <div class="save">
   <button id="copy">Copy save</button>
@@ -980,13 +991,23 @@
     applyBoard(); bRaf = done ? 0 : requestAnimationFrame(bstep);
   }
   const kickBoard = () => { if (!bRaf) { bT = performance.now(); bRaf = requestAnimationFrame(bstep); } };
-  world.addEventListener('wheel', e => {
-    e.preventDefault();
-    const d = e.deltaY * (e.deltaMode === 1 ? 16 : 1), nz = Math.max(.3, Math.min(2.5, bvt.z * Math.exp(-d * .0016))), f = nz / bvt.z;
-    bvt.x = e.clientX - (e.clientX - bvt.x) * f; bvt.y = e.clientY - (e.clientY - bvt.y) * f; bvt.z = nz; kickBoard();
-  }, { passive: false });
+  // (no zooming on the board: scrolling is left alone, only panning)
+  $('#recenter').addEventListener('click', () => { bvt = { x: 0, y: 0, z: 1 }; kickBoard(); });
   world.addEventListener('dblclick', e => { if (e.target === world) { bvt = { x: 0, y: 0, z: 1 }; kickBoard(); } });         // double-click empty space: back to the start view
   addEventListener('pointerup', () => { bpn = null; world.classList.remove('panning'); }); addEventListener('pointercancel', () => { bpn = null; world.classList.remove('panning'); });
+
+  /* ---------- hover labels for the three round dock buttons ---------- */
+  const dtip = document.createElement('div'); dtip.className = 'dtip'; document.body.appendChild(dtip);
+  [['#autoDock', 'Automation'], ['#dock', 'Add Elements'], ['#shareDock', 'Share Live']].forEach(([sel, label]) => {
+    const d = $(sel);
+    const hide = () => dtip.classList.remove('show');
+    d.addEventListener('pointerenter', e => {
+      if (e.pointerType === 'touch' || d.classList.contains('open') || d.classList.contains('away')) return;
+      dtip.textContent = label; const r = d.getBoundingClientRect(), w = dtip.offsetWidth, cx = r.left + r.width / 2, left = Math.max(8, Math.min(innerWidth - w - 8, cx - w / 2));
+      dtip.style.left = left + 'px'; dtip.style.top = r.bottom + 14 + 'px'; dtip.style.setProperty('--cx', (cx - left) + 'px'); dtip.classList.add('show');
+    });
+    d.addEventListener('pointerleave', hide); d.addEventListener('pointerdown', hide); d.addEventListener('click', hide);
+  });
 
   /* ---------- drag & resize ---------- */
   let drag = null;
