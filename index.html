@@ -329,8 +329,18 @@
   .anode .lamp { width: 18px; height: 18px; flex: none; border-radius: 50%; background: rgba(255,255,255,.16); transition: background .18s, box-shadow .18s; }
   .anode .lamp.on { background: var(--lc, #ffd84d); box-shadow: 0 0 14px 3px var(--lc, #ffd84d); }
   .anode .cc { min-width: 26px; text-align: center; }
-  .anode .ol { position: absolute; right: 17px; font-size: 10px; font-weight: 600; color: rgba(255,255,255,.45); pointer-events: none; }
-  .anode.t-wait { padding-left: 24px; } .anode.waiting { box-shadow: 0 0 0 3px rgba(255,216,77,.7); }
+  .anode .ol { position: absolute; right: 18px; font-size: 10px; font-weight: 600; color: rgba(255,255,255,.45); pointer-events: none; }
+  .anode.t-wait { padding-left: 24px; } .anode.t-number { padding-left: 16px; }
+  .anode .wring { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; opacity: 0; transition: opacity .25s ease; }
+  .anode .wring rect { fill: none; stroke: #ffd84d; stroke-width: 3; stroke-dasharray: 100; stroke-dashoffset: 0; stroke-linecap: round; filter: drop-shadow(0 0 5px #ffd84d) drop-shadow(0 0 12px rgba(255,216,77,.7)); }
+  .anode.waiting .wring { opacity: 1; }
+  .anode.t-audio { height: 78px; padding: 0 46px 0 40px; }
+  .anode.t-audio .ac { display: flex; flex-direction: column; gap: 8px; }
+  .anode.t-audio .r2 { display: flex; align-items: center; gap: 6px; }
+  .anode.t-audio .r2 small { font-size: 11px; }
+  .anode.t-audio .ip[data-p="0"] { top: 22px; } .anode.t-audio .ip[data-p="1"] { top: 56px; }
+  .anode.t-audio .ip[data-p="2"] { left: 50%; top: 0; margin: -8px 0 0 -8px; } .anode.t-audio .ip[data-p="3"] { left: 50%; top: 100%; margin: -8px 0 0 -8px; }
+  .anode .pl { position: absolute; left: calc(50% + 14px); font-size: 9px; font-weight: 600; color: rgba(255,255,255,.45); pointer-events: none; }
   .anode .il { position: absolute; left: 14px; font-size: 10px; font-weight: 600; color: rgba(255,255,255,.45); }
   .anode .nk { border: 0; height: 22px; min-width: 30px; padding: 0 8px; border-radius: 11px; background: rgba(255,255,255,.16); color: rgba(255,255,255,.65); font: 600 11px 'Montserrat', sans-serif; cursor: pointer; }
   .anode .nk.op { min-width: 28px; padding: 0 9px; font-size: 13px; background: rgba(255,255,255,.22); color: #fff; }
@@ -547,7 +557,7 @@
       <svg class="awires" id="awires"></svg>
     </div>
     <div class="amaps" id="amaps"><div class="mlist" id="mlist"><div class="minner" id="minner"></div></div><div class="mctl"><button id="mminus" title="Remove the last mapped button"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><button id="mplus" title="Add a mapped button"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></svg></button></div></div>
-    <div class="apal" id="apal"><button data-t="audio">Audio</button><button data-t="key">Button Input</button><button data-t="counter">Counter</button><button data-t="wait">WAIT</button><button data-t="and">AND</button><button data-t="if">IF</button><button data-t="nor">NOR</button><button data-t="or">OR</button><button data-t="xor">XOR</button><button data-t="xand">XAND</button><button data-t="random">RANDOM</button><button data-t="light">LIGHT</button></div>
+    <div class="apal" id="apal"><button data-t="audio">Audio</button><button data-t="key">Button Input</button><button data-t="counter">Counter</button><button data-t="wait">WAIT</button><button data-t="number">Number</button><button data-t="and">AND</button><button data-t="if">IF</button><button data-t="nor">NOR</button><button data-t="or">OR</button><button data-t="xor">XOR</button><button data-t="xand">XAND</button><button data-t="random">RANDOM</button><button data-t="light">LIGHT</button></div>
   </div>
 </div>
 
@@ -784,7 +794,7 @@
     if (!p || p._src !== it.src) {
       if (p) p.pause();
       p = new Audio(it.src); p._src = it.src; p.preload = 'auto';
-      p.addEventListener('ended', () => { if (it.loop) { p.currentTime = it.trimStart || 0; p.play(); } else setPlayIcon(it.id, false); });
+      p.addEventListener('ended', () => { if (it.loop) { p.currentTime = it.trimStart || 0; p.play(); } else { setPlayIcon(it.id, false); autoEnded(it.id); } });
       p.addEventListener('pause', () => setPlayIcon(it.id, false));
       ['loadedmetadata', 'progress', 'seeked', 'pause', 'ended', 'timeupdate'].forEach(ev => p.addEventListener(ev, () => updateSeek(it)));
       p.addEventListener('play', () => { setPlayIcon(it.id, true); watch(it, p); });
@@ -801,7 +811,7 @@
       if (p.paused) return;
       if (it.trimEnd && p.currentTime >= it.trimEnd) {
         if (it.loop) p.currentTime = it.trimStart || 0;
-        else { p.pause(); p.currentTime = it.trimStart || 0; return; }
+        else { p.pause(); p.currentTime = it.trimStart || 0; autoEnded(it.id); return; }
       }
       p._raf = requestAnimationFrame(tick);
     };
@@ -1614,7 +1624,7 @@
   const autoDock = $('#autoDock'), acanvas = $('#acanvas'), aworld = $('#aworld'), awires = $('#awires'), amaps = $('#amaps'), mlist = $('#mlist'), minner = $('#minner'), azp = $('#azp'), autoin = autoDock.querySelector('.autoin');
   const RY0 = 24, RPITCH = 46, GAPX = 12, MAXB = 200, PURPLE = '#e0a8f0', STOPC = '#ff9a9a', DARK = '#3d3d3d';
   const SPEC = {
-    audio: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, counter: { ins: 1, out: true, multi: true }, wait: { ins: 1, out: true, multi: true },
+    audio: { ins: 4, out: true, multi: true }, number: { ins: 0, out: true }, key: { ins: 0, out: true }, counter: { ins: 1, out: true, multi: true }, wait: { ins: 1, out: true, multi: true },
     and: { ins: 2, out: true, multi: true, gate: true }, or: { ins: 2, out: true, multi: true, gate: true }, nor: { ins: 2, out: true, multi: true, gate: true },
     xor: { ins: 2, out: true, multi: true, gate: true }, xand: { ins: 2, out: true, multi: true, gate: true },
     if: { ins: 1, out: true, multi: true }, random: { ins: 1, out: true, multi: true }, light: { ins: 1, out: false, multi: true }
@@ -1639,9 +1649,9 @@
       const seenN = new Set();
       if (Array.isArray(a.nodes)) a.nodes.slice(0, 120).forEach(n => {
         if (!n || !idOk(n.id) || !SPEC[n.t] || seenN.has(n.id) || out.btns.some(b => b.id === n.id)) return; seenN.add(n.id);
-        const pc = {}; if (n.pc && typeof n.pc === 'object') ['o', 'o1', '0', '1'].forEach(k => { if (HEX.test(n.pc[k])) pc[k] = n.pc[k]; });
+        const pc = {}; if (n.pc && typeof n.pc === 'object') ['o', 'o1', '0', '1', '2', '3'].forEach(k => { if (HEX.test(n.pc[k])) pc[k] = n.pc[k]; });
         out.nodes.push({ id: n.id, t: n.t, x: isFinite(n.x) ? num(n.x, 5000) : 30, y: isFinite(n.y) ? num(n.y, 5000) : 30, cue: idOk(n.cue) ? n.cue : '', btn: idOk(n.btn) ? n.btn : '',
-          n: Math.max(1, Math.min(99, Math.round(+n.n) || 2)), op: OPS.some(o => o[0] === n.op) ? n.op : '>', k: isFinite(n.k) ? num(n.k, 1e6) : 0, sec: isFinite(n.sec) ? Math.max(0, Math.min(3600, +n.sec)) : 1, pc });
+          n: Math.max(1, Math.min(99, Math.round(+n.n) || 2)), vol: isFinite(n.vol) ? Math.max(0, Math.min(100, +n.vol)) : 100, pitch: isFinite(n.pitch) ? Math.max(-24, Math.min(24, +n.pitch)) : 0, v: isFinite(n.v) ? num(n.v, 1e6) : 100, op: OPS.some(o => o[0] === n.op) ? n.op : '>', k: isFinite(n.k) ? num(n.k, 1e6) : 0, sec: isFinite(n.sec) ? Math.max(0, Math.min(3600, +n.sec)) : 1, pc });
       });
       if (Array.isArray(a.links)) {
         const seen = new Set();
@@ -1695,7 +1705,7 @@
 
   /* nodes */
   const nodeEls = {}, cnt = {}, SVG_X = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>', SVG_PEN = '<svg viewBox="0 0 24 24"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19z"/></svg>';
-  const LABEL = { wait: 'WAIT', and: 'AND', or: 'OR', nor: 'NOR', xor: 'XOR', xand: 'XAND', if: 'IF', random: 'RANDOM', counter: 'Counter', light: 'LIGHT', key: 'Button Input' };
+  const LABEL = { number: 'Number', wait: 'WAIT', and: 'AND', or: 'OR', nor: 'NOR', xor: 'XOR', xand: 'XAND', if: 'IF', random: 'RANDOM', counter: 'Counter', light: 'LIGHT', key: 'Button Input' };
   function reachBtns(id) {
     const seen = new Set(), out = new Set();
     (function go(c) { if (seen.has(c)) return; seen.add(c); auto.links.forEach(l => { if (l[0] !== c) return; const bi = auto.btns.findIndex(b => b.id === l[1]); if (bi >= 0) out.add(bi + 1); else go(l[1]); }); })(id);
@@ -1705,12 +1715,13 @@
     const sp = SPEC[n.t], el = document.createElement('div'); el.className = 'anode t-' + n.t + (sp.ins === 2 ? ' tall' : ''); el.dataset.id = n.id;
     let h = '';
     for (let i = 0; i < sp.ins; i++) h += '<i class="ip" data-p="' + i + '"></i>';
-    if (n.t === 'audio') h += '<span class="il" style="top:11px">play</span><span class="il" style="top:35px">stop</span>';
-    if (n.t === 'audio') h += '<span class="nm"></span><small></small>';
+    if (n.t === 'audio') h += '<span class="il" style="top:16px">play</span><span class="il" style="top:50px">stop</span><span class="pl" style="top:3px">volume</span><span class="pl" style="bottom:3px">pitch</span><span class="ol" style="top:31px">done</span>';
+    if (n.t === 'audio') h += '<div class="ac"><div class="r1"><span class="nm"></span></div><div class="r2"><small>vol</small><input class="ni av" type="number" min="0" max="100" title="Volume (0-100)"><small>pitch</small><input class="ni ap" type="number" min="-24" max="24" step="1" title="Pitch in semitones (-24 to 24)"></div></div>';
+    else if (n.t === 'number') h += '<span class="nm">Number</span><input class="ni nv" type="number" step="any" title="A number other nodes can read">';
     else if (n.t === 'if') h += '<span class="nm">IF</span><button class="nk op" title="Comparison"></button><input class="ni ik" type="number" step="any" title="Number to compare with">';
     else if (n.t === 'key') h += '<span class="nm">Button Input</span><button class="nk" title="Choose which mapped button this watches"></button>';
     else if (n.t === 'counter') h += '<span class="nm">Counter</span><input class="ni" type="number" min="1" max="99" title="Runs what is wired in every Nth press"><small class="cc"></small>';
-    else if (n.t === 'wait') h += '<span class="nm">WAIT</span><input class="ni" type="number" min="0" max="3600" step="0.1" title="Seconds to wait"><small>sec</small>';
+    else if (n.t === 'wait') h += '<span class="nm">WAIT</span><input class="ni" type="number" min="0" max="3600" step="0.1" title="Seconds to wait"><small>sec</small><svg class="wring"><rect pathLength="100"/></svg>';
     else if (n.t === 'light') h += '<span class="lamp"></span><span class="nm">LIGHT</span>';
     else h += '<span class="nm">' + LABEL[n.t] + '</span>';
     if (sp.out) for (let o = 0; o < (sp.outs || 1); o++) h += '<i class="port" data-o="' + o + '"></i>';
@@ -1718,7 +1729,18 @@
     el.querySelector('.ndel').addEventListener('click', e => { e.stopPropagation(); removeNode(n.id); });
     const nk = el.querySelector('.nk'); if (nk && n.t === 'if') nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, OPS.map(o => ({ id: o[0], sm: o[0], label: o[1] })), id => { n.op = id; save(); }); });
     else if (nk) nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, auto.btns.map((b, i) => ({ id: b.id, sm: i + 1, label: b.name })), id => { n.btn = id; save(); }); });
-    const ni = el.querySelector('.ni'); if (ni) { ni.addEventListener('input', () => { if (n.t === 'if') n.k = isFinite(+ni.value) && ni.value !== '' ? +ni.value : 0; else if (n.t === 'wait') n.sec = Math.max(0, Math.min(3600, +ni.value || 0)); else { n.n = Math.max(1, Math.min(99, Math.round(+ni.value) || 1)); cnt[n.id] = 0; updCounter(n); } }); ni.addEventListener('change', () => save()); ni.addEventListener('keydown', e => e.stopPropagation()); }
+    el.querySelectorAll('.ni').forEach(ni => {
+      ni.addEventListener('keydown', e => e.stopPropagation()); ni.addEventListener('change', () => save());
+      ni.addEventListener('input', () => {
+        const x = +ni.value, ok = ni.value !== '' && isFinite(x), c = ni.classList;
+        if (c.contains('ik')) n.k = ok ? x : 0;
+        else if (c.contains('av')) n.vol = ok ? Math.max(0, Math.min(100, x)) : 100;
+        else if (c.contains('ap')) n.pitch = ok ? Math.max(-24, Math.min(24, x)) : 0;
+        else if (c.contains('nv')) n.v = ok ? x : 0;
+        else if (n.t === 'wait') n.sec = ok ? Math.max(0, Math.min(3600, x)) : 0;
+        else { n.n = Math.max(1, Math.min(99, Math.round(x) || 1)); cnt[n.id] = 0; updCounter(n); }
+      });
+    });
     aworld.appendChild(el); return el;
   }
   const updCounter = n => { const el = nodeEls[n.id], cc = el && el.querySelector('.cc'); if (cc) cc.textContent = (cnt[n.id] || 0) + '/' + n.n; };
@@ -1733,11 +1755,12 @@
       if (n.t === 'audio') {
         const it = get(n.cue);
         el.querySelector('.nm').textContent = it ? it.name : 'Choose a cue'; el.classList.toggle('dim', !it || !it.src);
-        el.querySelector('small').textContent = '';
+        const av = el.querySelector('.av'), ap = el.querySelector('.ap'); if (document.activeElement !== av) av.value = n.vol; if (document.activeElement !== ap) ap.value = n.pitch;
       } else if (n.t === 'key') {
         const nk = el.querySelector('.nk'), b = auto.btns.find(x => x.id === n.btn); nk.textContent = b ? b.name : 'link a button'; nk.classList.toggle('set', !!b);
       } else if (n.t === 'counter') { const ni = el.querySelector('.ni'); if (document.activeElement !== ni) ni.value = n.n; updCounter(n); }
       else if (n.t === 'wait') { const ni = el.querySelector('.ni'); if (document.activeElement !== ni) ni.value = n.sec; }
+      else if (n.t === 'number') { const ni = el.querySelector('.ni'); if (document.activeElement !== ni) ni.value = n.v; }
       else if (n.t === 'if') { const ni = el.querySelector('.ni'); el.querySelector('.nk').textContent = n.op; if (document.activeElement !== ni) ni.value = n.k; }
       else if (n.t === 'light') el.querySelector('.lamp').style.setProperty('--lc', n.pc && n.pc['0'] ? n.pc['0'] : '#ffd84d');
     });
@@ -1748,7 +1771,7 @@
   function removeNode(id) { clearWaits(id); auto.nodes = auto.nodes.filter(n => n.id !== id); auto.links = auto.links.filter(l => l[0] !== id && l[1] !== id); save(); }
   function addNode(t, cue) {
     const n = auto.nodes.length, col = n % 2, row = Math.floor(n / 2) % 3;     // drop new nodes on a loose grid so they never stack
-    auto.nodes.push({ id: uid(), t, x: Math.round((30 - v.x) / v.z + col * 320 + Math.floor(n / 6) * 26), y: Math.round((24 - v.y) / v.z + row * 70 + Math.floor(n / 6) * 26), cue: cue || '', btn: '', n: 2, sec: 1, op: '>', k: 0, pc: {} }); save();
+    auto.nodes.push({ id: uid(), t, x: Math.round((30 - v.x) / v.z + col * 320 + Math.floor(n / 6) * 26), y: Math.round((24 - v.y) / v.z + row * 70 + Math.floor(n / 6) * 26), cue: cue || '', btn: '', n: 2, sec: 1, vol: 100, pitch: 0, v: 100, op: '>', k: 0, pc: {} }); save();
   }
 
   /* pop-up list (cue / button chooser) */
@@ -1781,11 +1804,16 @@
 
   /* wires */
   let wd = null, nd = null, pn = null;
-  const wirePath = (x1, y1, x2, y2) => { const k = Math.max(50, Math.abs(x2 - x1) * .5); return 'M' + x1 + ' ' + y1 + ' C' + (x1 + k) + ' ' + y1 + ',' + (x2 - k) + ' ' + y2 + ',' + x2 + ' ' + y2; };
+  const wirePath = (x1, y1, x2, y2, dir) => {
+    const k = Math.max(50, Math.abs(x2 - x1) * .5);
+    if (dir === 't' || dir === 'b') { const kk = Math.max(46, Math.abs(y2 - y1) * .5), sg = dir === 't' ? -1 : 1; return 'M' + x1 + ' ' + y1 + ' C' + (x1 + k) + ' ' + y1 + ',' + x2 + ' ' + (y2 + sg * kk) + ',' + x2 + ' ' + y2; }
+    return 'M' + x1 + ' ' + y1 + ' C' + (x1 + k) + ' ' + y1 + ',' + (x2 - k) + ' ' + y2 + ',' + x2 + ' ' + y2;
+  };
   const outPos = (id, fp) => { const el = nodeEls[id], pt = el && el.querySelectorAll('.port')[fp || 0]; return pt ? [v.x + (parseFloat(el.style.left) + el.offsetWidth) * v.z, v.y + (parseFloat(el.style.top) + pt.offsetTop + pt.offsetHeight / 2) * v.z] : null; };
   function inPos(to, p, W) {
     const el = nodeEls[to], ip = el && el.querySelectorAll('.ip')[p]; if (!ip) return null;
-    return [v.x + parseFloat(el.style.left) * v.z, v.y + (parseFloat(el.style.top) + ip.offsetTop + ip.offsetHeight / 2) * v.z];
+    const dir = el.classList.contains('t-audio') ? (p === 2 ? 't' : p === 3 ? 'b' : 'l') : 'l';
+    return [v.x + (parseFloat(el.style.left) + ip.offsetLeft + ip.offsetWidth / 2) * v.z, v.y + (parseFloat(el.style.top) + ip.offsetTop + ip.offsetHeight / 2) * v.z, dir];
   }
   function drawWires() {
     if (!autoOpen) return;
@@ -1795,7 +1823,7 @@
     const nowT = performance.now();
     auto.links.forEach((l, n) => {
       const a = outPos(l[0], l[3]), b = inPos(l[1], l[2], W); if (!a || !b) return;
-      const d = wirePath(a[0], a[1], b[0], b[1]);
+      const d = wirePath(a[0], a[1], b[0], b[1], b[2]);
       s += '<g class="wg' + ((lglow.get(l[0] + l[1] + l[2]) || 0) > nowT ? ' on' : '') + '" data-n="' + n + '" style="--wc:' + pinColor(nodeById(l[0]), outKey(l[3])) + '"><path class="hit" d="' + d + '"/><path class="vis" d="' + d + '"/></g>';
     });
     if (wd) { const a = outPos(wd.id, wd.fp); if (a) s += '<path class="tmp" style="--wc:' + pinColor(nodeById(wd.id), outKey(wd.fp)) + '" d="' + wirePath(a[0], a[1], wd.px, wd.py) + '"/>'; }
@@ -1812,7 +1840,7 @@
     return i >= 0 && i < auto.btns.length && Math.abs(y - rowY(i)) <= 22 ? i : -1;
   }
   function targetAt(cx, cy) {
-    const hit = document.elementFromPoint(cx, cy), ip = hit && hit.closest && hit.closest('.ip');
+    const ip = document.elementsFromPoint(cx, cy).find(e => e.classList && e.classList.contains('ip'));   // wires can sit on top of pins
     if (ip) return { to: ip.closest('.anode').dataset.id, p: +ip.dataset.p, el: ip };
     return null;
   }
@@ -1839,7 +1867,7 @@
     else if (node) {
       e.preventDefault(); const n = nodeById(node.dataset.id); if (!n) return;
       const ip = e.target.closest('.ip');
-      nd = { n, el: node, sx: e.clientX, sy: e.clientY, ox: n.x, oy: n.y, moved: false, onName: n.t === 'audio' && !!e.target.closest('.nm, small'), ip: ip || null }; node.style.cursor = 'grabbing';
+      nd = { n, el: node, sx: e.clientX, sy: e.clientY, ox: n.x, oy: n.y, moved: false, onName: n.t === 'audio' && !!e.target.closest('.nm'), ip: ip || null }; node.style.cursor = 'grabbing';
     } else { e.preventDefault(); pn = { sx: e.clientX, sy: e.clientY, ox: v.x, oy: v.y }; acanvas.classList.add('pan'); }
   });
   addEventListener('pointermove', e => {
@@ -1915,6 +1943,7 @@
     const n = nodeById(id); if (!n || seen.has(id)) return false; seen = new Set(seen).add(id);
     if (n.t === 'audio') { const p = players[n.cue]; return !!(p && !p.paused); }
     if (n.t === 'wait') return (n.pend || 0) > 0;
+    if (n.t === 'number') return n.v !== 0;
     if (n.t === 'key') return !!n.btn && isHeld(n.btn);
     if (n.t === 'counter') return (cnt[id] || 0) > 0;
     if (n.t === 'random') return (n.rv || 0) >= 50;
@@ -1927,10 +1956,23 @@
     if (n.t === 'counter') return cnt[id] || 0;
     if (n.t === 'random') return n.rv || 0;
     if (n.t === 'wait') return n.pend || 0;
+    if (n.t === 'number') return n.v;
     if (n.t === 'audio') { const p = players[n.cue]; return p ? Math.round(p.currentTime * 10) / 10 : 0; }
     return val(id, seen) ? 1 : 0;
   }
   const pin = (id, p, seen) => inputsL(id, p).some(l => val(l[0], seen));
+  /* volume and pitch: set in the node, or driven by whatever is wired into its top (volume) / bottom (pitch) pin */
+  function applyAudio(n, it, pl) {
+    const vl = inputsL(n.id, 2)[0], pt = inputsL(n.id, 3)[0];
+    const vol = Math.max(0, Math.min(100, +(vl ? numOf(vl[0], new Set([n.id])) : n.vol) || 0));
+    const st = Math.max(-24, Math.min(24, +(pt ? numOf(pt[0], new Set([n.id])) : n.pitch) || 0));
+    pl.volume = vol / 100; pl.playbackRate = Math.max(.0625, Math.min(16, (it.speed || 1) * Math.pow(2, st / 12)));
+    pl.preservesPitch = pl.mozPreservesPitch = pl.webkitPreservesPitch = st !== 0 ? false : it.keepPitch !== false;
+  }
+  /* when a cue finishes by itself, its right-hand pin sends a signal out */
+  function autoEnded(cueId) {
+    auto.nodes.forEach(n => { if (n.t === 'audio' && n.cue === cueId) { flash(n.id); emit(n.id, new Set([n.id]), { played: 0, stopped: 0, miss: 0, delayed: 0 }); } });
+  }
   /* an event travels along the wires: emit() sends it out of a node, deliver() is what each node does when one arrives */
   function emit(id, seen, st) {
     let ls = auto.links.filter(l => l[0] === id); const n = nodeById(id);
@@ -1943,9 +1985,15 @@
       const it = get(n.cue), pl = it && player(it);
       if (!pl) { st.miss++; return; }
       if (p === 1) { pl.pause(); pl.currentTime = it.trimStart || 0; updateSeek(it); st.stopped++; return; }
-      pl.pause(); pl.currentTime = it.trimStart || 0; pl.play().catch(() => toast('Could not play this file')); st.played++;
+      applyAudio(n, it, pl); pl.pause(); pl.currentTime = it.trimStart || 0; pl.play().catch(() => toast('Could not play this file')); st.played++;
     } else if (n.t === 'wait') {
-      st.delayed++; n.pend = (n.pend || 0) + 1; const el = nodeEls[to]; if (el) el.classList.add('waiting');
+      st.delayed++; n.pend = (n.pend || 0) + 1; const el = nodeEls[to];
+      if (el) {
+        const sv = el.querySelector('.wring'), rc = sv.querySelector('rect'), w = el.offsetWidth, h = el.offsetHeight;
+        sv.setAttribute('viewBox', '0 0 ' + w + ' ' + h); rc.setAttribute('x', 1.5); rc.setAttribute('y', 1.5); rc.setAttribute('width', w - 3); rc.setAttribute('height', h - 3); rc.setAttribute('rx', (h - 3) / 2);
+        rc.style.transition = 'none'; rc.style.strokeDashoffset = 0; void rc.getBoundingClientRect();       // the border burns down as the wait runs out
+        rc.style.transition = 'stroke-dashoffset ' + (n.sec || 0) + 's linear'; rc.style.strokeDashoffset = 100; el.classList.add('waiting');
+      }
       const t = setTimeout(() => { n.pend = Math.max(0, (n.pend || 1) - 1); const e2 = nodeEls[to]; if (e2 && !n.pend) e2.classList.remove('waiting'); emit(to, seen, { played: 0, stopped: 0, miss: 0, delayed: 0 }); }, (n.sec || 0) * 1000);
       (waits[to] = waits[to] || []).push(t);
     } else if (n.t === 'counter') { cnt[to] = (cnt[to] || 0) + 1; if (cnt[to] >= n.n) { cnt[to] = 0; updCounter(n); emit(to, seen, st); } else updCounter(n); }
@@ -1968,7 +2016,7 @@
     auto.nodes.forEach(n => {
       const el = nodeEls[n.id]; if (!el) return;
       if (n.t === 'light') el.querySelector('.lamp').classList.toggle('on', pin(n.id, 0, new Set()) || (n.lit || 0) > now);
-      else if (n.t === 'audio') { const p = players[n.cue]; el.classList.toggle('live', !!(p && !p.paused)); }
+      else if (n.t === 'audio') { const p = players[n.cue], it = get(n.cue), on = !!(p && !p.paused); el.classList.toggle('live', on); if (on && it) applyAudio(n, it, p); }
       else if (n.t === 'key') el.classList.toggle('live', !!n.btn && isHeld(n.btn));
     });
     lightRaf = requestAnimationFrame(lightTick);
