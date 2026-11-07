@@ -276,9 +276,9 @@
   .dock.open .autoin { opacity: 1; transform: none; pointer-events: auto; transition: opacity .3s .22s, transform .5s .22s var(--ease); }
   .awrap { position: relative; flex: 0 1 640px; min-width: 0; }
   .acanvas { position: absolute; inset: 0; border-radius: 22px; overflow: hidden; background-color: rgba(0,0,0,.4); touch-action: none; cursor: grab;
-    background-image: radial-gradient(circle, rgba(255,255,255,.13) 1.2px, transparent 1.7px); background-size: 24px 24px; }
+    background-image: radial-gradient(circle, rgba(255,255,255,.13) calc(1.2px * var(--z, 1)), transparent calc(1.7px * var(--z, 1))); background-size: 24px 24px; }
   .acanvas.pan { cursor: grabbing; }
-  .aworld { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+  .aworld { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; z-index: 2; }
   .anode { position: absolute; display: flex; align-items: center; gap: 9px; height: 34px; padding: 0 24px 0 16px; border-radius: 17px; background: #000; color: #fff;
     font: 600 14px 'Montserrat', sans-serif; white-space: nowrap; cursor: grab; transition: box-shadow .3s ease, opacity .3s ease; }
   .anode small { font-size: 13px; font-weight: 500; color: rgba(255,255,255,.4); }
@@ -304,7 +304,7 @@
   .anode.pre { outline: 2px solid rgba(224,168,240,.55); outline-offset: 5px; }
   .acanvas.selecting { cursor: crosshair; }
   .acanvas.holding { cursor: progress; }
-  .awires { position: absolute; left: 0; top: 0; pointer-events: none; overflow: hidden; }
+  .awires { position: absolute; left: 0; top: 0; pointer-events: none; overflow: hidden; z-index: 1; }   /* wires run behind the nodes */
   .awires .vis, .awires .tmp { fill: none; stroke: var(--wc, #e0a8f0); stroke-width: calc(4.5px * var(--z, 1)); stroke-linecap: round; transition: stroke .2s ease; }
   .awires .tmp { opacity: .8; stroke-dasharray: calc(2px * var(--z, 1)) calc(9px * var(--z, 1)); }
   .awires .hit { fill: none; stroke: transparent; stroke-width: 16; pointer-events: stroke; cursor: pointer; }
@@ -1833,7 +1833,7 @@
   let v = { x: 0, y: 0, z: 1 }, vt = { x: 0, y: 0, z: 1 }, vRaf = 0, vT = 0;
   function applyView() {
     aworld.style.transform = 'translate(' + v.x + 'px,' + v.y + 'px) scale(' + v.z + ')';
-    const g = 24 * v.z; acanvas.style.backgroundSize = g + 'px ' + g + 'px'; acanvas.style.backgroundPosition = v.x + 'px ' + v.y + 'px';
+    const g = 24 * v.z; acanvas.style.backgroundSize = g + 'px ' + g + 'px'; acanvas.style.backgroundPosition = v.x + 'px ' + v.y + 'px'; acanvas.style.setProperty('--z', v.z);   // dots shrink / grow with the zoom for depth
     azp.textContent = Math.round(vt.z * 100) + '%'; if (typeof placeBar === 'function') placeBar(true);
   }
   function vstep(t) {
@@ -2084,8 +2084,8 @@
   const selBox = document.createElement('div'); selBox.className = 'asel'; acanvas.appendChild(selBox);
   const HOLD_MS = 450; let lastAlt = false; addEventListener('keydown', e => { if (e.key === 'Alt') lastAlt = true; }, true); addEventListener('keyup', e => { if (e.key === 'Alt') lastAlt = false; }, true);
   const wirePath = (x1, y1, x2, y2, dir) => {
-    const k = Math.max(50, Math.abs(x2 - x1) * .5);
-    if (dir === 't' || dir === 'b') { const kk = Math.max(46, Math.abs(y2 - y1) * .5), sg = dir === 't' ? -1 : 1; return 'M' + x1 + ' ' + y1 + ' C' + (x1 + k) + ' ' + y1 + ',' + x2 + ' ' + (y2 + sg * kk) + ',' + x2 + ' ' + y2; }
+    const z = v.z, k = Math.max(50 * z, Math.abs(x2 - x1) * .5);   // handle lengths scale with zoom so the curve keeps its shape
+    if (dir === 't' || dir === 'b') { const kk = Math.max(46 * z, Math.abs(y2 - y1) * .5), sg = dir === 't' ? -1 : 1; return 'M' + x1 + ' ' + y1 + ' C' + (x1 + k) + ' ' + y1 + ',' + x2 + ' ' + (y2 + sg * kk) + ',' + x2 + ' ' + y2; }
     return 'M' + x1 + ' ' + y1 + ' C' + (x1 + k) + ' ' + y1 + ',' + (x2 - k) + ' ' + y2 + ',' + x2 + ' ' + y2;
   };
   const outPos = (id, fp) => { const el = nodeEls[id], pt = el && el.querySelectorAll('.port')[fp || 0]; return pt ? [v.x + (parseFloat(el.style.left) + el.offsetWidth) * v.z, v.y + (parseFloat(el.style.top) + pt.offsetTop + pt.offsetHeight / 2) * v.z] : null; };
@@ -2116,7 +2116,11 @@
   }
   /* wires blend from the colour of the pin they leave to the colour of the pin they enter */
   function wireFill(l, i, a, b, addDef) {
-    const src = nodeById(l[0]), dst = nodeById(l[1]), c1 = pinColor(src, outKey(l[3])), c2 = (dst && ((dst.pc && dst.pc[l[2]]) || (isValIn(dst, l[2]) ? VALC : ''))) || c1;
+    const src = nodeById(l[0]), dst = nodeById(l[1]), c1 = pinColor(src, outKey(l[3])), c2 = dst && ((dst.pc && dst.pc[l[2]]) || (isValIn(dst, l[2]) ? VALC : ''));
+    if (!c2) {   // input pin with no colour of its own: hold the output colour for 90% of the wire, then fade to fully transparent at the pin
+      addDef('<linearGradient id="lg' + i + '" gradientUnits="userSpaceOnUse" x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '"><stop offset="0" stop-color="' + c1 + '"/><stop offset=".9" stop-color="' + c1 + '"/><stop offset="1" stop-color="' + c1 + '" stop-opacity="0"/></linearGradient>');
+      return 'url(#lg' + i + ')';
+    }
     if (c1 === c2) return c1;
     addDef('<linearGradient id="lg' + i + '" gradientUnits="userSpaceOnUse" x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '"><stop offset="0" stop-color="' + c1 + '"/><stop offset="1" stop-color="' + c2 + '"/></linearGradient>');
     return 'url(#lg' + i + ')';
