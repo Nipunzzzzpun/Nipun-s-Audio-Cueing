@@ -376,10 +376,10 @@
   .anode.t-random .cc { color: #fff; font-weight: 600; font-size: 12px; }
   .anode.t-print .ip[data-p="1"] { top: 100%; margin: -8px 0 0 -8px; }
   .anode.t-print .ni.pt { width: 150px; text-align: left; padding: 0 12px; }
-  .kguide { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 12px); z-index: 390; display: flex; align-items: center; gap: 14px; pointer-events: none; opacity: 0; white-space: nowrap;
-    font: 600 15px 'Montserrat', sans-serif; color: #4d4d4d; transition: opacity .25s ease, transform .4s var(--ease); }
+  .kguide { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 12px); z-index: 390; display: flex; align-items: center; gap: 8px; pointer-events: none; opacity: 0; white-space: nowrap;
+    font: 600 9px 'Montserrat', sans-serif; color: #4d4d4d; transition: opacity .25s ease, transform .4s var(--ease); }
   .kguide.show { opacity: 1; transform: translate(-50%, 0); }
-  .kguide kbd { font: 600 15px 'Montserrat', sans-serif; color: #fff; background: #555; border: 3px solid rgba(0,0,0,.18); background-clip: padding-box; border-radius: 12px; padding: 6px 14px; }
+  .kguide kbd { font: 600 9px 'Montserrat', sans-serif; color: #fff; background: #555; border: 2px solid rgba(0,0,0,.18); background-clip: padding-box; border-radius: 7px; padding: 4px 8px; }
   .popwrap { position: fixed; left: 50%; bottom: 72px; transform: translateX(-50%); z-index: 400; display: flex; flex-direction: column-reverse; align-items: center; gap: 8px; pointer-events: none; width: max-content; max-width: calc(100vw - 32px); }
   .popmsg { pointer-events: auto; cursor: pointer; display: flex; justify-content: center; overflow: hidden; border-radius: 999px; background: rgba(0,0,0,.74); border: 2px solid rgba(0,0,0,.35); background-clip: padding-box; color: #fff;
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 8px 26px rgba(0,0,0,.25); opacity: 0; transform: translateY(46px);
@@ -1984,7 +1984,7 @@
     if (typeof placing !== 'undefined' && placing) g = ['Esc', 'to cancel placing'];
     else if (drag && drag.mode === 'resize' && drag.it && drag.it.type === 'image' && drag.dir.length === 2) g = ['Shift', 'to keep proportions'];
     else if (wd && wd.moved) g = ['Ctrl', 'to turn off snapping'];
-    else if (sq) g = ['Alt', sq.alt ? 'to select only what you fully surround' : 'to select anything you touch'];
+    else if (sq) g = ['Alt', 'to select anything you touch'];
     const key = g ? g.join('|') : '';
     if (key === kgKey) return; kgKey = key;
     if (g) { kg.innerHTML = '<kbd>' + g[0] + '</kbd><span>' + g[1] + '</span>'; kg.classList.add('show'); } else kg.classList.remove('show');
