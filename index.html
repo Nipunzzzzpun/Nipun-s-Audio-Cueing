@@ -303,10 +303,12 @@
   .azoom button:hover { background: rgba(255,255,255,.18); } .azoom button:active { transform: scale(.88); }
   .azoom svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; }
   .azoom .hb.exp svg { fill: none; }
-  #aexp svg { fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  #aexp svg { fill: none; stroke: #fff; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
   #aexp .ex-in, #autoDock.full #aexp .ex-out { display: none; } #autoDock.full #aexp .ex-in { display: block; }
+  .dock.auto.open { transition: width .7s var(--ease), height .7s var(--ease), border-radius .65s var(--ease), transform .45s var(--ease), opacity .3s ease; }
   .dock.auto.open.full { width: calc(100vw - 40px); height: calc(100vh - 40px); }
-  .dock.auto.full .awrap { flex: 1 1 auto; }
+  .dock.auto .awrap { flex: none; width: 640px; max-width: 100%; transition: width .7s var(--ease); }
+  .dock.auto.full .awrap { width: calc(100vw - 532px); max-width: none; }
   .azoom .hb svg { width: 21px; height: 21px; fill: #fff; stroke: none; }
   .azoom .hb.redo svg { transform: scaleX(-1); }
   .azoom .hb:disabled { opacity: .3; cursor: default; pointer-events: none; }
@@ -499,12 +501,11 @@
   .gh:hover { background: rgba(0,0,0,.72); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.28), 0 0 0 2px rgba(224,168,240,.7), 0 0 20px rgba(224,168,240,.45); }
   .gh:hover svg { transform: rotate(-12deg) scale(1.12); } .gh:hover::after { transform: translateX(120%); }
   .gh:active { transform: scale(.95); }
-  .dtip { position: fixed; z-index: 101; left: 0; top: 0; pointer-events: none; padding: 7px 20px; border-radius: 20px; background: var(--glass); background-clip: padding-box; border: 2px solid var(--glass-border);
-    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); color: #fff; font: 500 15px 'Montserrat', sans-serif; white-space: nowrap; opacity: 0; transform: translateY(-6px) scale(.92); transform-origin: var(--cx, 50%) -10px;
-    transition: opacity .18s ease, transform .3s var(--spring); }
+  .dtip { position: fixed; z-index: 101; left: 0; top: 0; pointer-events: none; padding: 7px 17px; color: #fff; font: 500 11.5px 'Montserrat', sans-serif; white-space: nowrap; opacity: 0;
+    transform: translateY(-5px) scale(.94); transform-origin: var(--cx, 50%) -8px; transition: opacity .16s ease, transform .26s var(--ease); }
   .dtip.show { opacity: 1; transform: none; }
-  .dtip::before { content: ''; position: absolute; left: var(--cx, 50%); top: -13px; width: 18px; height: 11px; margin-left: -9px; background: var(--glass-border); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
-  .dtip::after { content: ''; position: absolute; left: var(--cx, 50%); top: -9px; width: 12px; height: 7px; margin-left: -6px; background: #747474; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+  .dtip svg { position: absolute; left: 0; top: 0; overflow: visible; z-index: -1; }
+  .dtip { isolation: isolate; }
   .recenter { position: fixed; right: 16px; bottom: 68px; z-index: 90; width: 44px; height: 44px; padding: 0; border: 0; background: none; cursor: pointer;
     -webkit-backdrop-filter: invert(1); backdrop-filter: invert(1);                                   /* the icon shape just inverts whatever is behind it */
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13.5,13.5v1.75q0,0.32-0.21,0.54T12.75,16t-0.54-0.21T12,15.25V13.5q0-0.63 0.44-1.06T13.5,12h1.75q0.33,0 0.54,0.21Q16,12.43 16,12.75t-0.21,0.54T15.25,13.5H13.5Zm0,7h1.75q0.33,0 0.54,0.21Q16,20.93 16,21.25t-0.21,0.54T15.25,22H13.5q-0.63,0-1.06-0.44T12,20.5V18.75q0-0.32 0.21-0.54T12.75,18t0.54,0.21q0.21,0.21 0.21,0.54V20.5Zm7-7H18.75q-0.32,0-0.54-0.21T18,12.75t0.21-0.54T18.75,12H20.5q0.63,0 1.06,0.44T22,13.5v1.75q0,0.32-0.21,0.54T21.25,16q-0.32,0-0.54-0.21T20.5,15.25V13.5Zm0,7V18.75q0-0.32 0.21-0.54T21.25,18t0.54,0.21Q22,18.43 22,18.75V20.5q0,0.63-0.44,1.06T20.5,22H18.75q-0.32,0-0.54-0.21T18,21.25t0.21-0.54t0.54-0.21H20.5ZM12,5Q9.08,5 7.04,7.04T5,12q0,1.8 0.81,3.3T8,17.75V16q0-0.43 0.29-0.71Q8.58,15 9,15q0.43,0 0.71,0.29T10,16v4q0,0.43-0.29,0.71T9,21H5q-0.42,0-0.71-0.29Q4,20.43 4,20t0.29-0.71T5,19H6.35Q4.8,17.75 3.9,15.94T3,12q0-1.88 0.71-3.51T5.64,5.64Q6.85,4.42 8.49,3.71T12,3q2.85,0 5.1,1.56t3.25,4.06q0.15,0.4 0,0.77T19.8,9.92t-0.79,0q-0.39-0.15-0.54-0.55Q17.7,7.43 15.96,6.21T12,5Z'/%3E%3C/svg%3E") center / 30px 30px no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13.5,13.5v1.75q0,0.32-0.21,0.54T12.75,16t-0.54-0.21T12,15.25V13.5q0-0.63 0.44-1.06T13.5,12h1.75q0.33,0 0.54,0.21Q16,12.43 16,12.75t-0.21,0.54T15.25,13.5H13.5Zm0,7h1.75q0.33,0 0.54,0.21Q16,20.93 16,21.25t-0.21,0.54T15.25,22H13.5q-0.63,0-1.06-0.44T12,20.5V18.75q0-0.32 0.21-0.54T12.75,18t0.54,0.21q0.21,0.21 0.21,0.54V20.5Zm7-7H18.75q-0.32,0-0.54-0.21T18,12.75t0.21-0.54T18.75,12H20.5q0.63,0 1.06,0.44T22,13.5v1.75q0,0.32-0.21,0.54T21.25,16q-0.32,0-0.54-0.21T20.5,15.25V13.5Zm0,7V18.75q0-0.32 0.21-0.54T21.25,18t0.54,0.21Q22,18.43 22,18.75V20.5q0,0.63-0.44,1.06T20.5,22H18.75q-0.32,0-0.54-0.21T18,21.25t0.21-0.54t0.54-0.21H20.5ZM12,5Q9.08,5 7.04,7.04T5,12q0,1.8 0.81,3.3T8,17.75V16q0-0.43 0.29-0.71Q8.58,15 9,15q0.43,0 0.71,0.29T10,16v4q0,0.43-0.29,0.71T9,21H5q-0.42,0-0.71-0.29Q4,20.43 4,20t0.29-0.71T5,19H6.35Q4.8,17.75 3.9,15.94T3,12q0-1.88 0.71-3.51T5.64,5.64Q6.85,4.42 8.49,3.71T12,3q2.85,0 5.1,1.56t3.25,4.06q0.15,0.4 0,0.77T19.8,9.92t-0.79,0q-0.39-0.15-0.54-0.55Q17.7,7.43 15.96,6.21T12,5Z'/%3E%3C/svg%3E") center / 30px 30px no-repeat; }
@@ -616,7 +617,7 @@
       <div class="acanvas" id="acanvas">
         <div class="aworld" id="aworld"></div>
         <div class="aempty" id="aempty">Press + to add a mapped button, add a Button Input linked to it, then wire it to an Audio’s play pin.</div>
-        <div class="azoom"><button class="hb" id="aexp" title="Enlarge the node editor"><svg viewBox="0 0 24 24" class="ex-out"><path d="M14 4h6v6M10 20H4v-6M20 4l-7.5 7.5M4 20l7.5-7.5"/></svg><svg viewBox="0 0 24 24" class="ex-in"><path d="M20 10h-6V4M4 14h6v6M14 10l6.5-6.5M3.5 20.5L10 14"/></svg></button><button class="hb" id="aundo" title="Undo (Ctrl+Z)" disabled><svg viewBox="0 0 24 24"><path d="M8,19q-0.42,0-0.71-0.29Q7,18.43 7,18t0.29-0.71T8,17h6.1q1.57,0 2.74-1T18,13.5T16.84,11T14.1,10H7.8l1.9,1.9q0.28,0.28 0.28,0.7q0,0.42-0.28,0.7T9,13.58q-0.42,0-0.7-0.28L4.7,9.7Q4.55,9.55 4.49,9.38T4.43,9T4.49,8.63T4.7,8.3L8.3,4.7Q8.58,4.42 9,4.42q0.43,0 0.7,0.28Q9.98,4.97 9.98,5.4T9.7,6.1L7.8,8h6.3q2.43,0 4.16,1.57T20,13.5t-1.74,3.93Q16.53,19 14.1,19H8Z"/></svg></button><button class="hb redo" id="aredo" title="Redo (Ctrl+Y)" disabled><svg viewBox="0 0 24 24"><path d="M8,19q-0.42,0-0.71-0.29Q7,18.43 7,18t0.29-0.71T8,17h6.1q1.57,0 2.74-1T18,13.5T16.84,11T14.1,10H7.8l1.9,1.9q0.28,0.28 0.28,0.7q0,0.42-0.28,0.7T9,13.58q-0.42,0-0.7-0.28L4.7,9.7Q4.55,9.55 4.49,9.38T4.43,9T4.49,8.63T4.7,8.3L8.3,4.7Q8.58,4.42 9,4.42q0.43,0 0.7,0.28Q9.98,4.97 9.98,5.4T9.7,6.1L7.8,8h6.3q2.43,0 4.16,1.57T20,13.5t-1.74,3.93Q16.53,19 14.1,19H8Z"/></svg></button><button id="azoom" title="Reset zoom"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21M10.5 8v5M8 10.5h5"/></svg></button><span class="zp" id="azp">100%</span></div>
+        <div class="azoom"><button class="hb" id="aexp" title="Enlarge the node editor"><svg viewBox="0 0 24 24" class="ex-out"><path d="M14 5h5v5M10 19H5v-5M19 5l-6 6M5 19l6-6"/></svg><svg viewBox="0 0 24 24" class="ex-in"><path d="M19 10h-5V5M5 14h5v5M14 10l5-5M10 14l-5 5"/></svg></button><button class="hb" id="aundo" title="Undo (Ctrl+Z)" disabled><svg viewBox="0 0 24 24"><path d="M8,19q-0.42,0-0.71-0.29Q7,18.43 7,18t0.29-0.71T8,17h6.1q1.57,0 2.74-1T18,13.5T16.84,11T14.1,10H7.8l1.9,1.9q0.28,0.28 0.28,0.7q0,0.42-0.28,0.7T9,13.58q-0.42,0-0.7-0.28L4.7,9.7Q4.55,9.55 4.49,9.38T4.43,9T4.49,8.63T4.7,8.3L8.3,4.7Q8.58,4.42 9,4.42q0.43,0 0.7,0.28Q9.98,4.97 9.98,5.4T9.7,6.1L7.8,8h6.3q2.43,0 4.16,1.57T20,13.5t-1.74,3.93Q16.53,19 14.1,19H8Z"/></svg></button><button class="hb redo" id="aredo" title="Redo (Ctrl+Y)" disabled><svg viewBox="0 0 24 24"><path d="M8,19q-0.42,0-0.71-0.29Q7,18.43 7,18t0.29-0.71T8,17h6.1q1.57,0 2.74-1T18,13.5T16.84,11T14.1,10H7.8l1.9,1.9q0.28,0.28 0.28,0.7q0,0.42-0.28,0.7T9,13.58q-0.42,0-0.7-0.28L4.7,9.7Q4.55,9.55 4.49,9.38T4.43,9T4.49,8.63T4.7,8.3L8.3,4.7Q8.58,4.42 9,4.42q0.43,0 0.7,0.28Q9.98,4.97 9.98,5.4T9.7,6.1L7.8,8h6.3q2.43,0 4.16,1.57T20,13.5t-1.74,3.93Q16.53,19 14.1,19H8Z"/></svg></button><button id="azoom" title="Reset zoom"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21M10.5 8v5M8 10.5h5"/></svg></button><span class="zp" id="azp">100%</span></div>
       </div>
       <svg class="awires" id="awires"></svg>
     </div>
@@ -998,13 +999,23 @@
 
   /* ---------- hover labels for the three round dock buttons ---------- */
   const dtip = document.createElement('div'); dtip.className = 'dtip'; document.body.appendChild(dtip);
+  const NS = 'http://www.w3.org/2000/svg', tipSvg = document.createElementNS(NS, 'svg'), tipB = document.createElementNS(NS, 'path'), tipF = document.createElementNS(NS, 'path'), tipT = document.createElement('span');
+  tipB.setAttribute('fill', 'rgba(0,0,0,.4)'); tipB.setAttribute('fill-rule', 'evenodd'); tipF.setAttribute('fill', 'rgba(0,0,0,.52)'); tipSvg.append(tipB, tipF); dtip.append(tipSvg, tipT);
+  // one outline (pill with a small pointer on top): the border is the gap between an outer and an inner copy, so nothing overlaps
+  function tipPath(w, h, cx, o, nw, nh) {
+    const r = h / 2 - o, L = o, R = w - o, T = o, B = h - o, f = n => +n.toFixed(2);
+    return ['M', L + r, T, 'H', cx - nw / 2, 'L', cx - 1.2, T - nh + 1.4, 'Q', cx, T - nh, cx + 1.2, T - nh + 1.4, 'L', cx + nw / 2, T, 'H', R - r, 'A', r, r, 0, 0, 1, R, T + r, 'V', B - r, 'A', r, r, 0, 0, 1, R - r, B, 'H', L + r, 'A', r, r, 0, 0, 1, L, B - r, 'V', T + r, 'A', r, r, 0, 0, 1, L + r, T, 'Z'].map(x => typeof x === 'number' ? f(x) : x).join(' ');
+  }
+  const NW = 11, NH = 6.5, TB = 2, TL = Math.hypot(NW / 2, NH), INW = NW - 2 * TB * (TL - NW / 2) / NH, INH = NH + TB - TB * TL / (NW / 2);     // inner pointer sized so the border is the same thickness all the way round
   [['#autoDock', 'Automation'], ['#dock', 'Add Elements'], ['#shareDock', 'Share Live']].forEach(([sel, label]) => {
     const d = $(sel);
     const hide = () => dtip.classList.remove('show');
     d.addEventListener('pointerenter', e => {
       if (e.pointerType === 'touch' || d.classList.contains('open') || d.classList.contains('away')) return;
-      dtip.textContent = label; const r = d.getBoundingClientRect(), w = dtip.offsetWidth, cx = r.left + r.width / 2, left = Math.max(8, Math.min(innerWidth - w - 8, cx - w / 2));
-      dtip.style.left = left + 'px'; dtip.style.top = r.bottom + 14 + 'px'; dtip.style.setProperty('--cx', (cx - left) + 'px'); dtip.classList.add('show');
+      tipT.textContent = label; const r = d.getBoundingClientRect(), w = dtip.offsetWidth, h = dtip.offsetHeight, cx = r.left + r.width / 2, left = Math.max(8, Math.min(innerWidth - w - 8, cx - w / 2)), c = cx - left;
+      tipSvg.setAttribute('width', w); tipSvg.setAttribute('height', h);
+      tipB.setAttribute('d', tipPath(w, h, c, 0, NW, NH) + ' ' + tipPath(w, h, c, 2, INW, INH)); tipF.setAttribute('d', tipPath(w, h, c, 2, INW, INH));
+      dtip.style.left = left + 'px'; dtip.style.top = r.bottom + 10 + 'px'; dtip.style.setProperty('--cx', c + 'px'); dtip.classList.add('show');
     });
     d.addEventListener('pointerleave', hide); d.addEventListener('pointerdown', hide); d.addEventListener('click', hide);
   });
@@ -1820,7 +1831,17 @@
     const r = acanvas.getBoundingClientRect(), px = e.clientX - r.left, py = e.clientY - r.top, f = nz / vt.z;
     vt.x = px - (px - vt.x) * f; vt.y = py - (py - vt.y) * f; vt.z = nz; kickView(); applyView();
   }, { passive: false });
-  $('#azoom').addEventListener('click', () => { vt = { x: 0, y: 0, z: 1 }; kickView(); applyView(); });
+  function fitView() {                                           // centre everything (nothing there: back to 0,0)
+    if (!auto.nodes.length) vt = { x: 0, y: 0, z: 1 };
+    else {
+      let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+      auto.nodes.forEach(n => { const el = nodeEls[n.id], w = el ? el.offsetWidth : 160, h = el ? el.offsetHeight : 40; x0 = Math.min(x0, n.x - 14); y0 = Math.min(y0, n.y - 14); x1 = Math.max(x1, n.x + w + 14); y1 = Math.max(y1, n.y + h + 14); });
+      const W = acanvas.clientWidth, H = acanvas.clientHeight, z = Math.max(.4, Math.min(1, (W - 80) / (x1 - x0), (H - 80) / (y1 - y0)));
+      vt = { z, x: W / 2 - (x0 + x1) / 2 * z, y: H / 2 - (y0 + y1) / 2 * z };
+    }
+    kickView(); applyView();
+  }
+  $('#azoom').addEventListener('click', fitView); $('#azoom').title = 'Centre everything';
 
   /* nodes */
   const selSet = new Set();
