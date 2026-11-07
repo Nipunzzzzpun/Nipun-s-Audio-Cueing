@@ -414,10 +414,11 @@
   .rcur b { position: absolute; left: 18px; top: 20px; background: var(--c); color: #fff; font: 600 11px 'Montserrat', sans-serif; padding: 3px 9px; border-radius: 999px; white-space: nowrap;
     opacity: 0; transform: translateY(-4px) scale(.9); transform-origin: left top; transition: opacity .2s ease, transform .35s var(--spring); }
   .rcur.hover b { opacity: 1; transform: none; }
-  .rcur.host { mix-blend-mode: difference; }                 /* the host's cursor inverts whatever is under it */
-  .rcur.host svg { fill: #fff; filter: none; }
-  .rcur.host b { background: #fff; color: #000; }
-  .rcur.idle { opacity: .35; }
+  .rcur.host svg { visibility: hidden; }
+  .rcur-ar { position: fixed; z-index: 55; left: 0; top: 0; pointer-events: none; mix-blend-mode: difference; transition: left .08s linear, top .08s linear, opacity .4s ease; }   /* the host's arrow inverts whatever is under it */
+  .rcur-ar svg { width: 24px; height: 24px; margin: -4px 0 0 -4px; transform: scaleX(-1); fill: #fff; }
+  .rcur-ar.idle, .rcur.idle { opacity: .35; }
+
 
   /* join dialog */
   .dialog input[type=text] { width: 100%; height: 44px; margin-top: 8px; border: 2px solid #ddd; border-radius: 12px; padding: 0 12px; font: 600 15px 'Montserrat', sans-serif; outline: none; transition: border-color .2s; }
@@ -579,7 +580,7 @@
 
 <div class="overlay" id="joinOverlay">
   <div class="dialog">
-    <h3>join room <span id="jcode"></span></h3>
+    <h3 id="pfTitle"></h3>
     <p id="jmsg"></p>
     <label class="lbl" style="margin-top:0">Your name<input type="text" id="pfName" maxlength="24" placeholder="name" autocomplete="off" spellcheck="false"></label>
     <div class="pfrow"><span>Cursor colour</span><button class="swatch" id="pfColor" type="button" aria-label="Choose colour"></button></div>
@@ -653,7 +654,7 @@
     image: { w: 260, h: 190, src: '' },
     text:  { w: 280, h: 40, html: 'Text', font: 'Montserrat', fs: 32, color: '#111111', bold: false, italic: false }
   };
-  const SAFE_SRC = /^data:(image|audio)\/[a-z0-9.+-]+;base64,/i;
+  const SAFE_SRC = /^data:((image|audio)\/[a-z0-9.+-]+|application\/octet-stream);base64,/i;
   let items = [], els = {}, players = {}, selId = null, placing = null, editingId = null, pickFor = null, ro;
   const GRID = 20;                                   // keep in sync with --grid in the CSS
   const snap = v => Math.round(v / GRID) * GRID;
@@ -1302,6 +1303,7 @@
   const genCode = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), b => ALPHA[b % ALPHA.length]).join('');
   const CODE_RE = /^[a-z0-9]{6}$/;
   let cursors = {};
+  const dropCursor = el => { el.remove(); if (el._ar) el._ar.remove(); };
   const curSvg = '<svg viewBox="0 0 24 24"><path d="M10.05,13.95L3.58,11.33Q3.25,11.2 3.1,10.94T2.95,10.4q0-0.27 0.16-0.54T3.6,9.48l15.35-5.7q0.3-0.13 0.58-0.05T20,4t0.28,0.47T20.23,5.05L14.53,20.4q-0.13,0.33-0.39,0.49T13.6,21.05T13.06,20.9t-0.39-0.47l-2.63-6.48Z"/></svg>';
 
   function openShare() { dock.classList.add('away'); autoDock.classList.add('away'); shareDock.classList.add('open'); shareDock.setAttribute('aria-expanded', 'true'); select(null); }
@@ -1321,7 +1323,7 @@
       t.textContent = (net.me && u.id === net.me.id ? 'you' : '') + (u.id === 'host' ? (net.me && u.id === net.me.id ? ' · host' : 'host') : '');
       li.append(d, n, t); ulist.appendChild(li);
     });
-    Object.keys(cursors).forEach(id => { if (!net.users.some(u => u.id === id)) { cursors[id].remove(); delete cursors[id]; } });
+    Object.keys(cursors).forEach(id => { if (!net.users.some(u => u.id === id)) { dropCursor(cursors[id]); delete cursors[id]; } });
   }
   function live(on) {
     const guest = on && net.role === 'guest', stopB = $('#stopShare');
@@ -1337,11 +1339,40 @@
   const snap1 = it => { const { src, ...rest } = it; return JSON.stringify(rest); };
   function resetLast() { lastSent.clear(); items.forEach(it => lastSent.set(it.id, { j: snap1(it), src: it.src })); }
 
-  function send(m) {
-    if (net.role === 'host') net.conns.forEach(c => { if (c.open) c.send(m); });
-    else if (net.role === 'guest' && net.conn && net.conn.open) net.conn.send(m);
+  /* WebRTC data channels choke on big messages, so anything large (audio / image files) is cut into small numbered
+     chunks, sent at a pace the connection can take, and stitched back together on the other side. */
+  const CH = 12000;
+  function pump(c) {
+    if (c._pumping) return; c._pumping = true;
+    const step = () => {
+      if (!c.open) { c._q = []; c._pumping = false; return; }
+      const dc = c.dataChannel; let n = 0;
+      while (c._q.length && n < 30 && !(dc && dc.bufferedAmount > 512000)) { try { c.send(c._q.shift()); } catch (e) { c._q = []; break; } n++; }
+      if (c._q.length) setTimeout(step, 15); else c._pumping = false;
+    };
+    step();
   }
-  function relay(m, from) { net.conns.forEach(c => { if (c !== from && c.open) c.send(m); }); }
+  function tx(c, m) {
+    if (!c || !c.open) return;
+    const q = c._q || (c._q = []), s = JSON.stringify(m);
+    if (s.length <= CH) q.push(m);
+    else { const id = uid() + uid(), n = Math.ceil(s.length / CH); for (let i = 0; i < n; i++) q.push({ t: 'chunk', id, i, n, d: s.slice(i * CH, (i + 1) * CH) }); }
+    pump(c);
+  }
+  function onData(m, c) {
+    if (m && m.t === 'chunk' && typeof m.id === 'string' && Number.isInteger(m.i) && Number.isInteger(m.n) && m.n > 0 && m.n < 6000 && m.i >= 0 && m.i < m.n && typeof m.d === 'string') {
+      const rx = c._rx || (c._rx = {}), b = rx[m.id] || (rx[m.id] = { n: m.n, got: 0, parts: [] });
+      if (b.parts[m.i] === undefined) { b.parts[m.i] = m.d; b.got++; }
+      if (b.got === b.n) { delete rx[m.id]; let msg = null; try { msg = JSON.parse(b.parts.join('')); } catch (e) {} if (msg) onMsg(msg, c); }
+      return;
+    }
+    onMsg(m, c);
+  }
+  function send(m) {
+    if (net.role === 'host') net.conns.forEach(c => tx(c, m));
+    else if (net.role === 'guest') tx(net.conn, m);
+  }
+  function relay(m, from) { net.conns.forEach(c => { if (c !== from) tx(c, m); }); }
 
   function netSync() {                       // send only what changed since last time
     if (!net.role || applying) return;
@@ -1396,7 +1427,11 @@
     if (!el) { el = document.createElement('div'); el.className = 'rcur'; el.innerHTML = curSvg + '<b></b>'; document.body.appendChild(el); cursors[u.id] = el; }
     el.style.setProperty('--c', u.color); el.querySelector('b').textContent = u.name; el.classList.toggle('host', u.id === 'host');
     el.style.left = m.x + 'px'; el.style.top = m.y + 'px'; el.classList.remove('idle');
-    clearTimeout(el._t); el._t = setTimeout(() => el.classList.add('idle'), 6000);
+    if (u.id === 'host') {
+      if (!el._ar) { el._ar = document.createElement('div'); el._ar.className = 'rcur-ar'; el._ar.innerHTML = curSvg; document.body.appendChild(el._ar); }
+      el._ar.style.left = m.x + 'px'; el._ar.style.top = m.y + 'px'; el._ar.classList.remove('idle');
+    }
+    clearTimeout(el._t); el._t = setTimeout(() => { el.classList.add('idle'); if (el._ar) el._ar.classList.add('idle'); }, 6000);
   }
   addEventListener('pointermove', e => {
     for (const el of Object.values(cursors)) {
@@ -1411,7 +1446,7 @@
   });
 
   const rgbOf = h => { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
-  const colorClash = (c, list) => list.some(u => u.id !== 'host' && Math.hypot(...rgbOf(c).map((v, i) => v - rgbOf(u.color)[i])) < 60);
+  const colorClash = (c, list) => list.some(u => Math.hypot(...rgbOf(c).map((v, i) => v - rgbOf(u.color)[i])) < 60);
 
   function onMsg(m, from) {
     if (!m || typeof m !== 'object') return;
@@ -1422,10 +1457,10 @@
       if (!color || colorClash(color, net.users.filter(u => u !== from._u))) { from.send({ t: 'colortaken' }); return; }
       if (from._u) { Object.assign(from._u, { name, color }); }
       else { from._u = { id: from.peer, name, color }; net.conns.add(from); net.users.push(from._u); toast(name + ' joined'); }
-      from.send({ t: 'welcome', you: from._u, users: net.users, items: JSON.parse(JSON.stringify(items)) });
+      tx(from, { t: 'welcome', you: from._u, users: net.users, items: JSON.parse(JSON.stringify(items)) });
       relay({ t: 'users', users: net.users }, from); renderUsers();
     }
-    else if (m.t === 'colortaken' && net.joining) { openProfile(net.joinCode, 'That colour is too close to someone else’s. Pick another one.'); }
+    else if (m.t === 'colortaken' && net.joining) { openProfile(net.joinCode, 'That colour is too close to someone else’s. Pick another one.', 'join'); }
     else if (m.t === 'item') { applyItem(m.item); if (net.role === 'host') relay(m, from); }
     else if (m.t === 'del' && typeof m.id === 'string') {
       lastSent.delete(m.id);
@@ -1448,7 +1483,7 @@
     const code = net.pending, peer = new Peer('cueboard-' + code);
     net.peer = peer;
     peer.on('open', () => {
-      net.role = 'host'; net.code = code; net.me = { id: 'host', name: 'Host', color: '#ffffff' }; net.users = [net.me];
+      net.role = 'host'; net.code = code; net.me = { id: 'host', name: profile.name, color: profile.color }; net.users = [net.me];
       codeText.textContent = code; codeText.classList.remove('empty');
       resetLast(); live(true); toast('Sharing started — send people the code');
     });
@@ -1460,7 +1495,7 @@
     });
   }
   function hostConn(c) {
-    c.on('data', m => onMsg(m, c));
+    c.on('data', m => onData(m, c));
     const drop = () => {
       if (!c._u || !net.conns.has(c)) return; net.conns.delete(c); net.users = net.users.filter(u => u !== c._u);
       send({ t: 'users', users: net.users }); renderUsers(); toast(c._u.name + ' left');
@@ -1474,7 +1509,7 @@
     peer.on('open', () => {
       const c = peer.connect('cueboard-' + code, { reliable: true, serialization: 'json' }); net.conn = c;
       c.on('open', () => c.send({ t: 'hello', name: profile.name, color: profile.color }));
-      c.on('data', m => onMsg(m, c));
+      c.on('data', m => onData(m, c));
       c.on('close', () => { if (net.role === 'guest') { toast('The host ended the session'); stopShare(true); } });
     });
     peer.on('error', e => { toast(e.type === 'peer-unavailable' ? 'No room with that code' : 'Could not connect: ' + e.type); closeProfile(); stopShare(true); });
@@ -1486,7 +1521,7 @@
     net.conns.forEach(c => { try { c.close(); } catch (e) {} }); net.conns.clear();
     if (net.conn) { try { net.conn.close(); } catch (e) {} }
     if (net.peer) { try { net.peer.destroy(); } catch (e) {} }
-    Object.values(cursors).forEach(el => el.remove()); cursors = {};
+    Object.values(cursors).forEach(dropCursor); cursors = {};
     const backup = net.backup;
     net.role = null; net.peer = null; net.conn = null; net.me = null; net.users = []; net.joining = false; net.backup = null;
     lastSent.clear();
@@ -1500,9 +1535,10 @@
   const profile = { name: '', color: COLORS[1] };
   try { profile.name = localStorage.getItem('cuename') || ''; const c = localStorage.getItem('cuecolor'); if (/^#[0-9a-f]{6}$/i.test(c)) profile.color = c; } catch (e) {}
   function setPfColor(c) { profile.color = c; pfColor.style.setProperty('--c', c); }
-  function openProfile(code, msg) {
-    $('#jcode').textContent = code; const m = $('#jmsg');
-    m.textContent = msg || 'Pick a name and a colour. Others will see your cursor in that colour.'; m.classList.toggle('err', !!msg);
+  let pfMode = 'join';
+  function openProfile(code, msg, mode) {
+    pfMode = mode || 'join'; $('#pfTitle').textContent = pfMode === 'host' ? 'Start sharing' : 'Join room ' + code; $('#pfGo').textContent = pfMode === 'host' ? 'Start' : 'Join'; const m = $('#jmsg');
+    m.textContent = msg || (pfMode === 'host' ? 'Pick a name and a colour. People who join will see them next to your cursor.' : 'Pick a name and a colour. Others will see your cursor in that colour.'); m.classList.toggle('err', !!msg);
     pfName.value = profile.name; setPfColor(profile.color); joinOverlay.classList.add('show'); setTimeout(() => pfName.focus(), 60);
   }
   function closeProfile() { joinOverlay.classList.remove('show'); closePops(); }
@@ -1521,6 +1557,7 @@
     profile.name = pfName.value.replace(/[\u0000-\u001f]/g, '').trim().slice(0, 24) || 'Guest';
     try { localStorage.setItem('cuename', profile.name); localStorage.setItem('cuecolor', profile.color); } catch (e) {}
     closeProfile();
+    if (pfMode === 'host') { startHost(); return; }
     if (net.conn && net.conn.open) net.conn.send({ t: 'hello', name: profile.name, color: profile.color });
     else startJoin(net.joinCode);
   });
@@ -1542,7 +1579,11 @@
   stopBtn.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) { e.preventDefault(); if (net.role === 'host') holdStart(); else if (net.role === 'guest') stopShare(); } });
   stopBtn.addEventListener('keyup', holdEnd);
 
-  $('#startShare').addEventListener('click', startHost);
+  $('#startShare').addEventListener('click', () => {
+    if (net.role || net.joining) return;
+    if (!window.Peer) { toast('Sharing needs an internet connection'); return; }
+    openProfile('', '', 'host');
+  });
   $('#joinBtn').addEventListener('click', () => joinFlow($('#joinCode').value.trim().toLowerCase()));
   $('#joinCode').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') $('#joinBtn').click(); });
   $('#joinCode').addEventListener('input', e => { e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''); });
