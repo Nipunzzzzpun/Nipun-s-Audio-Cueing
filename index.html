@@ -376,11 +376,18 @@
   .anode.t-random .cc { color: #fff; font-weight: 600; font-size: 12px; }
   .anode.t-print .ip[data-p="1"] { top: 100%; margin: -8px 0 0 -8px; }
   .anode.t-print .ni.pt { width: 150px; text-align: left; padding: 0 12px; }
-  .popwrap { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%); z-index: 400; display: flex; flex-direction: column-reverse; align-items: center; gap: 8px; pointer-events: none; width: max-content; max-width: calc(100vw - 32px); }
-  .popmsg { pointer-events: auto; cursor: pointer; padding: 11px 22px; border-radius: 999px; background: rgba(0,0,0,.74); border: 2px solid rgba(0,0,0,.35); background-clip: padding-box; color: #fff; font: 600 14px 'Montserrat', sans-serif; text-align: center; overflow-wrap: anywhere;
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 8px 26px rgba(0,0,0,.25); animation: popIn .45s var(--spring) both; transition: opacity .3s, transform .3s; }
-  .popmsg.out { opacity: 0; transform: translateY(10px) scale(.94); }
-  @keyframes popIn { from { opacity: 0; transform: translateY(14px) scale(.85); } }
+  .kguide { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 12px); z-index: 390; display: flex; align-items: center; gap: 14px; pointer-events: none; opacity: 0; white-space: nowrap;
+    font: 600 15px 'Montserrat', sans-serif; color: #4d4d4d; transition: opacity .25s ease, transform .4s var(--ease); }
+  .kguide.show { opacity: 1; transform: translate(-50%, 0); }
+  .kguide kbd { font: 600 15px 'Montserrat', sans-serif; color: #fff; background: #555; border: 3px solid rgba(0,0,0,.18); background-clip: padding-box; border-radius: 12px; padding: 6px 14px; }
+  .popwrap { position: fixed; left: 50%; bottom: 72px; transform: translateX(-50%); z-index: 400; display: flex; flex-direction: column-reverse; align-items: center; gap: 8px; pointer-events: none; width: max-content; max-width: calc(100vw - 32px); }
+  .popmsg { pointer-events: auto; cursor: pointer; display: flex; justify-content: center; overflow: hidden; border-radius: 999px; background: rgba(0,0,0,.74); border: 2px solid rgba(0,0,0,.35); background-clip: padding-box; color: #fff;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 8px 26px rgba(0,0,0,.25); opacity: 0; transform: translateY(46px);
+    transition: opacity .3s ease, transform .5s var(--spring), width .42s var(--ease); }
+  .popmsg.up { opacity: 1; transform: none; }
+  .popmsg.down { opacity: 0; transform: translateY(18px); transition: opacity .3s ease, transform .35s ease, width .38s var(--ease); }
+  .popmsg span { flex: none; display: block; box-sizing: border-box; max-width: calc(100vw - 60px); padding: 11px 22px; font: 600 14px 'Montserrat', sans-serif; text-align: center; overflow-wrap: anywhere; opacity: 0; transition: opacity .25s ease; }
+  .popmsg.read span { opacity: 1; transition-delay: .12s; }
   .anode.t-loop { min-width: 432px; }
   .anode.t-loop .r2 { grid-template-columns: auto auto auto; justify-content: space-between; gap: 10px; }
   .anode.t-loop .nk { flex: none; min-width: 124px; padding: 0 18px; white-space: nowrap; text-align: center; }
@@ -1969,13 +1976,38 @@
     auto.nodes.push({ id: uid(), t, x: Math.round((30 - v.x) / v.z + col * 320 + Math.floor(n / 6) * 26), y: Math.round((24 - v.y) / v.z + row * 70 + Math.floor(n / 6) * 26), cue: cue || '', btn: '', n: 2, sec: 1, vol: 100, pitch: 0, v: 100, vm: 'add', vx: 1, vs: t === 'value' ? 100 : 0, op: '>', k: 0, lm: 'until', lc: 3, lt: 1, rmin: 0, rmax: 100, txt: 'Hello!', im: 'value', it: 'is', tx: '', pc: {} }); save();
   }
 
+  /* key guide: a small "[Key] does something" hint at the bottom-middle while a modifier key is useful */
+  const kg = document.createElement('div'); kg.className = 'kguide'; document.body.appendChild(kg);
+  let kgKey = '';
+  setInterval(() => {
+    let g = null;
+    if (typeof placing !== 'undefined' && placing) g = ['Esc', 'to cancel placing'];
+    else if (drag && drag.mode === 'resize' && drag.it && drag.it.type === 'image' && drag.dir.length === 2) g = ['Shift', 'to keep proportions'];
+    else if (wd && wd.moved) g = ['Ctrl', 'to turn off snapping'];
+    else if (sq) g = ['Alt', sq.alt ? 'to select only what you fully surround' : 'to select anything you touch'];
+    const key = g ? g.join('|') : '';
+    if (key === kgKey) return; kgKey = key;
+    if (g) { kg.innerHTML = '<kbd>' + g[0] + '</kbd><span>' + g[1] + '</span>'; kg.classList.add('show'); } else kg.classList.remove('show');
+  }, 120);
+
   /* text pop-ups (from the Print node) */
   const popWrap = document.createElement('div'); popWrap.className = 'popwrap'; document.body.appendChild(popWrap);
   function showPop(text) {
-    const el = document.createElement('div'); el.className = 'popmsg'; el.textContent = text; popWrap.appendChild(el);
+    const el = document.createElement('div'); el.className = 'popmsg'; const sp = document.createElement('span'); sp.textContent = text; el.appendChild(sp); popWrap.appendChild(el);
     while (popWrap.children.length > 4) popWrap.firstChild.remove();
-    const bye = () => { if (!el.isConnected || el.classList.contains('out')) return; el.classList.add('out'); setTimeout(() => el.remove(), 300); };
-    el.addEventListener('click', bye); setTimeout(bye, 2800);
+    const w = sp.offsetWidth, h = sp.offsetHeight, c = Math.min(w, h);   // c: the starting circle
+    el.style.width = c + 'px'; void el.offsetWidth;
+    el.classList.add('up');                                              // 1. floats up as a circle
+    setTimeout(() => { if (!el.isConnected) return; el.style.width = w + 'px'; el.classList.add('read'); }, 420);   // 2. widens, text fades in
+    setTimeout(() => { if (el.isConnected && !el.classList.contains('read')) el.classList.add('read'); }, 900);
+    let gone = false;
+    const bye = () => {                                                  // reverse: text out, shrinks to a circle, floats away
+      if (gone || !el.isConnected) return; gone = true;
+      el.classList.remove('read'); el.style.width = c + 'px';
+      setTimeout(() => { el.classList.remove('up'); el.classList.add('down'); }, 380);
+      setTimeout(() => el.remove(), 760);
+    };
+    el.addEventListener('click', bye); setTimeout(bye, 3200);
   }
 
   /* pop-up list (cue / button chooser) */
