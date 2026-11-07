@@ -347,9 +347,9 @@
   .anode .ip { position: absolute; left: -8px; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; box-sizing: border-box; background: #3d3d3d; border: 3.5px solid #fff; transition: transform .25s var(--spring), background .2s; }
   .anode .ip::after { content: ''; position: absolute; inset: -9px; border-radius: 50%; }
   .anode .ip.hot { transform: scale(1.5); background: #e0a8f0; }
-  .anode.t-split { display: block; width: 112px; padding: 0; border-radius: 30px; }
+  .anode.t-split { display: block; width: 38px; padding: 0; border-radius: 19px; }
   .anode.t-split .slines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-  .anode.t-split .sl { stroke: rgba(255,255,255,.1); stroke-width: 4; stroke-linecap: round; }
+  .anode.t-split .sl { stroke: rgba(255,255,255,.14); stroke-width: 3; stroke-linecap: round; }
   .anode.t-split .srow { position: absolute; left: 0; right: 0; display: flex; justify-content: center; align-items: center; gap: 12px; transform: translateY(-50%); pointer-events: none; }
   .anode.t-split .srow.so { top: 28%; } .anode.t-split .srow.si { top: 72%; }
   .anode.t-split .sv { font: 500 24px 'Montserrat', sans-serif; min-width: 20px; text-align: center; }
@@ -1795,7 +1795,7 @@
     if: { ins: 2, out: true, multi: true }, loop: { ins: 4, out: true, outs: 2, multi: true }, random: { ins: 3, out: true, multi: true }, print: { ins: 2, out: true, multi: true }, light: { ins: 1, out: false, multi: true }, split: { ins: 1, out: true, outs: 1, multi: true }
   };
   const insOf = n => n.t === 'split' ? n.si : SPEC[n.t].ins, outsOf = n => n.t === 'split' ? n.so : (SPEC[n.t].outs || 1);
-  const SW = 112, splitH = n => Math.max(124, 40 + Math.max(n.si, n.so) * 26);
+  const SW = 38, splitH = n => Math.max(66, 30 + Math.max(n.si, n.so) * 24);
   const VP = { audio: 2, value: 2, loop: 2, counter: 1, wait: 1, if: 1, number: 1, random: 1, print: 1 };      // first input pin of each node that carries a value (not a signal)
   const OPS = [['<', 'less than'], ['>', 'greater than'], ['=', 'equal to'], ['≤', 'at most'], ['≥', 'at least'], ['≠', 'not equal to']];
   const CMP = { '<': (a, b) => a < b, '>': (a, b) => a > b, '=': (a, b) => a === b, '≤': (a, b) => a <= b, '≥': (a, b) => a >= b, '≠': (a, b) => a !== b };
@@ -1931,7 +1931,7 @@
     else if (n.t === 'counter') h += '<span class="nm">Counter</span><input class="ni" type="number" min="1" max="99" title="Runs what is wired in every Nth press"><small class="cc"></small>';
     else if (n.t === 'wait') h += '<span class="nm">Wait</span><input class="ni" type="number" min="0" max="3600" step="0.1" title="Seconds to wait"><small>sec</small><svg class="wring"><rect pathLength="100"/></svg>';
     else if (n.t === 'light') h += '<span class="lamp"></span><span class="nm">Light</span>';
-    else if (n.t === 'split') { const ch = d => '<svg viewBox="0 0 10 14"><path d="' + (d < 0 ? 'M7 2L2 7l5 5' : 'M3 2l5 5-5 5') + '"/></svg>'; h += '<svg class="slines"></svg>' + ['o', 'i'].map(k => '<div class="srow ' + (k === 'o' ? 'so' : 'si') + '"><button class="sb" data-k="' + k + '" data-d="-1" title="' + (k === 'o' ? 'Fewer outputs' : 'Fewer inputs') + '">' + ch(-1) + '</button><span class="sv"></span><button class="sb" data-k="' + k + '" data-d="1" title="' + (k === 'o' ? 'More outputs' : 'More inputs') + '">' + ch(1) + '</button></div>').join(''); }
+    else if (n.t === 'split') { h += '<svg class="slines"></svg>'; }
     else h += '<span class="nm">' + LABEL[n.t] + '</span>';
     if (sp.out && n.t !== 'split') for (let o = 0; o < (sp.outs || 1); o++) h += '<i class="port" data-o="' + o + '"></i>';
     el.innerHTML = h + '<button class="ndel" title="Remove">' + SVG_X + '</button>';
@@ -1983,7 +1983,7 @@
       let h = ''; for (let i = 0; i < n.si; i++) h += '<i class="ip" data-p="' + i + '"></i>'; for (let o = 0; o < n.so; o++) h += '<i class="port" data-o="' + o + '"></i>';
       el.insertAdjacentHTML('beforeend', h);
     }
-    el.style.height = H + 'px'; el.querySelector('.srow.so .sv').textContent = n.so; el.querySelector('.srow.si .sv').textContent = n.si;
+    el.style.height = H + 'px';
     const put = (pin, q) => { const x = q.s === 'l' ? 0 : q.s === 'r' ? SW : q.f * SW, y = q.s === 't' ? 0 : q.s === 'b' ? H : q.f * H; pin.style.left = x - 8 + 'px'; pin.style.top = y - 8 + 'px'; pin.dataset.s = q.s; return [x, y]; };
     const I = [...el.querySelectorAll('.ip')].map((p, j) => put(p, n.sp.i[j])), O = [...el.querySelectorAll('.port')].map((p, j) => put(p, n.sp.o[j]));
     const sv = el.querySelector('.slines'); sv.setAttribute('viewBox', '0 0 ' + SW + ' ' + H);
@@ -2005,7 +2005,7 @@
     const n = pm.n, el = nodeEls[n.id]; if (!el) return;
     const r = el.getBoundingClientRect(), sc = r.width / SW || 1, H = splitH(n), x = (e.clientX - r.left) / sc, y = (e.clientY - r.top) / sc;
     const dist = { l: Math.abs(x), r: Math.abs(x - SW), t: Math.abs(y), b: Math.abs(y - H) }; let s = 'l'; for (const q in dist) if (dist[q] < dist[s]) s = q;
-    const m = 26, cl = (a, lo, hi) => Math.max(lo, Math.min(hi, a));
+    const m = 14, cl = (a, lo, hi) => Math.max(lo, Math.min(hi, a));
     const f = s === 'l' || s === 'r' ? cl(y / H, m / H, 1 - m / H) : cl(x / SW, m / SW, 1 - m / SW);
     n.sp[pm.k][pm.idx] = { s, f }; layoutSplit(n, el); drawWires();
   }
@@ -2279,7 +2279,7 @@
       const d = wirePath(a[0], a[1], b[0], b[1], b[2], a[2]);
       s += '<g class="wg' + (badLink(l) ? ' bad' : '') + ((lglow.get(l[0] + l[1] + l[2]) || 0) > nowT ? ' on' : '') + '" data-n="' + n + '" style="--wc:' + wireFill(l, n, a, b, (x) => { defs += x; }) + '"><path class="hit" d="' + d + '"/><path class="vis" d="' + d + '"/></g>';
     });
-    if (wd) { const a = outPos(wd.id, wd.fp); if (a) s += '<path class="tmp" style="--wc:' + pinColor(nodeById(wd.id), outKey(wd.fp)) + '" d="' + (wd.snapB ? wirePath(a[0], a[1], wd.snapB[0], wd.snapB[1], wd.snapB[2], a[2]) : wirePath(a[0], a[1], wd.px, wd.py, undefined, a[2])) + '"/>'; }
+    if (wd) { const a = outPos(wd.id, wd.fp); if (a) s += '<path class="tmp" style="--wc:' + pinColor(nodeById(wd.id), outKey(wd.fp)) + '" d="' + wirePath(a[0], a[1], wd.cx, wd.cy, wd.snapB ? wd.snapB[2] : undefined, a[2]) + '"/>'; }
     awires.innerHTML = '<defs>' + defs + '</defs>' + s;
     awires.querySelectorAll('.wg.bad').forEach(g => {          // a wire into a pin that is switched off: broken line with an × in the gap
       const vis = g.querySelector('.vis'), L = vis.getTotalLength(), gap = 30 * v.z, h = Math.max(0, (L - gap) / 2), pt = vis.getPointAtLength(L / 2), k = 6 * v.z;
@@ -2290,11 +2290,7 @@
   }
   /* wires blend from the colour of the pin they leave to the colour of the pin they enter */
   function wireFill(l, i, a, b, addDef) {
-    const src = nodeById(l[0]), dst = nodeById(l[1]), c1 = pinColor(src, outKey(l[3])), c2 = dst && ((dst.pc && dst.pc[l[2]]) || (isValIn(dst, l[2]) ? VALC : ''));
-    if (!c2) {   // input pin with no colour of its own: hold the output colour for 90% of the wire, then fade to fully transparent at the pin
-      addDef('<linearGradient id="lg' + i + '" gradientUnits="userSpaceOnUse" x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '"><stop offset="0" stop-color="' + c1 + '"/><stop offset=".9" stop-color="' + c1 + '"/><stop offset="1" stop-color="' + c1 + '" stop-opacity="0"/></linearGradient>');
-      return 'url(#lg' + i + ')';
-    }
+    const src = nodeById(l[0]), dst = nodeById(l[1]), c1 = pinColor(src, outKey(l[3])), c2 = (dst && ((dst.pc && dst.pc[l[2]]) || (isValIn(dst, l[2]) ? VALC : ''))) || c1;
     if (c1 === c2) return c1;
     addDef('<linearGradient id="lg' + i + '" gradientUnits="userSpaceOnUse" x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '"><stop offset="0" stop-color="' + c1 + '"/><stop offset="1" stop-color="' + c2 + '"/></linearGradient>');
     return 'url(#lg' + i + ')';
@@ -2313,7 +2309,7 @@
   const SNAP = 24;                                              // px: how close a dragged wire must get to a pin before it snaps (hold Ctrl to switch snapping off)
   function targetAt(cx, cy, snap, fromId, prev) {
     const ip = document.elementsFromPoint(cx, cy).find(e => e.classList && e.classList.contains('ip') && !e.classList.contains('soon') && !e.classList.contains('off'));   // wires can sit on top of pins
-    if (ip) return { to: ip.closest('.anode').dataset.id, p: +ip.dataset.p, el: ip };
+    if (ip) return { to: ip.closest('.anode').dataset.id, p: +ip.dataset.p, el: ip, snapped: !!snap };   // right on a pin counts as snapped too, so the wire stays put on it
     if (!snap) return null;
     const R = SNAP * Math.min(1, Math.max(.5, v.z));               // pins sit closer together when zoomed out, so the reach shrinks with them
     const dist = pin => { const r = pin.getBoundingClientRect(); return Math.hypot(cx - (r.left + r.width / 2), cy - (r.top + r.height / 2)); };
@@ -2326,10 +2322,17 @@
     });
     return best ? mk(best) : null;
   }
+  let wT = 0;
+  function wireTick(t) {                                          // the loose end of a wire glides to a pin it snaps to (and back to the cursor when it lets go)
+    if (!wd) return;
+    const dt = Math.min(48, t - (wd.lt || t)); wd.lt = t;
+    const tx = wd.snapB ? wd.snapB[0] : wd.px, ty = wd.snapB ? wd.snapB[1] : wd.py, k = 1 - Math.exp(-dt / 45);
+    wd.cx += (tx - wd.cx) * k; wd.cy += (ty - wd.cy) * k; drawWires(); requestAnimationFrame(wireTick);
+  }
   const markHot = el => { aworld.querySelectorAll('.ip.hot').forEach(x => x !== el && x.classList.remove('hot')); minner.querySelectorAll('.mrow.drop').forEach(x => x !== el && x.classList.remove('drop')); if (el) el.classList.add(el.classList.contains('ip') ? 'hot' : 'drop'); };
   function downstream(from, target) {           // does 'from' (a node) eventually feed 'target'?
     const seen = new Set(); let hit = false;
-    (function go(c) { if (hit || seen.has(c)) return; if (c === target) { hit = true; return; } seen.add(c); auto.links.forEach(l => { if (l[0] === c) go(l[1]); }); })(from);
+    (function go(c) { if (hit || seen.has(c)) return; if (c === target) { hit = true; return; } seen.add(c); auto.links.forEach(l => { if (l[0] === c && !isValIn(nodeById(l[1]), l[2])) go(l[1]); }); })(from);   // wires into value pins carry numbers, not signals, so they can't start a loop
     return hit;
   }
   function addLink(from, to, p, fp) {
@@ -2337,7 +2340,7 @@
     fp = fn.t === 'split' ? Math.max(0, Math.min(fn.so - 1, fp | 0)) : fp ? 1 : 0;
     const tn = nodeById(to); if (!tn || p >= insOf(tn)) return;
     if (tn.t === 'print' && p === 1) { toast('Coming soon...'); return; }
-    if (tn && downstream(to, from)) { toast('That would make a loop'); return; }
+    if (tn && !isValIn(tn, p) && downstream(to, from)) { toast('That would make a loop'); return; }
     if (tn && !(SPEC[tn.t].multi || (SPEC[tn.t].multiPins || []).includes(p))) auto.links = auto.links.filter(l => !(l[1] === to && l[2] === p));   // one wire per pin
     if (auto.links.some(l => l[0] === from && l[1] === to && l[2] === p && l[3] === fp)) return;
     auto.links.push([from, to, p, fp]); save();
@@ -2346,7 +2349,7 @@
   acanvas.addEventListener('pointerdown', e => {
     if (e.target.closest('.azoom, button, input')) return;
     const port = e.target.closest('.port'), node = e.target.closest('.anode'), r = acanvas.getBoundingClientRect();
-    if (port) { e.preventDefault(); wd = { id: node.dataset.id, fp: +port.dataset.o || 0, px: e.clientX - r.left, py: e.clientY - r.top, sx: e.clientX, sy: e.clientY, moved: false, el: port }; drawWires();
+    if (port) { e.preventDefault(); wd = { id: node.dataset.id, fp: +port.dataset.o || 0, px: e.clientX - r.left, py: e.clientY - r.top, sx: e.clientX, sy: e.clientY, moved: false, el: port, cx: e.clientX - r.left, cy: e.clientY - r.top }; requestAnimationFrame(wireTick); drawWires();
       const sn = nodeById(node.dataset.id); if (sn && sn.t === 'split') wd.hold = setTimeout(() => { if (!wd || wd.moved) return; const d = wd; wd = null; markHot(null); startPinMove(sn, 'o', d.fp, d.el); drawWires(); }, HOLD_MS); }
     else if (node) {
       e.preventDefault(); const n = nodeById(node.dataset.id); if (!n) return;
