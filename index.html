@@ -282,7 +282,9 @@
     font: 600 14px 'Montserrat', sans-serif; white-space: nowrap; cursor: grab; transition: box-shadow .3s ease, opacity .3s ease; }
   .anode small { font-size: 13px; font-weight: 500; color: rgba(255,255,255,.4); }
   .anode.dim .nm { opacity: .55; }
-  .anode.fire { box-shadow: 0 0 0 3px rgba(224,168,240,.75); }
+  .anode.fire { box-shadow: 0 0 0 3px rgba(224,168,240,.85), 0 0 24px 5px rgba(224,168,240,.55); }
+  .anode.live { box-shadow: 0 0 0 2px rgba(224,168,240,.6), 0 0 18px 3px rgba(224,168,240,.4); }
+  .awires .wg.on .vis { stroke-width: 7; filter: drop-shadow(0 0 7px var(--wc)); }
   .anode .port { position: absolute; right: -8px; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; box-sizing: border-box;
     background: #e0a8f0; border: 3.5px solid #fff; cursor: crosshair; transition: transform .25s var(--spring); }
   .anode .port:hover { transform: scale(1.35); }
@@ -327,8 +329,6 @@
   .anode .lamp { width: 18px; height: 18px; flex: none; border-radius: 50%; background: rgba(255,255,255,.16); transition: background .18s, box-shadow .18s; }
   .anode .lamp.on { background: var(--lc, #ffd84d); box-shadow: 0 0 14px 3px var(--lc, #ffd84d); }
   .anode .cc { min-width: 26px; text-align: center; }
-  .anode.t-audio { height: 58px; padding-left: 58px; padding-right: 58px; }
-  .anode.t-audio .port[data-o="0"] { top: 17px; } .anode.t-audio .port[data-o="1"] { top: 41px; }
   .anode .ol { position: absolute; right: 17px; font-size: 10px; font-weight: 600; color: rgba(255,255,255,.45); pointer-events: none; }
   .anode.t-wait { padding-left: 24px; } .anode.waiting { box-shadow: 0 0 0 3px rgba(255,216,77,.7); }
   .anode .il { position: absolute; left: 14px; font-size: 10px; font-weight: 600; color: rgba(255,255,255,.45); }
@@ -541,7 +541,7 @@
     <div class="awrap">
       <div class="acanvas" id="acanvas">
         <div class="aworld" id="aworld"></div>
-        <div class="aempty" id="aempty">Add nodes from the list on the right. Press + under the buttons to add a mapped button, then drag from a node’s dot to it.</div>
+        <div class="aempty" id="aempty">Press + to add a mapped button, add a Button Input linked to it, then wire it to an Audio’s play pin.</div>
         <div class="azoom"><button id="azoom" title="Reset zoom"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21M10.5 8v5M8 10.5h5"/></svg></button><span class="zp" id="azp">100%</span></div>
       </div>
       <svg class="awires" id="awires"></svg>
@@ -1614,9 +1614,10 @@
   const autoDock = $('#autoDock'), acanvas = $('#acanvas'), aworld = $('#aworld'), awires = $('#awires'), amaps = $('#amaps'), mlist = $('#mlist'), minner = $('#minner'), azp = $('#azp'), autoin = autoDock.querySelector('.autoin');
   const RY0 = 24, RPITCH = 46, GAPX = 12, MAXB = 200, PURPLE = '#e0a8f0', STOPC = '#ff9a9a', DARK = '#3d3d3d';
   const SPEC = {
-    audio: { ins: 1, out: true, outs: 2 }, wait: { ins: 1, out: true, multi: true }, key: { ins: 0, out: true }, counter: { ins: 1, out: true, multi: true },
-    and: { ins: 2, out: true, gate: true }, or: { ins: 2, out: true, gate: true }, nor: { ins: 2, out: true, gate: true }, xor: { ins: 2, out: true, gate: true }, xand: { ins: 2, out: true, gate: true },
-    if: { ins: 1, out: true }, random: { ins: 1, out: true, multi: true }, light: { ins: 1, out: false }
+    audio: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, counter: { ins: 1, out: true, multi: true }, wait: { ins: 1, out: true, multi: true },
+    and: { ins: 2, out: true, multi: true, gate: true }, or: { ins: 2, out: true, multi: true, gate: true }, nor: { ins: 2, out: true, multi: true, gate: true },
+    xor: { ins: 2, out: true, multi: true, gate: true }, xand: { ins: 2, out: true, multi: true, gate: true },
+    if: { ins: 1, out: true, multi: true }, random: { ins: 1, out: true, multi: true }, light: { ins: 1, out: false, multi: true }
   };
   const OPS = [['<', 'less than'], ['>', 'greater than'], ['=', 'equal to'], ['≤', 'at most'], ['≥', 'at least'], ['≠', 'not equal to']];
   const CMP = { '<': (a, b) => a < b, '>': (a, b) => a > b, '=': (a, b) => a === b, '≤': (a, b) => a <= b, '≥': (a, b) => a >= b, '≠': (a, b) => a !== b };
@@ -1648,7 +1649,7 @@
           if (!Array.isArray(l) || !seenN.has(l[0]) || l[0] === l[1]) return;
           const from = out.nodes.find(n => n.id === l[0]); if (!SPEC[from.t].out) return;
           const tn = out.nodes.find(n => n.id === l[1]), tb = out.btns.some(b => b.id === l[1]), p = l[2] | 0;
-          if (!tb && !tn) return; if (tb && p) return; if (tn && (p < 0 || p >= SPEC[tn.t].ins)) return;
+          if (!tn || p < 0 || p >= SPEC[tn.t].ins) return;
           const fp = from.t === 'audio' && l[3] === 1 ? 1 : 0, k = l[0] + l[1] + p + fp; if (seen.has(k)) return; seen.add(k); out.links.push([l[0], l[1], p, fp]);
         });
       }
@@ -1704,8 +1705,8 @@
     const sp = SPEC[n.t], el = document.createElement('div'); el.className = 'anode t-' + n.t + (sp.ins === 2 ? ' tall' : ''); el.dataset.id = n.id;
     let h = '';
     for (let i = 0; i < sp.ins; i++) h += '<i class="ip" data-p="' + i + '"></i>';
-    if (n.t === 'audio') h += '<span class="il" style="top:23px">when</span>';
-    if (n.t === 'audio') h += '<span class="nm"></span><small></small><span class="ol" style="top:11px">play</span><span class="ol" style="top:35px">stop</span>';
+    if (n.t === 'audio') h += '<span class="il" style="top:11px">play</span><span class="il" style="top:35px">stop</span>';
+    if (n.t === 'audio') h += '<span class="nm"></span><small></small>';
     else if (n.t === 'if') h += '<span class="nm">IF</span><button class="nk op" title="Comparison"></button><input class="ni ik" type="number" step="any" title="Number to compare with">';
     else if (n.t === 'key') h += '<span class="nm">Button Input</span><button class="nk" title="Choose which mapped button this watches"></button>';
     else if (n.t === 'counter') h += '<span class="nm">Counter</span><input class="ni" type="number" min="1" max="99" title="Runs what is wired in every Nth press"><small class="cc"></small>';
@@ -1730,9 +1731,9 @@
       el.querySelectorAll('.ip').forEach(ip => { ip.style.background = n.pc && n.pc[ip.dataset.p] ? n.pc[ip.dataset.p] : ''; });
       el.querySelectorAll('.port').forEach(pt => { const c = n.pc && n.pc[outKey(+pt.dataset.o)]; pt.style.background = c || (pt.dataset.o === '1' ? STOPC : ''); });
       if (n.t === 'audio') {
-        const it = get(n.cue), ns = reachBtns(n.id);
+        const it = get(n.cue);
         el.querySelector('.nm').textContent = it ? it.name : 'Choose a cue'; el.classList.toggle('dim', !it || !it.src);
-        el.querySelector('small').textContent = ns.length ? '(Connected ' + ns.join(', ') + ')' : '(Not connected)';
+        el.querySelector('small').textContent = '';
       } else if (n.t === 'key') {
         const nk = el.querySelector('.nk'), b = auto.btns.find(x => x.id === n.btn); nk.textContent = b ? b.name : 'link a button'; nk.classList.toggle('set', !!b);
       } else if (n.t === 'counter') { const ni = el.querySelector('.ni'); if (document.activeElement !== ni) ni.value = n.n; updCounter(n); }
@@ -1783,8 +1784,6 @@
   const wirePath = (x1, y1, x2, y2) => { const k = Math.max(50, Math.abs(x2 - x1) * .5); return 'M' + x1 + ' ' + y1 + ' C' + (x1 + k) + ' ' + y1 + ',' + (x2 - k) + ' ' + y2 + ',' + x2 + ' ' + y2; };
   const outPos = (id, fp) => { const el = nodeEls[id], pt = el && el.querySelectorAll('.port')[fp || 0]; return pt ? [v.x + (parseFloat(el.style.left) + el.offsetWidth) * v.z, v.y + (parseFloat(el.style.top) + pt.offsetTop + pt.offsetHeight / 2) * v.z] : null; };
   function inPos(to, p, W) {
-    const bi = auto.btns.findIndex(b => b.id === to);
-    if (bi >= 0) return [W, Math.max(6, Math.min(mlist.clientHeight - 6, rowY(bi) - mlist.scrollTop))];
     const el = nodeEls[to], ip = el && el.querySelectorAll('.ip')[p]; if (!ip) return null;
     return [v.x + parseFloat(el.style.left) * v.z, v.y + (parseFloat(el.style.top) + ip.offsetTop + ip.offsetHeight / 2) * v.z];
   }
@@ -1793,10 +1792,11 @@
     const W = acanvas.offsetWidth + GAPX, H = acanvas.offsetHeight;
     awires.setAttribute('width', W); awires.setAttribute('height', H);
     let s = '';
+    const nowT = performance.now();
     auto.links.forEach((l, n) => {
       const a = outPos(l[0], l[3]), b = inPos(l[1], l[2], W); if (!a || !b) return;
       const d = wirePath(a[0], a[1], b[0], b[1]);
-      s += '<g class="wg" data-n="' + n + '" style="--wc:' + pinColor(nodeById(l[0]), outKey(l[3])) + '"><path class="hit" d="' + d + '"/><path class="vis" d="' + d + '"/></g>';
+      s += '<g class="wg' + ((lglow.get(l[0] + l[1] + l[2]) || 0) > nowT ? ' on' : '') + '" data-n="' + n + '" style="--wc:' + pinColor(nodeById(l[0]), outKey(l[3])) + '"><path class="hit" d="' + d + '"/><path class="vis" d="' + d + '"/></g>';
     });
     if (wd) { const a = outPos(wd.id, wd.fp); if (a) s += '<path class="tmp" style="--wc:' + pinColor(nodeById(wd.id), outKey(wd.fp)) + '" d="' + wirePath(a[0], a[1], wd.px, wd.py) + '"/>'; }
     awires.innerHTML = s;
@@ -1814,7 +1814,6 @@
   function targetAt(cx, cy) {
     const hit = document.elementFromPoint(cx, cy), ip = hit && hit.closest && hit.closest('.ip');
     if (ip) return { to: ip.closest('.anode').dataset.id, p: +ip.dataset.p, el: ip };
-    const i = rowAt(cx, cy); if (i >= 0) return { to: auto.btns[i].id, p: 0, el: minner.querySelectorAll('.mrow')[i] };
     return null;
   }
   const markHot = el => { aworld.querySelectorAll('.ip.hot').forEach(x => x !== el && x.classList.remove('hot')); minner.querySelectorAll('.mrow.drop').forEach(x => x !== el && x.classList.remove('drop')); if (el) el.classList.add(el.classList.contains('ip') ? 'hot' : 'drop'); };
@@ -1826,8 +1825,7 @@
   function addLink(from, to, p, fp) {
     fp = fp ? 1 : 0;
     const fn = nodeById(from); if (from === to || !fn || !SPEC[fn.t].out) return;
-    const tn = nodeById(to);
-    if (tn && p >= SPEC[tn.t].ins) return;
+    const tn = nodeById(to); if (!tn || p >= SPEC[tn.t].ins) return;
     if (tn && downstream(to, from)) { toast('That would make a loop'); return; }
     if (tn && !(SPEC[tn.t].multi || (SPEC[tn.t].multiPins || []).includes(p))) auto.links = auto.links.filter(l => !(l[1] === to && l[2] === p));   // one wire per pin
     if (auto.links.some(l => l[0] === from && l[1] === to && l[2] === p && l[3] === fp)) return;
@@ -1909,60 +1907,70 @@
   const pHeld = new Set(), kHeld = new Set();                 // mapped buttons currently held by pointer / by key
   const isHeld = id => pHeld.has(id) || kHeld.has(id);
   function flash(id) { const el = nodeEls[id]; if (el) { el.classList.add('fire'); setTimeout(() => el.classList.remove('fire'), 450); } }
-  const waits = {};
+  const lglow = new Map(), waits = {};
+  function glowLink(l) { lglow.set(l[0] + l[1] + l[2], performance.now() + 520); drawWires(); setTimeout(drawWires, 560); }
   function clearWaits(id) { (waits[id] || []).forEach(clearTimeout); delete waits[id]; const n = nodeById(id); if (n) n.pend = 0; }
-  function val(id, seen, fp) {
+  /* yes/no value of a node (read live by IF, gates and LIGHT) */
+  function val(id, seen) {
     const n = nodeById(id); if (!n || seen.has(id)) return false; seen = new Set(seen).add(id);
-    if (n.t === 'audio') { const p = players[n.cue], on = !!(p && !p.paused); return fp ? !on : on; }
+    if (n.t === 'audio') { const p = players[n.cue]; return !!(p && !p.paused); }
     if (n.t === 'wait') return (n.pend || 0) > 0;
     if (n.t === 'key') return !!n.btn && isHeld(n.btn);
     if (n.t === 'counter') return (cnt[id] || 0) > 0;
     if (n.t === 'random') return (n.rv || 0) >= 50;
-    if (n.t === 'if') { const l = inputsL(id, 0)[0]; return !!l && CMP[n.op](numOf(l[0], seen, l[3]), n.k); }
+    if (n.t === 'if') { const l = inputsL(id, 0)[0]; return !!l && CMP[n.op](numOf(l[0], seen), n.k); }
     if (SPEC[n.t].gate) { if (!inputs(id, 0).length && !inputs(id, 1).length) return false; return !!GATE[n.t](pin(id, 0, seen), pin(id, 1, seen)); }
     return false;
   }
-  function numOf(id, seen, fp) {                 // the number an IF compares: counts, seconds, random 0-100, or 1/0 for yes/no nodes
+  function numOf(id, seen) {                      // the number an IF compares: counts, seconds, random 0-100, or 1/0 for yes/no nodes
     const n = nodeById(id); if (!n) return 0;
     if (n.t === 'counter') return cnt[id] || 0;
     if (n.t === 'random') return n.rv || 0;
     if (n.t === 'wait') return n.pend || 0;
-    if (n.t === 'audio' && !fp) { const p = players[n.cue]; return p ? Math.round(p.currentTime * 10) / 10 : 0; }
-    return val(id, seen, fp) ? 1 : 0;
+    if (n.t === 'audio') { const p = players[n.cue]; return p ? Math.round(p.currentTime * 10) / 10 : 0; }
+    return val(id, seen) ? 1 : 0;
   }
-  const pin = (id, p, seen) => inputsL(id, p).some(l => val(l[0], seen, l[3]));
-  function exec(id, seen, st, fp) {
-    const n = nodeById(id); if (!n || seen.has(id)) return; seen = new Set(seen).add(id); flash(id);
+  const pin = (id, p, seen) => inputsL(id, p).some(l => val(l[0], seen));
+  /* an event travels along the wires: emit() sends it out of a node, deliver() is what each node does when one arrives */
+  function emit(id, seen, st) {
+    let ls = auto.links.filter(l => l[0] === id); const n = nodeById(id);
+    if (n && n.t === 'random' && ls.length) ls = [ls[Math.floor(Math.random() * ls.length)]];       // RANDOM picks one way out
+    ls.forEach(l => { glowLink(l); deliver(l[1], l[2], id, seen, st); });
+  }
+  function deliver(to, p, src, prev, st) {
+    const n = nodeById(to); if (!n || prev.has(to)) return; const seen = new Set(prev).add(to); flash(to);
     if (n.t === 'audio') {
-      const it = get(n.cue), p = it && player(it);
-      if (!p) { st.miss++; return; }
-      if (!fp && inputs(id, 0).length && !pin(id, 0, seen)) { st.blocked++; return; }          // its 'when' input is false
-      if (fp) { p.pause(); p.currentTime = it.trimStart || 0; updateSeek(it); st.stopped++; return; }       // the "stop" pin
-      p.pause(); p.currentTime = it.trimStart || 0; p.play().catch(() => toast('Could not play this file')); st.played++;
-    }
-    else if (n.t === 'counter') { cnt[id] = (cnt[id] || 0) + 1; if (cnt[id] >= n.n) { cnt[id] = 0; inputsL(id, 0).forEach(l => exec(l[0], seen, st, l[3])); } updCounter(n); }
-    else if (n.t === 'random') { const ins = inputsL(id, 0); if (ins.length) { const l = ins[Math.floor(Math.random() * ins.length)]; exec(l[0], seen, st, l[3]); } }
-    else if (n.t === 'wait') {
-      st.delayed++; n.pend = (n.pend || 0) + 1; const el = nodeEls[id]; if (el) el.classList.add('waiting');
-      const t = setTimeout(() => {
-        n.pend = Math.max(0, (n.pend || 1) - 1); const e2 = nodeEls[id]; if (e2 && !n.pend) e2.classList.remove('waiting');
-        inputsL(id, 0).forEach(l => exec(l[0], seen, { played: 0, stopped: 0, miss: 0, delayed: 0, blocked: 0 }, l[3]));
-      }, (n.sec || 0) * 1000);
-      (waits[id] = waits[id] || []).push(t);
-    }
+      const it = get(n.cue), pl = it && player(it);
+      if (!pl) { st.miss++; return; }
+      if (p === 1) { pl.pause(); pl.currentTime = it.trimStart || 0; updateSeek(it); st.stopped++; return; }
+      pl.pause(); pl.currentTime = it.trimStart || 0; pl.play().catch(() => toast('Could not play this file')); st.played++;
+    } else if (n.t === 'wait') {
+      st.delayed++; n.pend = (n.pend || 0) + 1; const el = nodeEls[to]; if (el) el.classList.add('waiting');
+      const t = setTimeout(() => { n.pend = Math.max(0, (n.pend || 1) - 1); const e2 = nodeEls[to]; if (e2 && !n.pend) e2.classList.remove('waiting'); emit(to, seen, { played: 0, stopped: 0, miss: 0, delayed: 0 }); }, (n.sec || 0) * 1000);
+      (waits[to] = waits[to] || []).push(t);
+    } else if (n.t === 'counter') { cnt[to] = (cnt[to] || 0) + 1; if (cnt[to] >= n.n) { cnt[to] = 0; updCounter(n); emit(to, seen, st); } else updCounter(n); }
+    else if (n.t === 'random') { n.rv = Math.floor(Math.random() * 101); emit(to, seen, st); }
+    else if (n.t === 'if') { if (CMP[n.op](numOf(src, prev), n.k)) emit(to, seen, st); }
+    else if (SPEC[n.t].gate) { if (val(to, prev)) emit(to, seen, st); }                      // a gate lets the event through only while its condition is true
     else if (n.t === 'light') n.lit = performance.now() + 600;
   }
   function runBtn(b) {
-    auto.nodes.forEach(n => { if (n.t === 'random') n.rv = Math.floor(Math.random() * 101); });
-    const st = { played: 0, stopped: 0, miss: 0, delayed: 0, blocked: 0 }, ins = inputsL(b.id, 0); ins.forEach(l => exec(l[0], new Set(), st, l[3]));
-    if (!st.played && !st.stopped && !st.delayed && !ins.some(l => ['light', 'counter'].includes((nodeById(l[0]) || {}).t))) toast(st.miss ? 'That cue has no audio file yet' : st.blocked ? 'Nothing played (a “when” condition is false)' : ins.length ? 'Nothing played' : 'Nothing is connected to ' + b.name);
+    const st = { played: 0, stopped: 0, miss: 0, delayed: 0 }, srcs = auto.nodes.filter(n => n.t === 'key' && n.btn === b.id);
+    if (!srcs.length) toast('Add a Button Input linked to ' + b.name + ' to make it do something');
+    srcs.forEach(n => { flash(n.id); emit(n.id, new Set([n.id]), st); });
+    if (srcs.length && st.miss && !st.played && !st.stopped && !st.delayed) toast('That cue has no audio file yet');
     const row = minner.querySelector('.mrow[data-id="' + b.id + '"]'); if (row) { row.classList.remove('ran'); void row.offsetWidth; row.classList.add('ran'); }
   }
   let lightRaf = 0;
   function lightTick() {
     if (!autoOpen) { lightRaf = 0; return; }
     const now = performance.now();
-    auto.nodes.forEach(n => { if (n.t !== 'light') return; const el = nodeEls[n.id]; if (el) el.querySelector('.lamp').classList.toggle('on', pin(n.id, 0, new Set()) || (n.lit || 0) > now); });
+    auto.nodes.forEach(n => {
+      const el = nodeEls[n.id]; if (!el) return;
+      if (n.t === 'light') el.querySelector('.lamp').classList.toggle('on', pin(n.id, 0, new Set()) || (n.lit || 0) > now);
+      else if (n.t === 'audio') { const p = players[n.cue]; el.classList.toggle('live', !!(p && !p.paused)); }
+      else if (n.t === 'key') el.classList.toggle('live', !!n.btn && isHeld(n.btn));
+    });
     lightRaf = requestAnimationFrame(lightTick);
   }
   addEventListener('pointerup', () => pHeld.clear()); addEventListener('pointercancel', () => pHeld.clear());
