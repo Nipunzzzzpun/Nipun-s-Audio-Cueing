@@ -376,11 +376,11 @@
   .anode.t-random .cc { color: #fff; font-weight: 600; font-size: 12px; }
   .anode.t-print .ip[data-p="1"] { top: 100%; margin: -8px 0 0 -8px; }
   .anode.t-print .ni.pt { width: 150px; text-align: left; padding: 0 12px; }
-  .popwrap { position: fixed; left: 50%; top: 84px; transform: translateX(-50%); z-index: 400; display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; width: max-content; max-width: calc(100vw - 32px); }
-  .popmsg { pointer-events: auto; cursor: pointer; padding: 16px 28px; border-radius: 26px; background: rgba(0,0,0,.84); color: #fff; font: 600 20px 'Montserrat', sans-serif; text-align: center; overflow-wrap: anywhere;
-    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 10px 34px rgba(0,0,0,.3); animation: popIn .45s var(--spring) both; transition: opacity .3s, transform .3s; }
-  .popmsg.out { opacity: 0; transform: translateY(-10px) scale(.94); }
-  @keyframes popIn { from { opacity: 0; transform: translateY(-14px) scale(.8); } }
+  .popwrap { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%); z-index: 400; display: flex; flex-direction: column-reverse; align-items: center; gap: 8px; pointer-events: none; width: max-content; max-width: calc(100vw - 32px); }
+  .popmsg { pointer-events: auto; cursor: pointer; padding: 11px 22px; border-radius: 999px; background: rgba(0,0,0,.74); border: 2px solid rgba(0,0,0,.35); background-clip: padding-box; color: #fff; font: 600 14px 'Montserrat', sans-serif; text-align: center; overflow-wrap: anywhere;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 8px 26px rgba(0,0,0,.25); animation: popIn .45s var(--spring) both; transition: opacity .3s, transform .3s; }
+  .popmsg.out { opacity: 0; transform: translateY(10px) scale(.94); }
+  @keyframes popIn { from { opacity: 0; transform: translateY(14px) scale(.85); } }
   .anode.t-loop { min-width: 432px; }
   .anode.t-loop .r2 { grid-template-columns: auto auto auto; justify-content: space-between; gap: 10px; }
   .anode.t-loop .nk { flex: none; min-width: 124px; padding: 0 18px; white-space: nowrap; text-align: center; }
@@ -2098,21 +2098,28 @@
     if (!autoOpen) return;
     const W = acanvas.offsetWidth + GAPX, H = acanvas.offsetHeight;
     awires.style.setProperty('--z', v.z); awires.setAttribute('width', W); awires.setAttribute('height', H);
-    let s = '';
+    let s = '', defs = '';
     const nowT = performance.now();
     auto.links.forEach((l, n) => {
       const a = outPos(l[0], l[3]), b = inPos(l[1], l[2], W); if (!a || !b) return;
       const d = wirePath(a[0], a[1], b[0], b[1], b[2]);
-      s += '<g class="wg' + (badLink(l) ? ' bad' : '') + ((lglow.get(l[0] + l[1] + l[2]) || 0) > nowT ? ' on' : '') + '" data-n="' + n + '" style="--wc:' + pinColor(nodeById(l[0]), outKey(l[3])) + '"><path class="hit" d="' + d + '"/><path class="vis" d="' + d + '"/></g>';
+      s += '<g class="wg' + (badLink(l) ? ' bad' : '') + ((lglow.get(l[0] + l[1] + l[2]) || 0) > nowT ? ' on' : '') + '" data-n="' + n + '" style="--wc:' + wireFill(l, n, a, b, (x) => { defs += x; }) + '"><path class="hit" d="' + d + '"/><path class="vis" d="' + d + '"/></g>';
     });
-    if (wd) { const a = outPos(wd.id, wd.fp); if (a) s += '<path class="tmp" style="--wc:' + pinColor(nodeById(wd.id), outKey(wd.fp)) + '" d="' + wirePath(a[0], a[1], wd.px, wd.py) + '"/>'; }
-    awires.innerHTML = s;
+    if (wd) { const a = outPos(wd.id, wd.fp); if (a) s += '<path class="tmp" style="--wc:' + pinColor(nodeById(wd.id), outKey(wd.fp)) + '" d="' + (wd.snapB ? wirePath(a[0], a[1], wd.snapB[0], wd.snapB[1], wd.snapB[2]) : wirePath(a[0], a[1], wd.px, wd.py)) + '"/>'; }
+    awires.innerHTML = '<defs>' + defs + '</defs>' + s;
     awires.querySelectorAll('.wg.bad').forEach(g => {          // a wire into a pin that is switched off: broken line with an × in the gap
       const vis = g.querySelector('.vis'), L = vis.getTotalLength(), gap = 30 * v.z, h = Math.max(0, (L - gap) / 2), pt = vis.getPointAtLength(L / 2), k = 6 * v.z;
       vis.style.strokeDasharray = h + ' ' + gap + ' ' + h;
       const x = document.createElementNS('http://www.w3.org/2000/svg', 'path'); x.setAttribute('class', 'xmk');
       x.setAttribute('d', 'M' + (pt.x - k) + ' ' + (pt.y - k) + 'L' + (pt.x + k) + ' ' + (pt.y + k) + 'M' + (pt.x + k) + ' ' + (pt.y - k) + 'L' + (pt.x - k) + ' ' + (pt.y + k)); g.appendChild(x);
     });
+  }
+  /* wires blend from the colour of the pin they leave to the colour of the pin they enter */
+  function wireFill(l, i, a, b, addDef) {
+    const src = nodeById(l[0]), dst = nodeById(l[1]), c1 = pinColor(src, outKey(l[3])), c2 = (dst && ((dst.pc && dst.pc[l[2]]) || (isValIn(dst, l[2]) ? VALC : ''))) || c1;
+    if (c1 === c2) return c1;
+    addDef('<linearGradient id="lg' + i + '" gradientUnits="userSpaceOnUse" x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '"><stop offset="0" stop-color="' + c1 + '"/><stop offset="1" stop-color="' + c2 + '"/></linearGradient>');
+    return 'url(#lg' + i + ')';
   }
   function badLink(l) { const t = nodeById(l[1]); return !!t && ((t.t === 'loop' && l[2] === 2 && t.lm === 'forever') || (t.t === 'if' && l[2] === 1 && t.im === 'text')); }
   new ResizeObserver(drawWires).observe(acanvas);
@@ -2125,10 +2132,17 @@
     const y = cy - r.top + mlist.scrollTop, i = Math.round((y - RY0) / RPITCH);
     return i >= 0 && i < auto.btns.length && Math.abs(y - rowY(i)) <= 22 ? i : -1;
   }
-  function targetAt(cx, cy) {
+  const SNAP = 24;                                              // px: how close a dragged wire must get to a pin before it snaps (hold Ctrl to switch snapping off)
+  function targetAt(cx, cy, snap, fromId) {
     const ip = document.elementsFromPoint(cx, cy).find(e => e.classList && e.classList.contains('ip') && !e.classList.contains('soon'));   // wires can sit on top of pins
     if (ip) return { to: ip.closest('.anode').dataset.id, p: +ip.dataset.p, el: ip };
-    return null;
+    if (!snap) return null;
+    let best = null, bd = SNAP * SNAP;
+    aworld.querySelectorAll('.ip:not(.soon):not(.off)').forEach(pin => {
+      if (pin.closest('.anode').dataset.id === fromId) return;
+      const r = pin.getBoundingClientRect(), dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2), d = dx * dx + dy * dy; if (d < bd) { bd = d; best = pin; }
+    });
+    return best ? { to: best.closest('.anode').dataset.id, p: +best.dataset.p, el: best, snapped: true } : null;
   }
   const markHot = el => { aworld.querySelectorAll('.ip.hot').forEach(x => x !== el && x.classList.remove('hot')); minner.querySelectorAll('.mrow.drop').forEach(x => x !== el && x.classList.remove('drop')); if (el) el.classList.add(el.classList.contains('ip') ? 'hot' : 'drop'); };
   function downstream(from, target) {           // does 'from' (a node) eventually feed 'target'?
@@ -2170,7 +2184,8 @@
     if (wd) {
       const r = acanvas.getBoundingClientRect(); wd.px = e.clientX - r.left; wd.py = e.clientY - r.top;
       if (Math.abs(e.clientX - wd.sx) + Math.abs(e.clientY - wd.sy) > 4) wd.moved = true;
-      const t = wd.moved ? targetAt(e.clientX, e.clientY) : null; markHot(t && t.el); drawWires();
+      const t = wd.moved ? targetAt(e.clientX, e.clientY, !e.ctrlKey && !e.metaKey, wd.id) : null; markHot(t && t.el);
+      wd.snapB = t && t.snapped ? inPos(t.to, t.p, acanvas.offsetWidth + GAPX) : null; drawWires();
     } else if (nd) {
       const dx = e.clientX - nd.sx, dy = e.clientY - nd.sy; if (Math.abs(dx) + Math.abs(dy) > 4) nd.moved = true; if (!nd.moved) return;
       (nd.grp || [{ n: nd.n, el: nd.el, ox: nd.ox, oy: nd.oy }]).forEach(g => { g.n.x = g.ox + dx / v.z; g.n.y = g.oy + dy / v.z; g.el.style.left = g.n.x + 'px'; g.el.style.top = g.n.y + 'px'; }); drawWires(); drawGroups(); placeBar(true);
@@ -2183,7 +2198,7 @@
     if (wd) {
       const d = wd, up = e && e.type === 'pointerup'; wd = null; markHot(null);
       if (up && !d.moved) openPinPicker(nodeById(d.id), outKey(d.fp), d.el);                       // a plain click on a pin picks its colour
-      else if (up) { const t = targetAt(e.clientX, e.clientY); if (t) addLink(d.id, t.to, t.p, d.fp); }
+      else if (up) { const t = targetAt(e.clientX, e.clientY, !e.ctrlKey && !e.metaKey, d.id); if (t) addLink(d.id, t.to, t.p, d.fp); }
       drawWires();
     }
     if (nd) {
