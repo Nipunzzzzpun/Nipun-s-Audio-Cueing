@@ -348,11 +348,15 @@
   .anode .ip::after { content: ''; position: absolute; inset: -9px; border-radius: 50%; }
   .anode .ip.hot { transform: scale(1.5); background: #e0a8f0; }
   .anode.t-split { display: block; width: 38px; padding: 0; border-radius: 19px; }
+  .sroute .rb .st.dis { opacity: .22; cursor: not-allowed; pointer-events: none; }
   .anode.t-split .slines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
   .anode.t-split .sl { stroke: rgba(255,255,255,.14); stroke-width: 3; stroke-linecap: round; }
   .anode.t-split .srow { position: absolute; left: 0; right: 0; display: flex; justify-content: center; align-items: center; gap: 12px; transform: translateY(-50%); pointer-events: none; }
   .anode.t-split .srow.so { top: 28%; } .anode.t-split .srow.si { top: 72%; }
   .anode.t-split .sv { font: 500 24px 'Montserrat', sans-serif; min-width: 20px; text-align: center; }
+  .anode.t-split .srz { position: absolute; right: -8px; bottom: -8px; width: 20px; height: 20px; cursor: nwse-resize; opacity: 0; transition: opacity .2s; z-index: 0; }
+  .anode.t-split .srz::before { content: ''; position: absolute; right: 5px; bottom: 5px; width: 9px; height: 9px; border-right: 3px solid rgba(255,255,255,.8); border-bottom: 3px solid rgba(255,255,255,.8); border-radius: 0 0 8px 0; }
+  .anode.t-split:hover .srz, .anode.t-split.picked .srz { opacity: 1; }
   .anode.t-split .sb { pointer-events: auto; border: 0; background: none; color: #fff; width: 22px; height: 28px; padding: 0; cursor: pointer; display: grid; place-items: center; opacity: .85; transition: transform .25s var(--spring), opacity .2s; }
   .anode.t-split .sb:hover { opacity: 1; transform: scale(1.25); } .anode.t-split .sb:active { transform: scale(.9); }
   .anode.t-split .sb svg { width: 10px; height: 14px; fill: none; stroke: #fff; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
@@ -360,7 +364,8 @@
   .anode.t-split .ip.grab, .anode.t-split .port.grab { transform: scale(1.5); cursor: grabbing; }
   .sroute { position: fixed; z-index: 290; width: 320px; height: 208px; border-radius: 28px; background: #000; color: #fff; font: 500 15px 'Montserrat', sans-serif; animation: itemIn .3s var(--spring) both; box-shadow: 0 14px 40px rgba(0,0,0,.4); user-select: none; touch-action: none; }
   .sroute svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-  .sroute .rl { fill: none; stroke: url(#rgrad); stroke-width: 6.5; stroke-linecap: round; transition: opacity .2s; }
+  .sroute .rbody { fill: #181818; }
+  .sroute .rl { fill: none; stroke-width: 5; stroke-linecap: round; transition: opacity .2s; }
   .sroute .rh { fill: none; stroke: transparent; stroke-width: 16; pointer-events: stroke; cursor: pointer; }
   .sroute .rg:hover .rl { stroke: #ff8a8a; }
   .sroute .rt { fill: none; stroke: #e0a8f0; stroke-width: 4.5; stroke-linecap: round; stroke-dasharray: 2 9; opacity: .8; }
@@ -1795,7 +1800,40 @@
     if: { ins: 2, out: true, multi: true }, loop: { ins: 4, out: true, outs: 2, multi: true }, random: { ins: 3, out: true, multi: true }, print: { ins: 2, out: true, multi: true }, light: { ins: 1, out: false, multi: true }, split: { ins: 1, out: true, outs: 1, multi: true }
   };
   const insOf = n => n.t === 'split' ? n.si : SPEC[n.t].ins, outsOf = n => n.t === 'split' ? n.so : (SPEC[n.t].outs || 1);
-  const SW = 38, splitH = n => Math.max(66, 30 + Math.max(n.si, n.so) * 24);
+  const SW = 38, SR = 19, MAXPIN = 12;
+  const sdim = n => [Math.max(SW, Math.min(400, +n.sw || SW)), Math.max(66, Math.min(600, +n.sh || (38 + Math.max(n.si, n.so) * 24)))];      // [width, height]; older / untouched Splitters size themselves to their pins
+  /* Splitter pins sit anywhere on its rounded border: u is the fraction round the edge (0 = top of the left side, running down the left, along the bottom, up the right, back along the top) */
+  const geo = (W, H) => { const R = SR, Lv = H - 2 * R, Lh = W - 2 * R, q = Math.PI * R / 2; return { R, Lv, Lh, q, P: 2 * Lv + 2 * Lh + 4 * q }; };
+  const splitCap = (W, H) => Math.min(MAXPIN, Math.floor(geo(W, H).P / 48));       // the bigger the Splitter, the more pins fit
+  function bpt(u, W, H) {
+    const { R, Lv, Lh, q, P } = geo(W, H); let d = (((u % 1) + 1) % 1) * P, x, y, nx, ny;
+    const arc = (cx, cy, t) => { x = cx + R * Math.cos(t); y = cy + R * Math.sin(t); nx = Math.cos(t); ny = Math.sin(t); };
+    if (d <= Lv) { x = 0; y = R + d; nx = -1; ny = 0; }
+    else if ((d -= Lv) <= q) arc(R, H - R, Math.PI - d / R);
+    else if ((d -= q) <= Lh) { x = R + d; y = H; nx = 0; ny = 1; }
+    else if ((d -= Lh) <= q) arc(W - R, H - R, Math.PI / 2 - d / R);
+    else if ((d -= q) <= Lv) { x = W; y = H - R - d; nx = 1; ny = 0; }
+    else if ((d -= Lv) <= q) arc(W - R, R, -d / R);
+    else if ((d -= q) <= Lh) { x = W - R - d; y = 0; nx = 0; ny = -1; }
+    else { d -= Lh; arc(R, R, -Math.PI / 2 - d / R); }
+    return { x, y, s: Math.abs(nx) > Math.abs(ny) ? (nx < 0 ? 'l' : 'r') : (ny < 0 ? 't' : 'b') };
+  }
+  function projU(x, y, W, H) {                     // nearest point on the border to (x, y), as a fraction
+    let best = 0, bd = 1e18; const N = 360, test = u => { const b = bpt(u, W, H), dd = (b.x - x) ** 2 + (b.y - y) ** 2; if (dd < bd) { bd = dd; best = u; } };
+    for (let i = 0; i < N; i++) test(i / N); const c = best; for (let k = -12; k <= 12; k++) test(c + k / (N * 12));
+    return ((best % 1) + 1) % 1;
+  }
+  function fillPins(sp, n) {                       // make sure every pin has a place; untouched pins re-space themselves when the Splitter changes size
+    const [W, H] = sdim(n), g = geo(W, H), og = sp.w && sp.h ? geo(sp.w, sp.h) : g, same = sp.w === W && sp.h === H;
+    [['i', n.si], ['o', n.so]].forEach(([k, c]) => {
+      const cur = Array.isArray(sp[k]) ? sp[k] : []; if (cur.length === c && same) return;
+      const st = G => k === 'i' ? G.P - (G.Lh / 2 + G.q) : G.Lv + G.q + G.Lh / 2;        // inputs fill the left half, outputs the right half
+      const isDef = p => ((((((p.u % 1) + 1) % 1) * og.P - st(og)) % og.P) + og.P) % og.P <= og.P / 2 + .5;
+      const dflt = j => ({ u: ((st(g) + (k === 'i' ? (j + .5) : (c - j - .5)) / c * g.P / 2) % g.P) / g.P });
+      sp[k] = cur.every(isDef) ? Array.from({ length: c }, (_, j) => dflt(j)) : Array.from({ length: c }, (_, j) => cur[j] || dflt(j));
+    });
+    sp.w = W; sp.h = H; return sp;
+  }
   const VP = { audio: 2, value: 2, loop: 2, counter: 1, wait: 1, if: 1, number: 1, random: 1, print: 1 };      // first input pin of each node that carries a value (not a signal)
   const OPS = [['<', 'less than'], ['>', 'greater than'], ['=', 'equal to'], ['≤', 'at most'], ['≥', 'at least'], ['≠', 'not equal to']];
   const CMP = { '<': (a, b) => a < b, '>': (a, b) => a > b, '=': (a, b) => a === b, '≤': (a, b) => a <= b, '≥': (a, b) => a >= b, '≠': (a, b) => a !== b };
@@ -1815,11 +1853,12 @@
   function updValue(n) { const el = nodeEls[n.id], cc = el && el.querySelector('.cc'); if (cc) cc.textContent = '= ' + fmtV(vcur(n)); }
   const GATE = { and: (a, b) => a && b, or: (a, b) => a || b, nor: (a, b) => !(a || b), xor: (a, b) => a !== b, xand: (a, b) => a === b };
   function cleanSplit(n) {                       // Splitter: how many pins, which input feeds which output, and where each pin sits on the border
-    const si = Math.max(1, Math.min(6, Math.round(+n.si) || 1)), so = Math.max(1, Math.min(6, Math.round(+n.so) || 1)), seen = new Set(), sc = [];
+    const si = Math.max(1, Math.min(MAXPIN, Math.round(+n.si) || 1)), so = Math.max(1, Math.min(MAXPIN, Math.round(+n.so) || 1)), seen = new Set(), sc = [];
     if (Array.isArray(n.sc)) n.sc.slice(0, 40).forEach(c => { if (!Array.isArray(c)) return; const a = c[0] | 0, b = c[1] | 0, k = a + ',' + b; if (a >= 0 && a < si && b >= 0 && b < so && !seen.has(k)) { seen.add(k); sc.push([a, b]); } });
     else sc.push([0, 0]);
-    const side = a => Array.isArray(a) ? a.slice(0, 6).filter(p => p && 'lrtb'.includes(p.s) && p.s.length === 1 && isFinite(p.f)).map(p => ({ s: p.s, f: Math.max(.05, Math.min(.95, +p.f)) })) : [];
-    return { si, so, sc, sp: n.sp && typeof n.sp === 'object' ? { i: side(n.sp.i), o: side(n.sp.o) } : null };
+    const side = a => Array.isArray(a) ? a.slice(0, MAXPIN).filter(p => p && typeof p === 'object' && isFinite(p.u)).map(p => ({ u: ((+p.u % 1) + 1) % 1 })) : [];
+    return { si, so, sc, sw: isFinite(n.sw) && n.sw ? Math.max(SW, Math.min(400, +n.sw)) : null, sh: isFinite(n.sh) && n.sh ? Math.max(66, Math.min(600, +n.sh)) : null,
+      sp: n.sp && typeof n.sp === 'object' ? { i: side(n.sp.i), o: side(n.sp.o), w: isFinite(n.sp.w) ? +n.sp.w : 0, h: isFinite(n.sp.h) ? +n.sp.h : 0 } : null };
   }
   const idOk = x => typeof x === 'string' && /^[a-z0-9]{3,16}$/.test(x);
   const HEX = /^#[0-9a-f]{6}$/i;
@@ -1931,7 +1970,7 @@
     else if (n.t === 'counter') h += '<span class="nm">Counter</span><input class="ni" type="number" min="1" max="99" title="Runs what is wired in every Nth press"><small class="cc"></small>';
     else if (n.t === 'wait') h += '<span class="nm">Wait</span><input class="ni" type="number" min="0" max="3600" step="0.1" title="Seconds to wait"><small>sec</small><svg class="wring"><rect pathLength="100"/></svg>';
     else if (n.t === 'light') h += '<span class="lamp"></span><span class="nm">Light</span>';
-    else if (n.t === 'split') { h += '<svg class="slines"></svg>'; }
+    else if (n.t === 'split') { h += '<svg class="slines"></svg><i class="srz" title="Drag to resize. A bigger Splitter fits more pins"></i>'; }
     else h += '<span class="nm">' + LABEL[n.t] + '</span>';
     if (sp.out && n.t !== 'split') for (let o = 0; o < (sp.outs || 1); o++) h += '<i class="port" data-o="' + o + '"></i>';
     el.innerHTML = h + '<button class="ndel" title="Remove">' + SVG_X + '</button>';
@@ -1969,24 +2008,18 @@
   }
   const updCounter = n => { const el = nodeEls[n.id], cc = el && el.querySelector('.cc'); if (cc) cc.textContent = (cnt[n.id] || 0) + '/' + cN(n); };
   /* Splitter: pins live on the border (side + fraction along it); lines inside show which input feeds which output */
-  function splitPins(n) {
-    n.sp = n.sp || { i: [], o: [] };
-    [['i', n.si, 'l'], ['o', n.so, 'r']].forEach(([k, c, side]) => {
-      const cur = Array.isArray(n.sp[k]) ? n.sp[k] : [], dflt = j => ({ s: side, f: (j + 1) / (c + 1) });
-      if (cur.length !== c) n.sp[k] = cur.every(p => p.s === side) ? Array.from({ length: c }, (_, j) => dflt(j)) : Array.from({ length: c }, (_, j) => cur[j] || dflt(j));
-    });
-  }
+  function splitPins(n) { n.sp = fillPins(n.sp || { i: [], o: [] }, n); }
   function layoutSplit(n, el) {
-    splitPins(n); const H = splitH(n);
+    splitPins(n); const [W, H] = sdim(n); el.style.width = W + 'px';
     if (el.querySelectorAll('.ip').length !== n.si || el.querySelectorAll('.port').length !== n.so) {
       el.querySelectorAll('.ip, .port').forEach(x => x.remove());
       let h = ''; for (let i = 0; i < n.si; i++) h += '<i class="ip" data-p="' + i + '"></i>'; for (let o = 0; o < n.so; o++) h += '<i class="port" data-o="' + o + '"></i>';
       el.insertAdjacentHTML('beforeend', h);
     }
     el.style.height = H + 'px';
-    const put = (pin, q) => { const x = q.s === 'l' ? 0 : q.s === 'r' ? SW : q.f * SW, y = q.s === 't' ? 0 : q.s === 'b' ? H : q.f * H; pin.style.left = x - 8 + 'px'; pin.style.top = y - 8 + 'px'; pin.dataset.s = q.s; return [x, y]; };
+    const put = (pin, q) => { const b = bpt(q.u, W, H); pin.style.left = b.x - 8 + 'px'; pin.style.top = b.y - 8 + 'px'; pin.dataset.s = b.s; return [b.x, b.y]; };
     const I = [...el.querySelectorAll('.ip')].map((p, j) => put(p, n.sp.i[j])), O = [...el.querySelectorAll('.port')].map((p, j) => put(p, n.sp.o[j]));
-    const sv = el.querySelector('.slines'); sv.setAttribute('viewBox', '0 0 ' + SW + ' ' + H);
+    const sv = el.querySelector('.slines'); sv.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
     sv.innerHTML = n.sc.map(c => I[c[0]] && O[c[1]] ? '<path class="sl" d="M' + I[c[0]][0] + ' ' + I[c[0]][1] + 'L' + O[c[1]][0] + ' ' + O[c[1]][1] + '"/>' : '').join('');
   }
   function splitCount(n, k, d) {
@@ -1999,15 +2032,19 @@
     }
     save();
   }
+  let rz = null;                                                  // a Splitter being resized from its corner
+  function resizeSplit(e) {
+    const n = rz.n, el = nodeEls[n.id]; if (!el) return;
+    const w = Math.max(SW, Math.min(400, Math.round(rz.w + (e.clientX - rz.sx) / v.z))), h = Math.max(66, Math.min(600, Math.round(rz.h + (e.clientY - rz.sy) / v.z)));
+    if (splitCap(w, h) < Math.max(n.si, n.so)) return;              // never squeeze it below the pins it already has
+    n.sw = w; n.sh = h; layoutSplit(n, el); drawWires(); drawGroups(); placeBar(true);
+  }
   let pm = null;                                                  // a Splitter pin being carried round the border
   function startPinMove(n, k, idx, el) { pm = { n, k, idx, el }; el.classList.add('grab'); }
   function movePin(e) {
     const n = pm.n, el = nodeEls[n.id]; if (!el) return;
-    const r = el.getBoundingClientRect(), sc = r.width / SW || 1, H = splitH(n), x = (e.clientX - r.left) / sc, y = (e.clientY - r.top) / sc;
-    const dist = { l: Math.abs(x), r: Math.abs(x - SW), t: Math.abs(y), b: Math.abs(y - H) }; let s = 'l'; for (const q in dist) if (dist[q] < dist[s]) s = q;
-    const m = 14, cl = (a, lo, hi) => Math.max(lo, Math.min(hi, a));
-    const f = s === 'l' || s === 'r' ? cl(y / H, m / H, 1 - m / H) : cl(x / SW, m / SW, 1 - m / SW);
-    n.sp[pm.k][pm.idx] = { s, f }; layoutSplit(n, el); drawWires();
+    const r = el.getBoundingClientRect(), [W, H] = sdim(n), sc = r.width / W || 1;
+    n.sp[pm.k][pm.idx] = { u: projU((e.clientX - r.left) / sc, (e.clientY - r.top) / sc, W, H) }; layoutSplit(n, el); drawWires();
   }
   /* hold the Splitter: program which input goes to which output */
   let routeEl = null;
@@ -2015,33 +2052,40 @@
   addEventListener('pointerdown', e => { if (routeEl && !e.target.closest('.sroute')) closeRoute(); }, true);
   function openRoute(n, anchor) {
     closeRoute(); closePick(); closePops();
-    const PW = 320, PH = 208, IX = 80, OX = 230, PITCH = 24, CY = 92;
-    const d = { si: n.si, so: n.so, sc: n.sc.map(c => c.slice()) };
+    const PW = 320, PH = 208, CX = 160, CY = 88;
+    splitPins(n);
+    const d = { si: n.si, so: n.so, sw: n.sw, sh: n.sh, sc: n.sc.map(c => c.slice()), sp: { i: n.sp.i.map(p => ({ u: p.u })), o: n.sp.o.map(p => ({ u: p.u })), w: n.sp.w, h: n.sp.h } };
     const box = document.createElement('div'); box.className = 'sroute'; routeEl = box;
-    const iy = k => CY + (k - (d.si - 1) / 2) * PITCH, oy = k => CY + (k - (d.so - 1) / 2) * PITCH;
+    const DM = () => sdim(d), SC = () => { const [w, h] = DM(); return Math.min(2.2, 126 / h, 220 / w); };
+    const at = (k, j) => { const [w, h] = DM(), b = bpt(d.sp[k][j].u, w, h), s = SC(); return [CX + (b.x - w / 2) * s, CY + (b.y - h / 2) * s]; };
     const col = (k, nn) => (n.pc && (k === 'i' ? n.pc[nn] : n.pc[outKey(nn)])) || (k === 'i' ? DARK : PURPLE);
     const chev = l => '<svg viewBox="0 0 10 14"><path d="' + (l ? 'M7 2L2 7l5 5' : 'M3 2l5 5-5 5') + '"/></svg>';
     let drag = null;
     const draw = () => {
-      let h = '<svg><defs><linearGradient id="rgrad" gradientUnits="userSpaceOnUse" x1="' + IX + '" y1="0" x2="' + OX + '" y2="0"><stop offset="0" stop-color="#555"/><stop offset="1" stop-color="#e0a8f0"/></linearGradient></defs>';
-      d.sc.forEach((c, j) => { const p = 'M' + IX + ' ' + iy(c[0]) + 'L' + OX + ' ' + oy(c[1]); h += '<g class="rg" data-j="' + j + '"><path class="rh" d="' + p + '"/><path class="rl" d="' + p + '"/></g>'; });
-      h += '<path class="rt" style="display:none"/></svg>';
-      for (let i = 0; i < d.si; i++) h += '<i class="rp" data-k="i" data-n="' + i + '" style="left:' + (IX - 10) + 'px;top:' + (iy(i) - 10) + 'px;background:' + col('i', i) + '"></i>';
-      for (let o = 0; o < d.so; o++) h += '<i class="rp" data-k="o" data-n="' + o + '" style="left:' + (OX - 10) + 'px;top:' + (oy(o) - 10) + 'px;background:' + col('o', o) + '"></i>';
-      h += '<div class="rb" style="left:30px"><button class="ok" title="Save">' + '<svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>' + '</button><button class="no" title="Cancel"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>';
-      h += '<div class="rb" style="right:24px"><button class="st" data-k="i" data-d="-1" title="Fewer inputs">' + chev(1) + '</button><span>' + d.si + '</span><button class="st" data-k="i" data-d="1" title="More inputs">' + chev(0) + '</button>'
-        + '<button class="st" data-k="o" data-d="-1" title="Fewer outputs" style="margin-left:6px">' + chev(1) + '</button><span>' + d.so + '</span><button class="st" data-k="o" data-d="1" title="More outputs">' + chev(0) + '</button></div>';
-      box.innerHTML = h;
+      const s = SC(), [w, h] = DM(), cap = splitCap(w, h);
+      let g = '<svg><defs>', ln = '';
+      d.sc.forEach((c, j) => {
+        const A = at('i', c[0]), B = at('o', c[1]);
+        g += '<linearGradient id="rg' + j + '" gradientUnits="userSpaceOnUse" x1="' + A[0] + '" y1="' + A[1] + '" x2="' + B[0] + '" y2="' + B[1] + '"><stop offset="0" stop-color="#6a6a6a"/><stop offset="1" stop-color="#e0a8f0"/></linearGradient>';
+        const p = 'M' + A[0] + ' ' + A[1] + 'L' + B[0] + ' ' + B[1]; ln += '<g class="rg" data-j="' + j + '"><path class="rh" d="' + p + '"/><path class="rl" style="stroke:url(#rg' + j + ')" d="' + p + '"/></g>';
+      });
+      let h2 = g + '</defs><rect class="rbody" x="' + (CX - w * s / 2) + '" y="' + (CY - h * s / 2) + '" width="' + w * s + '" height="' + h * s + '" rx="' + SR * s + '"/>' + ln + '<path class="rt" style="display:none"/></svg>';
+      for (let i = 0; i < d.si; i++) { const p = at('i', i); h2 += '<i class="rp" data-k="i" data-n="' + i + '" style="left:' + (p[0] - 10) + 'px;top:' + (p[1] - 10) + 'px;background:' + col('i', i) + '"></i>'; }
+      for (let o = 0; o < d.so; o++) { const p = at('o', o); h2 += '<i class="rp" data-k="o" data-n="' + o + '" style="left:' + (p[0] - 10) + 'px;top:' + (p[1] - 10) + 'px;background:' + col('o', o) + '"></i>'; }
+      h2 += '<div class="rb" style="left:30px"><button class="ok" title="Save"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></button><button class="no" title="Cancel"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>';
+      h2 += '<div class="rb" style="right:24px"><button class="st" data-k="i" data-d="-1" title="Fewer inputs">' + chev(1) + '</button><span>' + d.si + '</span><button class="st' + (d.si >= cap ? ' dis' : '') + '" data-k="i" data-d="1" title="' + (d.si >= cap ? 'Resize the Splitter to fit more pins' : 'More inputs') + '">' + chev(0) + '</button>'
+        + '<button class="st" data-k="o" data-d="-1" title="Fewer outputs" style="margin-left:6px">' + chev(1) + '</button><span>' + d.so + '</span><button class="st' + (d.so >= cap ? ' dis' : '') + '" data-k="o" data-d="1" title="' + (d.so >= cap ? 'Resize the Splitter to fit more pins' : 'More outputs') + '">' + chev(0) + '</button></div>';
+      box.innerHTML = h2;
     };
     const step = (k, dd) => {
-      const key = k === 'i' ? 'si' : 'so', old = d[key], nv = Math.max(1, Math.min(6, old + dd)); if (nv === old) return; d[key] = nv;
+      const key = k === 'i' ? 'si' : 'so', old = d[key], nv = Math.max(1, Math.min(splitCap(...DM()), old + dd)); if (nv === old) return; d[key] = nv;
       if (nv > old) for (let j = old; j < nv; j++) d.sc.push(k === 'o' ? [Math.min(j, d.si - 1), j] : [j, Math.min(j, d.so - 1)]);
       else d.sc = d.sc.filter(c => c[0] < d.si && c[1] < d.so);
-      draw();
+      fillPins(d.sp, d); draw();
     };
     const commit = () => {
       auto.links = auto.links.filter(l => !(l[1] === n.id && l[2] >= d.si) && !(l[0] === n.id && (l[3] || 0) >= d.so));
-      n.si = d.si; n.so = d.so; n.sc = d.sc; closeRoute(); save();
+      n.si = d.si; n.so = d.so; n.sc = d.sc; n.sp = d.sp; closeRoute(); save();
     };
     draw(); document.body.appendChild(box);
     const r = anchor.getBoundingClientRect();
@@ -2050,16 +2094,22 @@
     const local = e => { const b = box.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
     box.addEventListener('pointerdown', e => {
       const pin = e.target.closest('.rp'); if (!pin) return; e.preventDefault();
-      drag = { k: pin.dataset.k, n: +pin.dataset.n }; pin.classList.add('hot');
+      drag = { k: pin.dataset.k, n: +pin.dataset.n, sx: e.clientX, sy: e.clientY, moved: false, held: false };
+      drag.t = setTimeout(() => { if (drag && !drag.moved) { drag.held = true; pin.classList.add('hot'); } }, HOLD_MS);       // hold a pin, then drag it round the border
     });
     const mv = e => {
-      if (!drag) return; const t = box.querySelector('.rt'), [x, y] = local(e), sx = drag.k === 'i' ? IX : OX, sy = drag.k === 'i' ? iy(drag.n) : oy(drag.n);
-      t.style.display = ''; t.setAttribute('d', 'M' + sx + ' ' + sy + 'L' + x + ' ' + y);
+      if (!drag) return; if (Math.abs(e.clientX - drag.sx) + Math.abs(e.clientY - drag.sy) > 4) drag.moved = true;
+      const [x, y] = local(e);
+      if (drag.held) { drag.k && (d.sp[drag.k][drag.n] = { u: projU((x - CX) / SC() + DM()[0] / 2, (y - CY) / SC() + DM()[1] / 2, DM()[0], DM()[1]) }); draw(); return; }
+      if (!drag.moved) return; clearTimeout(drag.t);
+      const t = box.querySelector('.rt'), P = at(drag.k, drag.n); t.style.display = ''; t.setAttribute('d', 'M' + P[0] + ' ' + P[1] + 'L' + x + ' ' + y);
     };
     const up = e => {
-      if (!drag) return; const a = drag; drag = null;
-      const hit = document.elementsFromPoint(e.clientX, e.clientY).find(x => x.classList && x.classList.contains('rp') && x.dataset.k !== a.k);
-      if (hit) { const i = a.k === 'i' ? a.n : +hit.dataset.n, o = a.k === 'o' ? a.n : +hit.dataset.n; if (!d.sc.some(c => c[0] === i && c[1] === o)) d.sc.push([i, o]); }
+      if (!drag) return; const a = drag; drag = null; clearTimeout(a.t);
+      if (!a.held) {
+        const hit = document.elementsFromPoint(e.clientX, e.clientY).find(x => x.classList && x.classList.contains('rp') && x.dataset.k !== a.k);
+        if (hit) { const i = a.k === 'i' ? a.n : +hit.dataset.n, o = a.k === 'o' ? a.n : +hit.dataset.n; if (!d.sc.some(c => c[0] === i && c[1] === o)) d.sc.push([i, o]); }
+      }
       draw();
     };
     box.addEventListener('click', e => {
@@ -2115,7 +2165,7 @@
   function removeNode(id) { clearWaits(id); auto.nodes = auto.nodes.filter(n => n.id !== id); auto.links = auto.links.filter(l => l[0] !== id && l[1] !== id); save(); }
   function addNode(t, cue) {
     const n = auto.nodes.length, col = n % 2, row = Math.floor(n / 2) % 3;     // drop new nodes on a loose grid so they never stack
-    auto.nodes.push({ id: uid(), t, x: Math.round((30 - v.x) / v.z + col * 320 + Math.floor(n / 6) * 26), y: Math.round((24 - v.y) / v.z + row * 70 + Math.floor(n / 6) * 26), cue: cue || '', btn: '', n: 2, sec: 1, vol: 100, pitch: 0, v: 100, vm: 'add', vx: 1, vs: t === 'value' ? 100 : 0, op: '>', k: 0, lm: 'until', lc: 3, lt: 1, rmin: 0, rmax: 100, txt: 'Hello!', im: 'value', it: 'is', tx: '', si: 1, so: 1, sc: [[0, 0]], sp: null, pc: {} }); save();
+    auto.nodes.push({ id: uid(), t, x: Math.round((30 - v.x) / v.z + col * 320 + Math.floor(n / 6) * 26), y: Math.round((24 - v.y) / v.z + row * 70 + Math.floor(n / 6) * 26), cue: cue || '', btn: '', n: 2, sec: 1, vol: 100, pitch: 0, v: 100, vm: 'add', vx: 1, vs: t === 'value' ? 100 : 0, op: '>', k: 0, lm: 'until', lc: 3, lt: 1, rmin: 0, rmax: 100, txt: 'Hello!', im: 'value', it: 'is', tx: '', si: 1, so: 1, sc: [[0, 0]], sw: 38, sh: 66, sp: null, pc: {} }); save();
   }
 
   /* key guide: a small "[Key] does something" hint at the bottom-middle while a modifier key is useful */
@@ -2349,7 +2399,8 @@
   acanvas.addEventListener('pointerdown', e => {
     if (e.target.closest('.azoom, button, input')) return;
     const port = e.target.closest('.port'), node = e.target.closest('.anode'), r = acanvas.getBoundingClientRect();
-    if (port) { e.preventDefault(); wd = { id: node.dataset.id, fp: +port.dataset.o || 0, px: e.clientX - r.left, py: e.clientY - r.top, sx: e.clientX, sy: e.clientY, moved: false, el: port, cx: e.clientX - r.left, cy: e.clientY - r.top }; requestAnimationFrame(wireTick); drawWires();
+    if (e.target.closest('.srz') && node) { const sn = nodeById(node.dataset.id), [w0, h0] = sdim(sn); e.preventDefault(); rz = { n: sn, sx: e.clientX, sy: e.clientY, w: w0, h: h0 }; }
+    else if (port) { e.preventDefault(); wd = { id: node.dataset.id, fp: +port.dataset.o || 0, px: e.clientX - r.left, py: e.clientY - r.top, sx: e.clientX, sy: e.clientY, moved: false, el: port, cx: e.clientX - r.left, cy: e.clientY - r.top }; requestAnimationFrame(wireTick); drawWires();
       const sn = nodeById(node.dataset.id); if (sn && sn.t === 'split') wd.hold = setTimeout(() => { if (!wd || wd.moved) return; const d = wd; wd = null; markHot(null); startPinMove(sn, 'o', d.fp, d.el); drawWires(); }, HOLD_MS); }
     else if (node) {
       e.preventDefault(); const n = nodeById(node.dataset.id); if (!n) return;
@@ -2368,6 +2419,7 @@
     }
   });
   addEventListener('pointermove', e => {
+    if (rz) { resizeSplit(e); return; }
     if (pm) { movePin(e); return; }
     if (wd) {
       const r = acanvas.getBoundingClientRect(); wd.px = e.clientX - r.left; wd.py = e.clientY - r.top;
@@ -2383,6 +2435,7 @@
       if (!pn.moved && Math.abs(e.clientX - pn.sx) + Math.abs(e.clientY - pn.sy) > 5) { pn.moved = true; clearTimeout(pn.t); } vt.x = v.x = pn.ox + e.clientX - pn.sx; vt.y = v.y = pn.oy + e.clientY - pn.sy; applyView(); drawWires(); }
   });
   const endPointer = e => {
+    if (rz) { rz = null; save(); }
     if (pm) { pm.el.classList.remove('grab'); pm = null; save(); }
     if (wd) {
       clearTimeout(wd.hold); const d = wd, up = e && e.type === 'pointerup'; wd = null; markHot(null);
