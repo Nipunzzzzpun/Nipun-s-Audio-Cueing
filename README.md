@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/automation.png" alt="Automation" width="100%"></p>
+<p align="center"><img src="assets/Automation.png" alt="Automation" width="100%"></p>
 
 ## About
 
