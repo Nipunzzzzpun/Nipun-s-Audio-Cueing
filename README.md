@@ -62,3 +62,7 @@ The GitHub button on the page links back to the repository automatically when it
 ## Built with
 
 Plain HTML, CSS and JavaScript, [PeerJS](https://peerjs.com/) for sharing, and the Montserrat / Major Mono Display fonts from Google Fonts.
+
+## Copyright
+
+Copyright (c) 2026 Nipun. All rights reserved. See [LICENSE](LICENSE).
