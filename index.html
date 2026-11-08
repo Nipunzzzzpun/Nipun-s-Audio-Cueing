@@ -438,7 +438,7 @@
   .kguide { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 12px); z-index: 390; display: flex; align-items: center; gap: 8px; pointer-events: none; opacity: 0; white-space: nowrap;
     font: 600 9px 'Montserrat', sans-serif; color: #4d4d4d; transition: opacity .25s ease, transform .4s var(--ease); }
   .kguide .kk { display: flex; align-items: center; gap: 3px; margin: 0 7px; } .kguide .kk span { margin-left: 4px; }
-  .kguide .kk > span, .kguide > span:not(.kk) { display: inline-block; filter: invert(1); color: #111; }   /* inverted so the words never blend into the board or the page */
+  .kguide .kk > span, .kguide > span:not(.kk) { display: inline-block; color: #fff; background: rgba(20,20,22,.78); padding: 3px 9px; border-radius: 9px; font-size: 10px; }   /* its own dark chip, so the words stay readable on the page and on the board */
   .kguide.show { opacity: 1; transform: translate(-50%, 0); }
   .kguide kbd { font: 600 9px 'Montserrat', sans-serif; color: #fff; background: #555; border: 2px solid rgba(0,0,0,.18); background-clip: padding-box; border-radius: 7px; padding: 4px 8px; }
   .popwrap { position: fixed; left: 50%; bottom: 72px; transform: translateX(-50%); z-index: 400; display: flex; flex-direction: column-reverse; align-items: center; gap: 8px; pointer-events: none; width: max-content; max-width: calc(100vw - 32px); }
@@ -475,7 +475,7 @@
   .anode .nk.op, .anode .nk.im { min-width: 28px; padding: 0 10px; font-size: 12.5px; background: rgba(255,255,255,.22); color: #fff; }
   .anode .nk.set { color: #fff; background: rgba(255,255,255,.3); } .anode .nk.wait { color: #000; background: #e0a8f0; animation: livePulse 1.2s ease-in-out infinite; }
   /* Mover: inputs on one side, outputs on the other, and one line joining a single pair. A signal into the left / right pin slides the line, and only the input the line sits on gets through */
-  .anode.t-mvset { padding: 0 30px; } .anode .ml { position: absolute; top: 50%; transform: translateY(-50%); font: 600 10px 'Montserrat', sans-serif; color: rgba(255,255,255,.4); pointer-events: none; } .anode .ml.l { left: 17px; } .anode .ml.r { right: 17px; } .anode.t-mvset .ip[data-p="0"] { left: 50%; top: 100%; margin: -8px 0 0 -8px; } .anode.t-mvset .port[data-o="0"] { right: auto; left: -8px; }
+  .anode.t-mvset { padding: 0 30px; } .anode .ml { position: absolute; top: 50%; transform: translateY(-50%); font: 600 10px 'Montserrat', sans-serif; color: rgba(255,255,255,.4); pointer-events: none; } .anode .ml.l { left: 17px; } .anode .ml.r { right: 17px; } .anode.t-mvset .ip[data-p="0"] { left: 50%; top: 0; margin: -8px 0 0 -8px; } .anode.t-mvset .ip[data-p="1"] { left: 50%; top: 100%; margin: -8px 0 0 -8px; } .anode.t-mvset .port[data-o="0"] { right: auto; left: -8px; }
   .anode.t-mvset .ni { width: 54px; height: 24px; font-size: 14px; }
   .anode.t-mover { display: block; padding: 0; border-radius: 16px; box-sizing: border-box; }
   .anode.t-mover .ip, .anode.t-mover .port { margin: 0; right: auto; bottom: auto; transition: transform .25s var(--spring), background .2s, opacity .2s; }
@@ -730,7 +730,7 @@
       <svg class="awires" id="awires"></svg>
     </div>
     <div class="amaps" id="amaps"><div class="mlist" id="mlist"><div class="minner" id="minner"></div></div><div class="mctl"><button id="mminus" title="Remove the last mapped button"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><button id="mplus" title="Add a mapped button"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></svg></button></div></div>
-    <div class="apal" id="apal"><button data-t="audio">Audio</button><button data-t="key">Button Input</button><button data-t="counter">Counter</button><button data-t="wait">Wait</button><button data-t="number">Number</button><button data-t="mvset">Mover Setter</button><button data-t="value">VALUE</button><button data-t="and">AND</button><button data-t="if">IF</button><button data-t="nor">NOR</button><button data-t="or">OR</button><button data-t="xor">XOR</button><button data-t="xand">XAND</button><button data-t="random">RANDOM</button><button data-t="loop">LOOP</button><button data-t="print">Print</button><button data-t="split">Splitter</button><button data-t="light">Light</button><button data-t="prop">Property Changer</button><button data-t="rgb">RGB</button><button data-t="matrix">LED Matrix</button><button data-t="mover">Mover</button></div>
+    <div class="apal" id="apal"><button data-t="audio">Audio</button><button data-t="key">Button Input</button><button data-t="counter">Counter</button><button data-t="wait">Wait</button><button data-t="number">Number</button><button data-t="value">VALUE</button><button data-t="and">AND</button><button data-t="if">IF</button><button data-t="nor">NOR</button><button data-t="or">OR</button><button data-t="xor">XOR</button><button data-t="xand">XAND</button><button data-t="random">RANDOM</button><button data-t="loop">LOOP</button><button data-t="print">Print</button><button data-t="split">Splitter</button><button data-t="light">Light</button><button data-t="prop">Property Changer</button><button data-t="rgb">RGB</button><button data-t="matrix">LED Matrix</button><button data-t="mover">Mover</button><button data-t="mvset">Mover Setter</button></div>
   </div>
 </div>
 
@@ -1895,7 +1895,7 @@
     audio: { ins: 4, out: true, multi: true }, value: { ins: 5, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, counter: { ins: 2, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
     and: { ins: 2, out: true, multi: true, gate: true }, or: { ins: 2, out: true, multi: true, gate: true }, nor: { ins: 2, out: true, multi: true, gate: true },
     xor: { ins: 2, out: true, multi: true, gate: true }, xand: { ins: 2, out: true, multi: true, gate: true },
-    if: { ins: 5, out: true, multi: true }, prop: { ins: 1, out: true, multi: true }, loop: { ins: 5, out: true, outs: 2, multi: true }, random: { ins: 3, out: true, multi: true }, print: { ins: 2, out: true, multi: true }, light: { ins: 1, out: false, multi: true }, rgb: { ins: 3, out: true, multi: true }, matrix: { ins: 34, out: false, multi: true }, mover: { ins: 18, out: true, outs: 16, multi: true }, mvset: { ins: 1, out: true, outs: 2, multi: true }, split: { ins: 1, out: true, outs: 1, multi: true }
+    if: { ins: 5, out: true, multi: true }, prop: { ins: 1, out: true, multi: true }, loop: { ins: 5, out: true, outs: 2, multi: true }, random: { ins: 3, out: true, multi: true }, print: { ins: 2, out: true, multi: true }, light: { ins: 1, out: false, multi: true }, rgb: { ins: 3, out: true, multi: true }, matrix: { ins: 34, out: false, multi: true }, mover: { ins: 18, out: true, outs: 16, multi: true }, mvset: { ins: 2, out: true, outs: 2, multi: true }, split: { ins: 1, out: true, outs: 1, multi: true }
   };
   const insOf = n => n.t === 'split' ? n.si : SPEC[n.t].ins, outsOf = n => n.t === 'split' ? n.so : (SPEC[n.t].outs || 1);
   const SW = 38, SR = 19, MAXPIN = 64;
@@ -1932,7 +1932,7 @@
     });
     sp.w = W; sp.h = H; return sp;
   }
-  const VP = { mvset: 0, audio: 2, value: 2, loop: 2, counter: 1, wait: 1, if: 1, number: 1, random: 1, print: 1 };      // first input pin of each node that carries a value (not a signal)
+  const VP = { mvset: 1, audio: 2, value: 2, loop: 2, counter: 1, wait: 1, if: 1, number: 1, random: 1, print: 1 };      // first input pin of each node that carries a value (not a signal)
   const OPS = [['<', 'less than'], ['>', 'greater than'], ['=', 'equal to'], ['≤', 'at most'], ['≥', 'at least'], ['≠', 'not equal to']];
   const CMP = { '<': (a, b) => a < b, '>': (a, b) => a > b, '=': (a, b) => a === b, '≤': (a, b) => a <= b, '≥': (a, b) => a >= b, '≠': (a, b) => a !== b };
   const TOPS = [['is', 'Is', '='], ['isnt', 'Isn’t', '≠'], ['has', 'Contains', '∋']];
@@ -1988,7 +1988,7 @@
   const vby = n => liveIn(n, 2, n.vx), vstart = n => liveIn(n, 3, n.vs);        // 'by' and 'start' can be driven by wires into the bottom pins
   const cN = n => Math.max(1, Math.min(99, Math.round(liveIn(n, 1, n.n)) || 1));
   const wSec = n => Math.max(0, Math.min(3600, liveIn(n, 1, n.sec)));
-  const mvV = n => { const l = inputsL(n.id, 0)[0], f = l && nodeById(l[0]); return f && ['number', 'value', 'random', 'counter', 'loop', 'split'].includes(f.t) ? liveIn(n, 0, n.v) : n.v; };      // only a number source drives it; a plain signal just makes it jump to its own number
+  const mvV = n => liveIn(n, 1, n.v);
   const ifK = n => liveIn(n, 1, n.k), numV = n => liveIn(n, 1, n.v);
   const lEvery = n => Math.max(.05, Math.min(3600, liveIn(n, 3, n.lt)));
   const rRange = n => { const a = Math.round(liveIn(n, 1, n.rmin)), b = Math.round(liveIn(n, 2, n.rmax)); return [Math.min(a, b), Math.max(a, b)]; };
@@ -2168,7 +2168,7 @@
     else if (n.t === 'loop') h += '<div class="ac"><div class="r1"><span class="nm">LOOP</span><small class="cc"></small></div><div class="r2"><button class="nk op lm" title="Loop mode"></button><label class="cell"><small>×</small><input class="ni lc" type="number" min="0" max="99999" step="1" title="How many times to loop (wire a value into the top pin to change it live)"></label><label class="cell"><small>every</small><input class="ni lt" type="number" min="0.05" max="3600" step="0.05" title="Seconds between each loop"><small>s</small></label></div></div>';
     else if (n.t === 'random') h += '<span class="nm">RANDOM</span><input class="ni rmin" type="number" step="1" title="Lowest number it can pick"><small>to</small><input class="ni rmax" type="number" step="1" title="Highest number it can pick"><small class="cc"></small>';
     else if (n.t === 'print') h += '<span class="nm">Print</span><input class="ni pt" type="text" maxlength="80" placeholder="message" title="Text to pop up. Wire a value into the pin below to show it after the text">';
-    else if (n.t === 'mvset') h += '<span class="ml l">L</span><span class="ml r">R</span><input class="ni nv" type="number" step="1" title="Mover Setter: the pin the line jumps to (0 is the first). Wire the left / right pins into a Mover&#39;s left / right pins, and a signal or number into the bottom pin">';
+    else if (n.t === 'mvset') h += '<span class="ml l">L</span><span class="ml r">R</span><input class="ni nv" type="number" min="0" step="1" title="Which pin the line jumps to (0 is the first). Or wire a number into the bottom pin. Wire L and R to the same Mover&#39;s left and right pins, then send a signal into the top pin">';
     else if (n.t === 'number') h += '<span class="nm">Number</span><input class="ni nv" type="number" step="any" title="A number other nodes can read">';
     else if (n.t === 'if') h += '<span class="nm">IF</span><button class="nk im" title="Compare a number (Value) or words (Text)"></button><button class="nk op" title="How to compare"></button><input class="ni ik" type="number" step="any" title="Number to compare with"><input class="ni tx" type="text" maxlength="60" placeholder="text" title="Text to compare with">';
     else if (n.t === 'prop') h += '<button class="nk pp" title="The mode this sends. Wire its output into a property pin"></button>';
@@ -2423,7 +2423,7 @@
   function removeNode(id) { clearWaits(id); auto.nodes = auto.nodes.filter(n => n.id !== id); auto.links = auto.links.filter(l => l[0] !== id && l[1] !== id); save(); }
   function addNode(t, cue) {
     const n = auto.nodes.length, col = n % 2, row = Math.floor(n / 2) % 3;     // drop new nodes on a loose grid so they never stack
-    auto.nodes.push({ id: uid(), t, x: Math.round((30 - v.x) / v.z + col * 320 + Math.floor(n / 6) * 26), y: Math.round((24 - v.y) / v.z + row * 70 + Math.floor(n / 6) * 26), cue: cue || '', btn: '', n: 2, sec: 1, vol: 100, pitch: 0, v: 100, vm: 'add', vx: 1, vs: t === 'value' ? 100 : 0, op: '>', k: 0, lm: 'until', lc: 3, lt: 1, rmin: 0, rmax: 100, txt: 'Hello!', im: 'value', it: 'is', tx: '', si: 1, so: 1, sc: [[0, 0]], sw: 38, sh: 66, sp: null, cr: 0, cg: 0, cb: 0, mw: 5, mh: 5, mx: Array(16).fill(0), mcl: {}, mvw: 5, mvk: 0, mvr: 0, mvs: 0, pr: 'add', pc: {} });
+    auto.nodes.push({ id: uid(), t, x: Math.round((30 - v.x) / v.z + col * 320 + Math.floor(n / 6) * 26), y: Math.round((24 - v.y) / v.z + row * 70 + Math.floor(n / 6) * 26), cue: cue || '', btn: '', n: 2, sec: 1, vol: 100, pitch: 0, v: t === 'mvset' ? 0 : 100, vm: 'add', vx: 1, vs: t === 'value' ? 100 : 0, op: '>', k: 0, lm: 'until', lc: 3, lt: 1, rmin: 0, rmax: 100, txt: 'Hello!', im: 'value', it: 'is', tx: '', si: 1, so: 1, sc: [[0, 0]], sw: 38, sh: 66, sp: null, cr: 0, cg: 0, cb: 0, mw: 5, mh: 5, mx: Array(16).fill(0), mcl: {}, mvw: 5, mvk: 0, mvr: 0, mvs: 0, pr: 'add', pc: {} });
     save();
   }
 
@@ -2493,6 +2493,7 @@
   const asb = document.createElement('div'); asb.className = 'asbar'; acanvas.appendChild(asb);
   asb.innerHTML = '<button class="col" title="Change pin colours: inputs, outputs, values or properties"><span class="sw"></span>Colour</button>'
     + '<button class="cap" title="Add or edit a caption under the node (clear the text to remove it)"><svg viewBox="0 0 24 24"><path d="M4 8h16M4 12h16M4 16h9"/></svg><span>Caption</span></button>'
+    + '<button class="mvm" title="Many input pins, or one pin that the line points at"><svg viewBox="0 0 24 24"><path d="M12 4v8M6 12h12M6 12v8M18 12v8"/></svg><span>Single input pin</span></button>'
     + '<button class="grp" title="Group the selected nodes so they move together"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4" stroke-dasharray="3 3.2"/><rect x="8" y="8" width="8" height="8" rx="2"/></svg><span>Group</span></button>'
     + '<button class="mv" title="Drag from here to move the selection"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>Move</button>'
     + '<button class="dup" title="Duplicate the selected nodes and the wires between them (Ctrl+D)"><svg viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="3.5"/><path d="M15.5 8.5V6.5a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h2"/></svg>Duplicate</button>'
@@ -2525,6 +2526,7 @@
     if (instant) { selBox.classList.add('inst'); requestAnimationFrame(() => selBox.classList.remove('inst')); }
     Object.assign(selBox.style, { left: x0 - 12 + 'px', top: y0 - 12 + 'px', width: x1 - x0 + 24 + 'px', height: y1 - y0 + 24 + 'px' });
     const grpBtn = asb.querySelector('.grp'), un = isOneGroup(ns);
+    const mvBtn = asb.querySelector('.mvm'); mvBtn.style.display = ns.length === 1 && ns[0].t === 'mover' ? '' : 'none'; if (ns.length === 1) mvBtn.querySelector('span').textContent = ns[0].mvs ? 'Many input pins' : 'Single input pin';
     const capBtn = asb.querySelector('.cap'); capBtn.style.display = ns.length === 1 ? '' : 'none'; capBtn.querySelector('span').textContent = ns.length === 1 && ns[0].cap ? 'Edit caption' : 'Add caption';
     grpBtn.style.display = ns.length > 1 || ns[0].g ? '' : 'none'; grpBtn.querySelector('span').textContent = un ? 'Ungroup' : 'Group';
     asb.style.display = 'flex'; const w = asb.offsetWidth, h = asb.offsetHeight, W = acanvas.clientWidth, H = acanvas.clientHeight;
@@ -2561,6 +2563,7 @@
     selSet.clear(); copies.forEach(c => selSet.add(c.id)); save(); syncNodes();
   }
   asb.querySelector('.dup').addEventListener('click', dupSel);
+  asb.querySelector('.mvm').addEventListener('click', e => { e.stopPropagation(); const ns = selNodes(), n = ns[0]; if (ns.length !== 1 || n.t !== 'mover') return; n.mvs = n.mvs ? 0 : 1; if (n.mvs) auto.links = auto.links.filter(l => !(l[1] === n.id && l[2] > 0 && l[2] < 16)); save(); drawWires(); placeBar(); });
   asb.querySelector('.cap').addEventListener('click', e => { e.stopPropagation(); const ns = selNodes(); if (ns.length === 1 && nodeEls[ns[0].id]) editCap(ns[0], nodeEls[ns[0].id]); });
   addEventListener('keydown', e => {
     if (!autoOpen || !selSet.size || !(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey || e.key.toLowerCase() !== 'd') return;
@@ -2610,7 +2613,7 @@
   const outPos = (id, fp) => { const el = nodeEls[id], pt = el && el.querySelectorAll('.port')[fp || 0]; return pt ? [v.x + (parseFloat(el.style.left) + pt.offsetLeft + pt.offsetWidth / 2) * v.z, v.y + (parseFloat(el.style.top) + pt.offsetTop + pt.offsetHeight / 2) * v.z, pt.dataset.s || (nodeById(id) && nodeById(id).t === 'prop' ? 't' : nodeById(id) && nodeById(id).t === 'mvset' && !fp ? 'l' : 'r')] : null; };
   function inPos(to, p, W) {
     const el = nodeEls[to], ip = el && el.querySelector('.ip[data-p="' + p + '"]'); if (!ip) return null;
-    const nn = nodeById(to), dir = !nn ? 'l' : nn.t === 'split' ? (ip.dataset.s || 'l') : nn.t === 'matrix' ? (p < 2 ? 'b' : p < 18 ? 't' : 'l') : nn.t === 'if' && p === 4 ? 't' : nn.t === 'mover' ? (p === 16 ? (nn.mvr ? 't' : 'l') : p === 17 ? (nn.mvr ? 'b' : 'r') : nn.mvr ? 'l' : 't') : nn.t === 'loop' ? (p >= 2 ? 'b' : 'l') : VP[nn.t] !== undefined && p >= VP[nn.t] ? 'b' : 'l';
+    const nn = nodeById(to), dir = !nn ? 'l' : nn.t === 'split' ? (ip.dataset.s || 'l') : nn.t === 'matrix' ? (p < 2 ? 'b' : p < 18 ? 't' : 'l') : (nn.t === 'if' && p === 4) || (nn.t === 'mvset' && p === 0) ? 't' : nn.t === 'mover' ? (p === 16 ? (nn.mvr ? 't' : 'l') : p === 17 ? (nn.mvr ? 'b' : 'r') : nn.mvr ? 'l' : 't') : nn.t === 'loop' ? (p >= 2 ? 'b' : 'l') : VP[nn.t] !== undefined && p >= VP[nn.t] ? 'b' : 'l';
     return [v.x + (parseFloat(el.style.left) + ip.offsetLeft + ip.offsetWidth / 2) * v.z, v.y + (parseFloat(el.style.top) + ip.offsetTop + ip.offsetHeight / 2) * v.z, dir];
   }
   /* dynamic wires: a wire runs as its normal loose curve, but if that curve would cross a node it is re-routed around the nodes in the way.
@@ -2797,18 +2800,7 @@
     auto.links.push([from, to, p, fp]); save();
   }
 
-  /* right-click a node: the things the selection bar doesn't have (Mover mode; colour, caption, duplicate and delete are on the bar) */
-  acanvas.addEventListener('contextmenu', e => {
-    const node = e.target.closest('.anode'); if (!node) return; e.preventDefault();
-    const n = nodeById(node.dataset.id); if (!n) return;
-    if (!selSet.has(n.id)) { selSet.clear(); selSet.add(n.id); if (n.g) expandSel(); syncNodes(); }
-    const many = selSet.size > 1, ents = [];
-    if (!many && n.t === 'mover') ents.push({ id: 'mvs', sm: '┬', label: n.mvs ? 'Many input pins' : 'Single input pin' });
-    if (!ents.length) return;                                              // colour, duplicate and delete live on the bar above the selection
-    pickList({ getBoundingClientRect: () => ({ left: e.clientX, bottom: e.clientY - 6 }) }, ents, id => {
-      if (id === 'mvs') { n.mvs = n.mvs ? 0 : 1; if (n.mvs) auto.links = auto.links.filter(l => !(l[1] === n.id && l[2] > 0 && l[2] < 16)); save(); drawWires(); } 
-    });
-  });
+  acanvas.addEventListener('contextmenu', e => { if (e.target.closest('.anode')) e.preventDefault(); });      // everything for a node lives on the bar above the selection
   acanvas.addEventListener('pointerdown', e => {
     if (e.button === 2 || e.target.closest('.azoom, button, input')) return;
     const port = e.target.closest('.port'), node = e.target.closest('.anode'), r = acanvas.getBoundingClientRect();
@@ -3010,7 +3002,7 @@
   }
   function deliver(to, p, src, prev, st) {
     const n = nodeById(to); if (!n || (prev.has(to) && !(n.t === 'loop' && p === 1))) return; const seen = new Set(prev).add(to);
-    if (VP[n.t] !== undefined && p >= VP[n.t] && n.t !== 'mvset') return;     // those pins carry values, not signals (a Mover Setter's one pin is both: a signal makes it jump)
+    if (VP[n.t] !== undefined && p >= VP[n.t]) return;     // those pins carry values, not signals
     flash(to);
     if (n.t === 'audio') {
       const it = get(n.cue), pl = it && player(it);
@@ -3052,9 +3044,9 @@
     else if (SPEC[n.t].gate) { if (val(to, prev)) emit(to, seen, st); }                      // a gate lets the event through only while its condition is true
     else if (n.t === 'prop') { if (p === 0) triggerProp(n); }
     else if (n.t === 'light') n.lit = performance.now() + 600;
-    else if (n.t === 'mvset') {                                                                   // jump every wired Mover straight to this pin, no sliding
-      const x = Math.round(mvV(n));
-      auto.links.filter(l => l[0] === to).forEach(l => { const t = nodeById(l[1]); if (!t || t.t !== 'mover' || l[2] < 16) return; glowLink(l); mvcur[t.id] = Math.max(0, Math.min(t.mvw - 1, x)); updMover(t); });
+    else if (n.t === 'mvset') {                                                                   // jump a Mover straight to a pin; its left AND right pin must both be wired to the same Mover
+      const x = Math.round(mvV(n)), out = auto.links.filter(l => l[0] === to);
+      new Set(out.filter(l => (l[3] | 0) === 0 && l[2] === 16).map(l => l[1])).forEach(id => { const t = nodeById(id); if (!t || t.t !== 'mover' || !out.some(l => (l[3] | 0) === 1 && l[2] === 17 && l[1] === id)) return; mvcur[id] = Math.max(0, Math.min(t.mvw - 1, x)); out.filter(l => l[1] === id).forEach(glowLink); updMover(t); });
     }
     else if (n.t === 'mover') {
       if (p >= 16) { mvcur[to] = Math.max(0, Math.min(n.mvw - 1, mvCur(n) + (p === 17 ? 1 : -1))); updMover(n); }                      // slide the line
@@ -3070,7 +3062,7 @@
     if (srcs.length && st.miss && !st.played && !st.stopped && !st.delayed) toast('That cue has no audio file yet');
     const row = minner.querySelector('.mrow[data-id="' + b.id + '"]'); if (row) { row.classList.remove('ran'); void row.offsetWidth; row.classList.add('ran'); }
   }
-  const VPIN = { loop: [[2, '.lc', n => loopTotal(n)], [3, '.lt', lEvery]], counter: [[1, '.ni', cN]], wait: [[1, '.ni', wSec]], if: [[1, n => n.im === 'text' ? '.tx' : '.ik', n => n.im === 'text' ? null : ifK(n)], [4, '.nm', null]], number: [[1, '.ni', numV]], mvset: [[0, '.ni', n => mvV(n)]], print: [[1, '.pt', null]], random: [[1, '.rmin', n => rRange(n)[0]], [2, '.rmax', n => rRange(n)[1]]] };
+  const VPIN = { loop: [[2, '.lc', n => loopTotal(n)], [3, '.lt', lEvery]], counter: [[1, '.ni', cN]], wait: [[1, '.ni', wSec]], if: [[1, n => n.im === 'text' ? '.tx' : '.ik', n => n.im === 'text' ? null : ifK(n)], [4, '.nm', null]], number: [[1, '.ni', numV]], mvset: [[1, '.ni', n => mvV(n)]], print: [[1, '.pt', null]], random: [[1, '.rmin', n => rRange(n)[0]], [2, '.rmax', n => rRange(n)[1]]] };
   const rgbVal = n => [0, 1, 2].map(i => { const l = inputsL(n.id, i)[0]; return Math.max(0, Math.min(255, Math.round(l ? +numOf(l[0], new Set([n.id]), l[3]) || 0 : n['c' + 'rgb'[i]] || 0))); });
   let lightRaf = 0;
   function lightTick() {
@@ -3232,8 +3224,8 @@
   /* what's new: edit this list when something ships (newest first) */
   const CHANGES = [
     { id: '2026-11-08', date: '8 Nov 2026', title: 'Nodes, menus and speed', groups: [
-      ['New nodes', ['[[Mover Setter]]: holds a number; a signal or number into its bottom pin makes the Mover wired to its left / right pins jump straight to that pin, instantly', '[[Mover]]: a pill with a moving line. Signals into its left / right pins slide the line, and only the input the line sits on gets through. Many-pin or single-pin mode (right-click it), turn it with the corner button, drag the corner to resize', '[[RGB]] node and [[LED Matrix]] (resizable, each LED keeps the colour it was lit with)', '[[Property Changer]], plus property pins on [[IF]], [[VALUE]] and [[LOOP]]', '[[IF]] has a new pin under Value / Text to choose what it checks, so it can read a [[VALUE]]', 'The count on [[LOOP]] is now a value pin along the bottom', '[[Splitter]] nodes pass numbers straight through']],
-      ['Editing', ['Colour, caption, duplicate and delete are all on the bar above the selection; right-click is only for a Mover\'s pin mode', 'Captions under nodes, and click a group\'s label to rename it', 'Colour pins by kind: inputs, outputs, values or properties, on any number of pins', 'Keyboard hints in the node editor, and no dotted ring on selected nodes', 'The [[Splitter]] editor is 30% bigger']],
+      ['New nodes', ['[[Mover Setter]]: a signal into the top pin makes the Mover jump straight to the pin number held in it (or wired into the bottom pin), instantly, in both pin modes. Its L and R pins must both go to the same Mover\'s left and right pins', '[[Mover]]: a pill with a moving line. Signals into its left / right pins slide the line, and only the input the line sits on gets through. Many-pin or single-pin mode (right-click it), turn it with the corner button, drag the corner to resize', '[[RGB]] node and [[LED Matrix]] (resizable, each LED keeps the colour it was lit with)', '[[Property Changer]], plus property pins on [[IF]], [[VALUE]] and [[LOOP]]', '[[IF]] has a new pin under Value / Text to choose what it checks, so it can read a [[VALUE]]', 'The count on [[LOOP]] is now a value pin along the bottom', '[[Splitter]] nodes pass numbers straight through']],
+      ['Editing', ['Everything for a node is on the bar above the selection: colour, caption, a Mover\'s pin mode, group, move, duplicate and delete. Right-click no longer opens a menu', 'Captions under nodes, and click a group\'s label to rename it', 'Colour pins by kind: inputs, outputs, values or properties, on any number of pins', 'Keyboard hints in the node editor, and no dotted ring on selected nodes', 'The [[Splitter]] editor is 30% bigger']],
       ['Fixes and speed', ['Signals redraw the wires once per frame instead of once per wire, so big graphs no longer slow down and LED numbers come out right', '[[LED Matrix]] only combines a row and a column fired in the same moment', 'Wires no longer flip shape while zooming', 'Cursors: random colours, shown only on the board you are on, with presence dots on the tabs', 'Phones and tablets now see a "open this on a computer" note instead of the board']]
     ] },
     { id: 'earlier', date: 'Earlier', title: 'The basics', groups: [
