@@ -419,7 +419,7 @@
   .anode.t-value { min-width: 376px; }
   .anode.t-value .r2 { grid-template-columns: auto auto auto; justify-content: space-between; gap: 10px; }
   .anode.t-value .nk { flex: none; }
-  .anode.t-value .ip[data-p="2"], .anode.t-value .ip[data-p="3"], .anode.t-value .ip[data-p="4"], .anode.t-loop .ip[data-p="4"], .anode.t-if .ip[data-p="2"] { top: 100%; margin: -8px 0 0 -8px; }
+  .anode.t-value .ip[data-p="2"], .anode.t-value .ip[data-p="3"], .anode.t-value .ip[data-p="4"], .anode.t-loop .ip[data-p="4"], .anode.t-if .ip[data-p="2"], .anode.t-if .ip[data-p="3"] { top: 100%; margin: -8px 0 0 -8px; }
   .anode .nk.plink { pointer-events: none; color: #fff; }
   .anode.t-prop { padding: 0 18px 0 22px; }
   .anode.t-prop .nk { display: flex; align-items: center; gap: 12px; height: 26px; padding: 0 24px 0 16px; font-size: 16px; }
@@ -1853,7 +1853,7 @@
     audio: { ins: 4, out: true, multi: true }, value: { ins: 5, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, counter: { ins: 2, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
     and: { ins: 2, out: true, multi: true, gate: true }, or: { ins: 2, out: true, multi: true, gate: true }, nor: { ins: 2, out: true, multi: true, gate: true },
     xor: { ins: 2, out: true, multi: true, gate: true }, xand: { ins: 2, out: true, multi: true, gate: true },
-    if: { ins: 3, out: true, multi: true }, prop: { ins: 1, out: true, multi: true }, loop: { ins: 5, out: true, outs: 2, multi: true }, random: { ins: 3, out: true, multi: true }, print: { ins: 2, out: true, multi: true }, light: { ins: 1, out: false, multi: true }, rgb: { ins: 3, out: true, multi: true }, matrix: { ins: 34, out: false, multi: true }, split: { ins: 1, out: true, outs: 1, multi: true }
+    if: { ins: 4, out: true, multi: true }, prop: { ins: 1, out: true, multi: true }, loop: { ins: 5, out: true, outs: 2, multi: true }, random: { ins: 3, out: true, multi: true }, print: { ins: 2, out: true, multi: true }, light: { ins: 1, out: false, multi: true }, rgb: { ins: 3, out: true, multi: true }, matrix: { ins: 34, out: false, multi: true }, split: { ins: 1, out: true, outs: 1, multi: true }
   };
   const insOf = n => n.t === 'split' ? n.si : SPEC[n.t].ins, outsOf = n => n.t === 'split' ? n.so : (SPEC[n.t].outs || 1);
   const SW = 38, SR = 19, MAXPIN = 64;
@@ -2520,7 +2520,8 @@
   function routeCore(a, b, rects, key) {
     const z = v.z;
     if (!rects.length) return null;
-    const aw = [(a[0] - v.x) / z, (a[1] - v.y) / z, a[2]], bw = [(b[0] - v.x) / z, (b[1] - v.y) / z, b[2]];
+    const q2 = x => Math.round(x * 100) / 100;                       // snap to 0.01: float noise from zooming must never flip a tie between two equally short routes
+    const aw = [q2((a[0] - v.x) / z), q2((a[1] - v.y) / z), a[2]], bw = [q2((b[0] - v.x) / z), q2((b[1] - v.y) / z), b[2]];
     const k = Math.max(50, Math.abs(bw[0] - aw[0]) * .5), kk = Math.max(46, Math.abs(bw[1] - aw[1]) * .5), sv = VEC[a[2]] || VEC.r, ev = VEC[b[2]] || VEC.l, ln = q => q[0] ? k : kk;
     const c1 = [aw[0] + sv[0] * ln(sv), aw[1] + sv[1] * ln(sv)], c2 = [bw[0] + ev[0] * ln(ev), bw[1] + ev[1] * ln(ev)];
     const pad = wst.has(key) ? 26 : -2;                               // once re-routed a wire stays routed until clearly in the clear (no flip-flopping)
@@ -2820,8 +2821,9 @@
     return fmtV(+numOf(id, new Set([id])) || 0);
   }
   function ifTest(n, src, seen) {
-    if (n.im !== 'text') return CMP[n.op](numOf(src, seen), ifK(n));
-    const a = textOf(src).trim().toLowerCase(), b = (n.tx || '').trim().toLowerCase();
+    const sl = inputsL(n.id, 3)[0], sid = sl ? sl[0] : src;                  // a wire into the pin under "Value"/"Text" picks what gets checked (say a VALUE node); otherwise it's whatever sent the signal
+    if (n.im !== 'text') return CMP[n.op](numOf(sid, seen, sl ? sl[3] : undefined), ifK(n));
+    const a = textOf(sid).trim().toLowerCase(), b = (n.tx || '').trim().toLowerCase();
     return n.it === 'has' ? a.includes(b) : n.it === 'isnt' ? a !== b : a === b;
   }
   function numOf(id, seen, fp) {                      // the number an IF compares: counts, seconds, random 0-100, or 1/0 for yes/no nodes
@@ -2930,7 +2932,7 @@
     if (srcs.length && st.miss && !st.played && !st.stopped && !st.delayed) toast('That cue has no audio file yet');
     const row = minner.querySelector('.mrow[data-id="' + b.id + '"]'); if (row) { row.classList.remove('ran'); void row.offsetWidth; row.classList.add('ran'); }
   }
-  const VPIN = { loop: [[3, '.lt', lEvery]], counter: [[1, '.ni', cN]], wait: [[1, '.ni', wSec]], if: [[1, n => n.im === 'text' ? '.tx' : '.ik', n => n.im === 'text' ? null : ifK(n)]], number: [[1, '.ni', numV]], print: [[1, '.pt', null]], random: [[1, '.rmin', n => rRange(n)[0]], [2, '.rmax', n => rRange(n)[1]]] };
+  const VPIN = { loop: [[3, '.lt', lEvery]], counter: [[1, '.ni', cN]], wait: [[1, '.ni', wSec]], if: [[1, n => n.im === 'text' ? '.tx' : '.ik', n => n.im === 'text' ? null : ifK(n)], [3, '.im', null]], number: [[1, '.ni', numV]], print: [[1, '.pt', null]], random: [[1, '.rmin', n => rRange(n)[0]], [2, '.rmax', n => rRange(n)[1]]] };
   const rgbVal = n => [0, 1, 2].map(i => { const l = inputsL(n.id, i)[0]; return Math.max(0, Math.min(255, Math.round(l ? +numOf(l[0], new Set([n.id]), l[3]) || 0 : n['c' + 'rgb'[i]] || 0))); });
   let lightRaf = 0;
   function lightTick() {
