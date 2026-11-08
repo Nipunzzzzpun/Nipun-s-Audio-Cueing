@@ -35,6 +35,8 @@
   svg { fill: #fff; display: block; }
 
   /* ---------- world ---------- */
+  #nomob { display: none; } html.nomobile #nomob { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 28px; text-align: center; background: #555; color: #fff; font: 600 15px/1.5 'Montserrat', sans-serif; }
+  #nomob h1 { margin: 0 0 8px; font-size: 22px; } #nomob p { margin: 0; opacity: .75; max-width: 320px; }
   #world { position: fixed; inset: 0; touch-action: none; cursor: grab; transform-origin: 0 0; }
   #world.panning, #world.panning .item { cursor: grabbing; }
   .item { position: absolute; touch-action: none; animation: itemIn .4s var(--spring) both; }
@@ -593,6 +595,14 @@
   .gh svg { width: 22px; height: 22px; fill: #fff; flex: none; transition: transform .5s var(--spring); }
   .gh::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,.28) 50%, transparent 70%); transform: translateX(-120%); transition: transform .7s var(--ease); }
   .gh:hover { background: rgba(0,0,0,.72); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.28), 0 0 0 2px rgba(224,168,240,.7), 0 0 20px rgba(224,168,240,.45); }
+  button.gh { border: 0; cursor: pointer; } .gh.wn { left: 138px; } .gh.wn svg { width: 19px; height: 19px; }
+  .gh .wdot { position: absolute; top: 9px; right: 11px; width: 8px; height: 8px; border-radius: 50%; background: #e0a8f0; box-shadow: 0 0 8px rgba(224,168,240,.9); display: none; } .gh .wdot.on { display: block; }
+  .dialog.cl { width: min(520px, calc(100vw - 32px)); max-height: min(78vh, 640px); display: flex; flex-direction: column; }
+  .dialog.cl #clList { overflow-y: auto; margin: 6px -6px 4px 0; padding-right: 6px; scrollbar-width: thin; }
+  .dialog.cl h4 { margin: 16px 0 4px; font-size: 13px; letter-spacing: .02em; } .dialog.cl h4 small { font-weight: 500; opacity: .5; margin-left: 8px; }
+  .dialog.cl h5 { margin: 10px 0 3px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; opacity: .55; }
+  .dialog.cl ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.5; } .dialog.cl li { margin: 2px 0; }
+  .dialog.cl .tg { display: inline-block; padding: 0 7px; margin: 0 1px; border-radius: 7px; background: #ececec; color: #111; font-weight: 600; font-size: 12px; line-height: 1.6; white-space: nowrap; }
   .gh:hover svg { transform: rotate(-12deg) scale(1.12); } .gh:hover::after { transform: translateX(120%); }
   .gh:active { transform: scale(.95); }
   .dtip { position: fixed; z-index: 101; left: 0; top: 0; pointer-events: none; padding: 7px 17px; color: #fff; font: 500 11.5px 'Montserrat', sans-serif; white-space: nowrap; opacity: 0;
@@ -764,6 +774,16 @@
 
 <div class="overlay" id="codeOverlay"><div class="bigcode" id="bigCode"></div></div>
 
+<button class="gh wn" id="wn" type="button" title="See what's new"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.1 6.1.5-4.7 4 1.5 6.2L12 15.6 6.7 18.8l1.5-6.2-4.7-4 6.1-.5z"/></svg>What's new<i class="wdot" id="wdot"></i></button>
+
+<div class="overlay" id="clOverlay">
+  <div class="dialog cl">
+    <h3>What's new</h3>
+    <div id="clList"></div>
+    <div class="row"><button class="go" id="clDone">Close</button></div>
+  </div>
+</div>
+
 <a class="gh" id="gh" href="https://github.com/" target="_blank" rel="noopener" title="View the source on GitHub"><svg viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg>GitHub</a>
 
 <button class="recenter" id="recenter" title="Reset the view to the centre" aria-label="Reset the view"></button>
@@ -810,8 +830,12 @@
 <input type="file" id="fileAudio" accept="audio/*" hidden>
 <input type="file" id="fileImg" accept="image/*" hidden>
 
+<div id="nomob"><div><h1>Open this on a computer</h1><p>Cue Board needs a mouse and keyboard, so it isn't available on phones or tablets.</p></div></div>
 <script>
 (() => {
+  /* phones and tablets: no board, just a note (nothing else starts up, and shared links are not joined) */
+  const NOMOB = /Android|iPhone|iPad|iPod|Mobile|Silk|Kindle/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) || (matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches);
+  if (NOMOB) { document.documentElement.classList.add('nomobile'); document.addEventListener('DOMContentLoaded', () => { document.body.querySelectorAll('body > *:not(#nomob):not(style)').forEach(x => { x.style.display = 'none'; }); }); return; }
   /* ---------- icons ---------- */
   const ICON = {
     image: '<svg viewBox="0 0 24 24"><path d="M5.8,19.7q-0.65,0-1.08-0.43T4.3,18.2V5.8q0-0.65 0.43-1.08T5.8,4.3H18.2q0.65,0 1.08,0.43T19.7,5.8V18.2q0,0.65-0.43,1.07T18.2,19.7H5.8Zm0-0.7H18.2q0.3,0 0.55-0.25T19,18.2V5.8q0-0.3-0.25-0.55T18.2,5H5.8Q5.5,5 5.25,5.25T5,5.8V18.2q0,0.3 0.25,0.55T5.8,19ZM5,19q0,0 0-0.25T5,18.2V5.8Q5,5.5 5,5.25T5,5Q5,5 5,5.25T5,5.8V18.2q0,0.3 0,0.55T5,19Zm3.7-2.65h6.8q0.23,0 0.33-0.2t-0.03-0.4L14,13.33q-0.13-0.15-0.3-0.15t-0.3,0.15l-2.2,2.73l-1.3-1.5q-0.13-0.13-0.29-0.13T9.33,14.58l-0.9,1.18q-0.15,0.2-0.05,0.4t0.33,0.2Z"/></svg>',
@@ -2108,7 +2132,7 @@
     });
   }
   function matLight(n) {                                            // row + column on together light that LED (and it stays lit until cleared)
-    const now = performance.now(), on = p => ((n.pp && n.pp[p]) || 0) > now;      // a pulse only counts for the burst it fired in (~30ms), so later signals don't join it
+    const now = performance.now(), on = p => burstOpen && !!n.pp && n.pp[p] === burstId;      // a pulse only counts for the burst it fired in (~30ms), so later signals don't join it
     const rs = [], cs = []; for (let r = 0; r < n.mh; r++) if (on(18 + r)) rs.push(r); for (let c = 0; c < n.mw; c++) if (on(2 + c)) cs.push(c);
     if (!rs.length || !cs.length) return;
     const rows = mrun[n.id] || (mrun[n.id] = n.mx.slice());
@@ -2884,7 +2908,10 @@
   const isHeld = id => pHeld.has(id) || kHeld.has(id);
   function flash(id) { const el = nodeEls[id]; if (el) { el.classList.add('fire'); setTimeout(() => el.classList.remove('fire'), 450); } }
   const lglow = new Map(), waits = {}, loops = {};
-  function glowLink(l) { lglow.set(l[0] + l[1] + l[2], performance.now() + 520); drawWires(); setTimeout(drawWires, 560); }
+  let glowRaf = 0; const wantDraw = () => { if (!glowRaf) glowRaf = requestAnimationFrame(() => { glowRaf = 0; drawWires(); }); };     // many signals in one go redraw the wires once, not once each
+  function glowLink(l) { lglow.set(l[0] + l[1] + l[2], performance.now() + 520); wantDraw(); setTimeout(wantDraw, 560); }
+  let burstId = 0, burstOpen = false;                                   // everything fired by one signal chain shares a burst (it ends when the code that started it finishes)
+  const burst = () => { if (!burstOpen) { burstOpen = true; burstId++; queueMicrotask(() => { burstOpen = false; }); } return burstId; };
   function clearWaits(id) { if (loops[id]) { clearTimeout(loops[id].t); delete loops[id]; updLoop(nodeById(id)); } (waits[id] || []).forEach(clearTimeout); delete waits[id]; const n = nodeById(id); if (n) n.pend = 0; }
   /* yes/no value of a node (read live by IF, gates and LIGHT) */
   function val(id, seen) {
@@ -3015,7 +3042,7 @@
       if (p >= 16) { mvcur[to] = Math.max(0, Math.min(n.mvw - 1, mvCur(n) + (p === 17 ? 1 : -1))); updMover(n); }                      // slide the line
       else if (n.mvs ? p === 0 : p < n.mvw && p === mvCur(n)) emit(to, seen, st, n.mvs ? mvCur(n) : p);                                                             // only the pin the line sits on gets through
     }
-    else if (n.t === 'matrix') { if (p === 0) mrun[to] = Array(16).fill(0); else if (p >= 2) { (n.pp = n.pp || {})[p] = performance.now() + 30; matLight(n); } }
+    else if (n.t === 'matrix') { if (p === 0) mrun[to] = Array(16).fill(0); else if (p >= 2) { (n.pp = n.pp || {})[p] = burst(); matLight(n); } }
   }
   function runBtn(b) {
     applyProps();
@@ -3185,6 +3212,26 @@
   /* ---------- boot ---------- */
   try { const s = JSON.parse(localStorage.getItem('cueboard')); if (s && Array.isArray(s.items)) { loadAuto(s.auto); loadItems(s.items); } } catch (e) {}
   hist.cur = autoJSON();
+  /* what's new: edit this list when something ships (newest first) */
+  const CHANGES = [
+    { id: '2026-11-08', date: '8 Nov 2026', title: 'Nodes, menus and speed', groups: [
+      ['New nodes', ['[[Mover]]: a pill with a moving line. Signals into its left / right pins slide the line, and only the input the line sits on gets through. Many-pin or single-pin mode (right-click it), turn it with the corner button, drag the corner to resize', '[[RGB]] node and [[LED Matrix]] (resizable, each LED keeps the colour it was lit with)', '[[Property Changer]], plus property pins on [[IF]], [[VALUE]] and [[LOOP]]', '[[IF]] has a new pin under Value / Text to choose what it checks, so it can read a [[VALUE]]', 'The count on [[LOOP]] is now a value pin along the bottom', '[[Splitter]] nodes pass numbers straight through']],
+      ['Editing', ['Right-click a node: caption, colour, duplicate, delete (the old ✕ and pencil buttons are gone)', 'Captions under nodes, and click a group\'s label to rename it', 'Colour pins by kind: inputs, outputs, values or properties, on any number of pins', 'Keyboard hints in the node editor, and no dotted ring on selected nodes', 'The [[Splitter]] editor is 30% bigger']],
+      ['Fixes and speed', ['Signals redraw the wires once per frame instead of once per wire, so big graphs no longer slow down and LED numbers come out right', '[[LED Matrix]] only combines a row and a column fired in the same moment', 'Wires no longer flip shape while zooming', 'Cursors: random colours, shown only on the board you are on, with presence dots on the tabs', 'Phones and tablets now see a "open this on a computer" note instead of the board']]
+    ] },
+    { id: 'earlier', date: 'Earlier', title: 'The basics', groups: [
+      ['Cue board', ['Audio, image and text cues on a dotted board, with copy and paste saves', 'Share Live: join a room and see each other\'s cursors']],
+      ['Automation', ['Link buttons to nodes ([[Audio]], [[Wait]], [[Counter]], [[LOOP]], [[IF]], [[VALUE]], [[RANDOM]]…) with wires that route around nodes', '[[Splitter]], groups, undo / redo, and a selection bar']]
+    ] }
+  ];
+  const clOv = $('#clOverlay'), wnDot = $('#wdot'), CL_NEW = CHANGES[0].id;
+  const clSeen = () => { try { return localStorage.getItem('cb_seen') || ''; } catch (e) { return ''; } };
+  wnDot.classList.toggle('on', clSeen() !== CL_NEW);
+  $('#clList').innerHTML = CHANGES.map(c => '<h4>' + c.title + '<small>' + c.date + '</small></h4>' + c.groups.map(([h, li]) => '<h5>' + h + '</h5><ul>' + li.map(x => '<li>' + x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\[\[(.+?)\]\]/g, '<span class="tg">$1</span>') + '</li>').join('') + '</ul>').join('')).join('');
+  const closeCl = () => clOv.classList.remove('show');
+  $('#wn').addEventListener('click', () => { clOv.classList.add('show'); wnDot.classList.remove('on'); try { localStorage.setItem('cb_seen', CL_NEW); } catch (e) { /* fine */ } });
+  $('#clDone').addEventListener('click', closeCl); clOv.addEventListener('pointerdown', e => { if (e.target === clOv) closeCl(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && clOv.classList.contains('show')) { closeCl(); e.stopPropagation(); } }, true);
   { const m = location.hostname.match(/^([^.]+)\.github\.io$/), rp = location.pathname.split('/')[1]; if (m) $('#gh').href = 'https://github.com/' + m[1] + (rp ? '/' + rp : ''); }   // on GitHub Pages, link to this very repo
 })();
 </script>
