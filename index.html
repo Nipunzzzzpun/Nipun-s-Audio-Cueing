@@ -365,7 +365,8 @@
   .sroute { position: fixed; z-index: 290; width: 320px; height: 208px; border-radius: 28px; background: #000; color: #fff; font: 500 15px 'Montserrat', sans-serif; animation: itemIn .3s var(--spring) both; box-shadow: 0 14px 40px rgba(0,0,0,.4); user-select: none; touch-action: none; }
   .sroute svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
   .sroute .rbody { fill: #181818; }
-  .sroute .rl { fill: none; stroke-width: 5; stroke-linecap: round; transition: opacity .2s; }
+  .sroute .rl { fill: none; stroke-width: 3; stroke-linecap: round; opacity: .14; transition: opacity .15s, stroke-width .15s; }
+  .sroute .rg.on .rl, .sroute .rg:hover .rl { opacity: 1; stroke-width: 4.5; }
   .sroute .rh { fill: none; stroke: transparent; stroke-width: 16; pointer-events: stroke; cursor: pointer; }
   .sroute .rg:hover .rl { stroke: #ff8a8a; }
   .sroute .rt { fill: none; stroke: #e0a8f0; stroke-width: 4.5; stroke-linecap: round; stroke-dasharray: 2 9; opacity: .8; }
@@ -526,13 +527,13 @@
   #codeOverlay { background: rgba(0,0,0,.92); cursor: pointer; z-index: 250; }
 
   /* other people's cursors */
-  .rcur { position: fixed; z-index: 55; left: 0; top: 0; pointer-events: none; transition: left .08s linear, top .08s linear, opacity .4s ease; --c: #f43f5e; }
+  .rcur { position: fixed; z-index: 2000; left: 0; top: 0; pointer-events: none; transition: left .08s linear, top .08s linear, opacity .4s ease; --c: #f43f5e; }
   .rcur svg { width: 24px; height: 24px; margin: -4px 0 0 -4px; transform: scaleX(-1); fill: var(--c); filter: drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
   .rcur b { position: absolute; left: 18px; top: 20px; background: var(--c); color: #fff; font: 600 11px 'Montserrat', sans-serif; padding: 3px 9px; border-radius: 999px; white-space: nowrap;
     opacity: 0; transform: translateY(-4px) scale(.9); transform-origin: left top; transition: opacity .2s ease, transform .35s var(--spring); }
   .rcur.hover b { opacity: 1; transform: none; }
   .rcur.host svg { visibility: hidden; }
-  .rcur-ar { position: fixed; z-index: 55; left: 0; top: 0; pointer-events: none; mix-blend-mode: difference; transition: left .08s linear, top .08s linear, opacity .4s ease; }   /* the host's arrow inverts whatever is under it */
+  .rcur-ar { position: fixed; z-index: 1999; left: 0; top: 0; pointer-events: none; mix-blend-mode: difference; transition: left .08s linear, top .08s linear, opacity .4s ease; }   /* the host's arrow inverts whatever is under it */
   .rcur-ar svg { width: 24px; height: 24px; margin: -4px 0 0 -4px; transform: scaleX(-1); fill: #fff; }
   .rcur-ar.idle, .rcur.idle { opacity: .35; }
 
@@ -1031,7 +1032,13 @@
 
   /* ---------- board view: pan + zoom, same feel as the node editor ---------- */
   let bv = { x: 0, y: 0, z: 1 }, bvt = { x: 0, y: 0, z: 1 }, bRaf = 0, bT = 0, bpn = null;
-  function putCur(el) { if (el._wx === undefined) return; const x = el._wx * bv.z + bv.x + 'px', y = el._wy * bv.z + bv.y + 'px'; el.style.left = x; el.style.top = y; if (el._ar) { el._ar.style.left = x; el._ar.style.top = y; } }
+  function putCur(el) {
+    if (el._wx === undefined) return; let x, y, show = true;
+    if (el._a) {                                                  // this person is inside the node editor: their position is in the editor's own board
+      if (typeof autoOpen === 'undefined' || !autoOpen) show = false;
+      else { const r = acanvas.getBoundingClientRect(), px = r.left + v.x + el._wx * v.z, py = r.top + v.y + el._wy * v.z; show = px >= r.left && px <= r.right && py >= r.top && py <= r.bottom; x = px + 'px'; y = py + 'px'; }
+    } else { x = el._wx * bv.z + bv.x + 'px'; y = el._wy * bv.z + bv.y + 'px'; }
+    el.style.display = show ? '' : 'none'; if (el._ar) el._ar.style.display = show ? '' : 'none'; if (!show) return; el.style.left = x; el.style.top = y; if (el._ar) { el._ar.style.left = x; el._ar.style.top = y; } }
   function applyBoard() {
     world.style.transform = 'translate(' + bv.x + 'px,' + bv.y + 'px) scale(' + bv.z + ')';
     const g = GRID * bv.z; document.body.style.backgroundSize = g + 'px ' + g + 'px'; document.body.style.backgroundPosition = (bv.x - g / 2) + 'px ' + (bv.y - g / 2) + 'px';
@@ -1615,7 +1622,7 @@
       if (!el._ar) { el._ar = document.createElement('div'); el._ar.className = 'rcur-ar'; el._ar.innerHTML = curSvg; document.body.appendChild(el._ar); }
       el._ar.classList.remove('idle');
     }
-    el._wx = m.x; el._wy = m.y; putCur(el);                          // cursors travel in board coordinates, so they line up whatever each person's pan / zoom
+    el._wx = m.x; el._wy = m.y; el._a = !!m.a; putCur(el);                          // cursors travel in board coordinates, so they line up whatever each person's pan / zoom
     clearTimeout(el._t); el._t = setTimeout(() => { el.classList.add('idle'); if (el._ar) el._ar.classList.add('idle'); }, 6000);
   }
   addEventListener('pointermove', e => {
@@ -1627,6 +1634,7 @@
   let curT = 0;
   addEventListener('pointermove', e => {
     if (!net.role || !net.me) return; const n = performance.now(); if (n - curT < 40) return; curT = n;
+    if (autoOpen) { const r = acanvas.getBoundingClientRect(); if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) { send({ t: 'cur', u: net.me.id, a: 1, x: (e.clientX - r.left - v.x) / v.z, y: (e.clientY - r.top - v.y) / v.z }); return; } }
     send({ t: 'cur', u: net.me.id, x: (e.clientX - bv.x) / bv.z, y: (e.clientY - bv.y) / bv.z });
   });
 
@@ -1663,9 +1671,14 @@
     }
   }
 
+  /* most phones / school and mobile networks sit behind NATs that STUN alone can't cross, so a TURN relay is added as the fallback */
+  const PEERCFG = { config: { iceCandidatePoolSize: 4, iceServers: [
+    { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302', 'stun:global.stun.twilio.com:3478'] },
+    { urls: ['stun:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443', 'turn:openrelay.metered.ca:443?transport=tcp'], username: 'openrelayproject', credential: 'openrelayproject' }
+  ] } };
   function startHost() {
     if (!window.Peer) { toast('Sharing needs an internet connection'); return; }
-    const code = net.pending, peer = new Peer('cueboard-' + code);
+    const code = net.pending, peer = new Peer('cueboard-' + code, PEERCFG);
     net.peer = peer;
     peer.on('open', () => {
       net.role = 'host'; net.code = code; net.me = { id: 'host', name: profile.name, color: profile.color }; net.users = [net.me];
@@ -1690,7 +1703,7 @@
 
   function startJoin(code) {
     net.joining = true; toast('Connecting…');
-    const peer = new Peer(); net.peer = peer;
+    const peer = new Peer(undefined, PEERCFG); net.peer = peer;
     peer.on('open', () => {
       const c = peer.connect('cueboard-' + code, { reliable: true, serialization: 'json' }); net.conn = c;
       c.on('open', () => c.send({ t: 'hello', name: profile.name, color: profile.color }));
@@ -1698,7 +1711,7 @@
       c.on('close', () => { if (net.role === 'guest') { toast('The host ended the session'); stopShare(true); } });
     });
     peer.on('error', e => { toast(e.type === 'peer-unavailable' ? 'No room with that code' : 'Could not connect: ' + e.type); closeProfile(); stopShare(true); });
-    setTimeout(() => { if (net.peer === peer && net.joining && !(net.conn && net.conn.open)) { toast('Could not reach that room'); stopShare(true); } }, 12000);
+    setTimeout(() => { if (net.peer === peer && net.joining && !(net.conn && net.conn.open)) { toast('Could not reach that room — check the code, or try another network'); stopShare(true); } }, 25000);
   }
 
   function stopShare(silent) {
@@ -1718,13 +1731,15 @@
   /* join dialog: name + a colour of your own choosing */
   const joinOverlay = $('#joinOverlay'), pfName = $('#pfName'), pfColor = $('#pfColor');
   const profile = { name: '', color: COLORS[1] };
-  try { profile.name = localStorage.getItem('cuename') || ''; const c = localStorage.getItem('cuecolor'); if (/^#[0-9a-f]{6}$/i.test(c)) profile.color = c; } catch (e) {}
+  try { profile.name = localStorage.getItem('cuename') || ''; localStorage.removeItem('cuecolor'); } catch (e) {}
+  /* a fresh random colour every time, unless the person picks their own in the dialog */
+  const randColor = () => { const h = Math.random(), s = .6 + Math.random() * .3, l = .5 + Math.random() * .1, f = n => { const k = (n + h * 12) % 12, a = s * Math.min(l, 1 - l); return Math.round(255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)))); }; return '#' + [f(0), f(8), f(4)].map(x => x.toString(16).padStart(2, '0')).join(''); };
   function setPfColor(c) { profile.color = c; pfColor.style.setProperty('--c', c); }
   let pfMode = 'join';
   function openProfile(code, msg, mode) {
     pfMode = mode || 'join'; $('#pfTitle').textContent = pfMode === 'host' ? 'Start sharing' : 'Join room ' + code; $('#pfGo').textContent = pfMode === 'host' ? 'Start' : 'Join'; const m = $('#jmsg');
     m.textContent = msg || (pfMode === 'host' ? 'Pick a name and a colour. People who join will see them next to your cursor.' : 'Pick a name and a colour. Others will see your cursor in that colour.'); m.classList.toggle('err', !!msg);
-    pfName.value = profile.name; setPfColor(profile.color); joinOverlay.classList.add('show'); setTimeout(() => pfName.focus(), 60);
+    pfName.value = profile.name; setPfColor(randColor()); joinOverlay.classList.add('show'); setTimeout(() => pfName.focus(), 60);
   }
   function closeProfile() { joinOverlay.classList.remove('show'); closePops(); }
   function joinFlow(code) {
@@ -1740,7 +1755,7 @@
   $('#pfCancel').addEventListener('click', () => { closeProfile(); if (net.joining) stopShare(true); });
   $('#pfGo').addEventListener('click', () => {
     profile.name = pfName.value.replace(/[\u0000-\u001f]/g, '').trim().slice(0, 24) || 'Guest';
-    try { localStorage.setItem('cuename', profile.name); localStorage.setItem('cuecolor', profile.color); } catch (e) {}
+    try { localStorage.setItem('cuename', profile.name); } catch (e) {}
     closeProfile();
     if (pfMode === 'host') { startHost(); return; }
     if (net.conn && net.conn.open) net.conn.send({ t: 'hello', name: profile.name, color: profile.color });
@@ -1903,7 +1918,7 @@
   const keyLabel = k => !k ? 'key' : k.length === 1 ? k.toUpperCase() : ({ ' ': 'Space', ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→', Control: 'Ctrl' }[k] || k);
   const rowY = i => RY0 + i * RPITCH;
   const isValSrc = n => n && (n.t === 'number' || n.t === 'value'), isValIn = (n, p) => n && VP[n.t] !== undefined && p >= VP[n.t];     // value pins default to cornflower blue
-  const pinColor = (n, k) => (n && n.pc && n.pc[k]) || (k === 'o' ? (isValSrc(n) ? VALC : PURPLE) : k === 'o1' ? (n && n.t === 'split' ? PURPLE : STOPC) : /^o\d$/.test(k) ? PURPLE : DARK);
+  const pinColor = (n, k) => (n && n.pc && n.pc[k]) || (k === 'o' ? (isValSrc(n) ? VALC : PURPLE) : k === 'o1' ? (n && n.t === 'split' ? PURPLE : STOPC) : /^o\d+$/.test(k) ? PURPLE : DARK);
   function autoDropCue(id) {
     const gone = auto.nodes.filter(n => n.t === 'audio' && n.cue === id).map(n => n.id);
     if (!gone.length) return;
@@ -1915,6 +1930,7 @@
   function applyView() {
     aworld.style.transform = 'translate(' + v.x + 'px,' + v.y + 'px) scale(' + v.z + ')';
     const g = 24 * v.z; acanvas.style.backgroundSize = g + 'px ' + g + 'px'; acanvas.style.backgroundPosition = v.x + 'px ' + v.y + 'px'; acanvas.style.setProperty('--z', v.z);   // dots shrink / grow with the zoom for depth
+    if (typeof cursors === 'object') Object.values(cursors).forEach(putCur);
     azp.textContent = Math.round(vt.z * 100) + '%'; if (typeof placeBar === 'function') placeBar(true);
   }
   function vstep(t) {
@@ -2069,9 +2085,10 @@
         g += '<linearGradient id="rg' + j + '" gradientUnits="userSpaceOnUse" x1="' + A[0] + '" y1="' + A[1] + '" x2="' + B[0] + '" y2="' + B[1] + '"><stop offset="0" stop-color="#6a6a6a"/><stop offset="1" stop-color="#e0a8f0"/></linearGradient>';
         const p = 'M' + A[0] + ' ' + A[1] + 'L' + B[0] + ' ' + B[1]; ln += '<g class="rg" data-j="' + j + '"><path class="rh" d="' + p + '"/><path class="rl" style="stroke:url(#rg' + j + ')" d="' + p + '"/></g>';
       });
+      const ps = Math.max(8, Math.min(20, geo(w, h).P * s / Math.max(d.si + d.so, 1) * .7)), pst = 'width:' + ps + 'px;height:' + ps + 'px;border-width:' + Math.max(2, ps * .2) + 'px;', ph = ps / 2;
       let h2 = g + '</defs><rect class="rbody" x="' + (CX - w * s / 2) + '" y="' + (CY - h * s / 2) + '" width="' + w * s + '" height="' + h * s + '" rx="' + SR * s + '"/>' + ln + '<path class="rt" style="display:none"/></svg>';
-      for (let i = 0; i < d.si; i++) { const p = at('i', i); h2 += '<i class="rp" data-k="i" data-n="' + i + '" style="left:' + (p[0] - 10) + 'px;top:' + (p[1] - 10) + 'px;background:' + col('i', i) + '"></i>'; }
-      for (let o = 0; o < d.so; o++) { const p = at('o', o); h2 += '<i class="rp" data-k="o" data-n="' + o + '" style="left:' + (p[0] - 10) + 'px;top:' + (p[1] - 10) + 'px;background:' + col('o', o) + '"></i>'; }
+      for (let i = 0; i < d.si; i++) { const p = at('i', i); h2 += '<i class="rp" data-k="i" data-n="' + i + '" style="' + pst + 'left:' + (p[0] - ph) + 'px;top:' + (p[1] - ph) + 'px;background:' + col('i', i) + '"></i>'; }
+      for (let o = 0; o < d.so; o++) { const p = at('o', o); h2 += '<i class="rp" data-k="o" data-n="' + o + '" style="' + pst + 'left:' + (p[0] - ph) + 'px;top:' + (p[1] - ph) + 'px;background:' + col('o', o) + '"></i>'; }
       h2 += '<div class="rb" style="left:30px"><button class="ok" title="Save"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></button><button class="no" title="Cancel"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>';
       h2 += '<div class="rb" style="right:24px"><button class="st" data-k="i" data-d="-1" title="Fewer inputs">' + chev(1) + '</button><span>' + d.si + '</span><button class="st' + (d.si >= cap ? ' dis' : '') + '" data-k="i" data-d="1" title="' + (d.si >= cap ? 'Resize the Splitter to fit more pins' : 'More inputs') + '">' + chev(0) + '</button>'
         + '<button class="st" data-k="o" data-d="-1" title="Fewer outputs" style="margin-left:6px">' + chev(1) + '</button><span>' + d.so + '</span><button class="st' + (d.so >= cap ? ' dis' : '') + '" data-k="o" data-d="1" title="' + (d.so >= cap ? 'Resize the Splitter to fit more pins' : 'More outputs') + '">' + chev(0) + '</button></div>';
@@ -2092,6 +2109,8 @@
     box.style.left = Math.max(8, Math.min(innerWidth - PW - 8, r.left + r.width / 2 - PW / 2)) + 'px';
     box.style.top = Math.max(8, Math.min(innerHeight - PH - 8, r.top + r.height / 2 - PH / 2)) + 'px';
     const local = e => { const b = box.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
+    const lit = e => { const p = e.target.closest && e.target.closest('.rp'); box.querySelectorAll('.rg.on').forEach(x => x.classList.remove('on')); if (!p || e.type === 'pointerout') return; box.querySelectorAll('.rg').forEach(x => { const c = d.sc[+x.dataset.j]; if (c && c[p.dataset.k === 'i' ? 0 : 1] === +p.dataset.n) x.classList.add('on'); }); };
+    box.addEventListener('pointerover', lit); box.addEventListener('pointerout', lit);
     box.addEventListener('pointerdown', e => {
       const pin = e.target.closest('.rp'); if (!pin) return; e.preventDefault();
       drag = { k: pin.dataset.k, n: +pin.dataset.n, sx: e.clientX, sy: e.clientY, moved: false, held: false };
@@ -2336,42 +2355,42 @@
     const nn = nodeById(to), dir = !nn ? 'l' : nn.t === 'split' ? (ip.dataset.s || 'l') : nn.t === 'loop' ? (p === 2 ? 't' : p >= 3 ? 'b' : 'l') : VP[nn.t] !== undefined && p >= VP[nn.t] ? 'b' : 'l';
     return [v.x + (parseFloat(el.style.left) + ip.offsetLeft + ip.offsetWidth / 2) * v.z, v.y + (parseFloat(el.style.top) + ip.offsetTop + ip.offsetHeight / 2) * v.z, dir];
   }
-  /* dynamic wires: a wire runs as its normal loose curve, but if that curve would cross a node it is re-routed around the nodes in the way */
+  /* dynamic wires: a wire runs as its normal loose curve, but if that curve would cross a node it is re-routed around the nodes in the way.
+     All routing happens in board (world) space and is only converted to the screen when the path is written, so zooming and panning
+     transform a route exactly (no recomputation, no jitter). */
   function nodeRects() {
-    return auto.nodes.map(n => { const el = nodeEls[n.id]; return el ? { x: v.x + parseFloat(el.style.left) * v.z, y: v.y + parseFloat(el.style.top) * v.z, w: el.offsetWidth * v.z, h: el.offsetHeight * v.z } : null; }).filter(Boolean);
+    return auto.nodes.map(n => { const el = nodeEls[n.id]; return el ? { x: parseFloat(el.style.left), y: parseFloat(el.style.top), w: el.offsetWidth, h: el.offsetHeight } : null; }).filter(Boolean);
   }
-  /* re-routed wires glide to their new shape instead of snapping (waypoints are eased in board space, so panning and zooming never make them lag) */
   let wst = new Map(), wstNext = new Map(), wLast = 0, wKick = 0, wEase = 1, wBusy = false;
-  const easeRoute = (key, Q) => {
-    const w = Q.map(p => [(p[0] - v.x) / v.z, (p[1] - v.y) / v.z]), old = wst.get(key);
-    const cur = old && old.length === w.length ? w.map((p, i) => { if (!i || i === w.length - 1) return p; const dx = p[0] - old[i][0], dy = p[1] - old[i][1]; if (Math.abs(dx) + Math.abs(dy) > .3) wBusy = true; return [old[i][0] + dx * wEase, old[i][1] + dy * wEase]; }) : w;
-    wstNext.set(key, cur); return cur.map(p => [v.x + p[0] * v.z, v.y + p[1] * v.z]);
+  const easeRoute = (key, w) => {
+    const old = wst.get(key);
+    const cur = old && old.length === w.length ? w.map((p, i) => { if (!i || i === w.length - 1) return p; const dx = p[0] - old[i][0], dy = p[1] - old[i][1]; if (Math.abs(dx) + Math.abs(dy) > .3) { wBusy = true; return [old[i][0] + dx * wEase, old[i][1] + dy * wEase]; } return p; }) : w;
+    wstNext.set(key, cur); return cur;
   };
   function routeWire(a, b, rects, key) {
     const z = v.z, plain = wirePath(a[0], a[1], b[0], b[1], b[2], a[2]);
     if (!rects.length) return plain;
-    // does the loose curve touch a node? (sample it, ignoring the very ends where it leaves / enters its own pins)
-    const k = Math.max(50 * z, Math.abs(b[0] - a[0]) * .5), kk = Math.max(46 * z, Math.abs(b[1] - a[1]) * .5), sv = VEC[a[2]] || VEC.r, ev = VEC[b[2]] || VEC.l, ln = q => q[0] ? k : kk;
-    const c1 = [a[0] + sv[0] * ln(sv), a[1] + sv[1] * ln(sv)], c2 = [b[0] + ev[0] * ln(ev), b[1] + ev[1] * ln(ev)];
+    const aw = [(a[0] - v.x) / z, (a[1] - v.y) / z, a[2]], bw = [(b[0] - v.x) / z, (b[1] - v.y) / z, b[2]];
+    const k = Math.max(50, Math.abs(bw[0] - aw[0]) * .5), kk = Math.max(46, Math.abs(bw[1] - aw[1]) * .5), sv = VEC[a[2]] || VEC.r, ev = VEC[b[2]] || VEC.l, ln = q => q[0] ? k : kk;
+    const c1 = [aw[0] + sv[0] * ln(sv), aw[1] + sv[1] * ln(sv)], c2 = [bw[0] + ev[0] * ln(ev), bw[1] + ev[1] * ln(ev)];
+    const pad = wst.has(key) ? 26 : -2;                               // once re-routed a wire stays routed until clearly in the clear (no flip-flopping)
     let hit = false;
     for (let i = 1; i < 24 && !hit; i++) {
-      const t = i / 24, u = 1 - t, x = u * u * u * a[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * b[0], y = u * u * u * a[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * b[1];
-      const pad = wst.has(key) ? 26 * z : -2 * z;                   // once a wire has been re-routed it stays routed until it is clearly in the clear (no flip-flopping)
+      const t = i / 24, u = 1 - t, x = u * u * u * aw[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * bw[0], y = u * u * u * aw[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * bw[1];
       hit = rects.some(r => x > r.x - pad && x < r.x + r.w + pad && y > r.y - pad && y < r.y + r.h + pad);
     }
     if (!hit) return plain;
-    const m = 30 * z, g = 12 * z, A = [a[0] + sv[0] * m, a[1] + sv[1] * m], B = [b[0] + ev[0] * m, b[1] + ev[1] * m];
-    // nodes near the two ends are the only ones that can matter
-    const lo = [Math.min(A[0], B[0]) - 160 * z, Math.min(A[1], B[1]) - 160 * z], hi = [Math.max(A[0], B[0]) + 160 * z, Math.max(A[1], B[1]) + 160 * z];
+    const m = 30, g = 12, A = [aw[0] + sv[0] * m, aw[1] + sv[1] * m], B = [bw[0] + ev[0] * m, bw[1] + ev[1] * m];
+    const lo = [Math.min(A[0], B[0]) - 160, Math.min(A[1], B[1]) - 160], hi = [Math.max(A[0], B[0]) + 160, Math.max(A[1], B[1]) + 160];
     const R = rects.filter(r => r.x < hi[0] && r.x + r.w > lo[0] && r.y < hi[1] && r.y + r.h > lo[1]).slice(0, 12).map(r => ({ x: r.x - g, y: r.y - g, w: r.w + 2 * g, h: r.h + 2 * g }));
     const inside = (x, y) => R.some(r => x > r.x + .01 && x < r.x + r.w - .01 && y > r.y + .01 && y < r.y + r.h - .01);
     if (inside(A[0], A[1]) || inside(B[0], B[1])) return plain;
     const xs = [...new Set([A[0], B[0], ...R.flatMap(r => [r.x, r.x + r.w])])].sort((p, q) => p - q), ys = [...new Set([A[1], B[1], ...R.flatMap(r => [r.y, r.y + r.h])])].sort((p, q) => p - q);
     const blockH = (y, x1, x2) => R.some(r => y > r.y + .01 && y < r.y + r.h - .01 && Math.min(x1, x2) < r.x + r.w - .01 && Math.max(x1, x2) > r.x + .01);
     const blockV = (x, y1, y2) => R.some(r => x > r.x + .01 && x < r.x + r.w - .01 && Math.min(y1, y2) < r.y + r.h - .01 && Math.max(y1, y2) > r.y + .01);
-    const NX = xs.length, NY = ys.length, id = (i, j, d) => (j * NX + i) * 4 + d, turn = 40 * z;
+    const NX = xs.length, NY = ys.length, id = (i, j, d) => (j * NX + i) * 4 + d, turn = 40;
     const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]], d0 = a[2] === 'l' ? 1 : a[2] === 't' ? 3 : a[2] === 'b' ? 2 : 0;
-    const need = b[2] === 'l' ? 0 : b[2] === 'r' ? 1 : b[2] === 't' ? 2 : 3;          // direction of travel when arriving (opposite the pin's outward side)
+    const need = b[2] === 'l' ? 0 : b[2] === 'r' ? 1 : b[2] === 't' ? 2 : 3;
     const iA = xs.indexOf(A[0]), jA = ys.indexOf(A[1]), iB = xs.indexOf(B[0]), jB = ys.indexOf(B[1]);
     const dist = new Map(), prev = new Map(), heap = [];
     const push = (c, s) => { heap.push([c, s]); let i = heap.length - 1; while (i) { const p = (i - 1) >> 1; if (heap[p][0] <= heap[i][0]) break; [heap[p], heap[i]] = [heap[i], heap[p]]; i = p; } };
@@ -2392,23 +2411,23 @@
     }
     if (goal < 0) return plain;
     const pts = []; for (let st = goal; st !== undefined; st = prev.get(st)) { const cell = (st - st % 4) / 4; pts.push([xs[cell % NX], ys[(cell - cell % NX) / NX]]); }
-    pts.reverse(); pts.unshift([a[0], a[1]]); pts.push([b[0], b[1]]);
+    pts.reverse(); pts.unshift([aw[0], aw[1]]); pts.push([bw[0], bw[1]]);
     const P = pts.filter((p, i) => !i || Math.abs(p[0] - pts[i - 1][0]) + Math.abs(p[1] - pts[i - 1][1]) > .5);
     const Q = P.filter((p, i) => i === 0 || i === P.length - 1 || !((P[i - 1][0] === p[0] && p[0] === P[i + 1][0]) || (P[i - 1][1] === p[1] && p[1] === P[i + 1][1])));   // drop points on a straight run
-    const E = easeRoute(key, Q);
+    const E = easeRoute(key, Q), X = p => v.x + p[0] * z, Y = p => v.y + p[1] * z;
     // flowing corners: as generous as the space allows, eased back only as far as needed to keep clear of the nodes
     const build = cap => {
-      let dd = 'M' + E[0][0] + ' ' + E[0][1]; const chk = [];
+      let dd = 'M' + X(E[0]) + ' ' + Y(E[0]); const chk = [];
       for (let i = 1; i < E.length - 1; i++) {
         const p = E[i - 1], c = E[i], n = E[i + 1], l1 = Math.hypot(c[0] - p[0], c[1] - p[1]) || 1, l2 = Math.hypot(n[0] - c[0], n[1] - c[1]) || 1, rr = Math.min(cap, l1 / 2, l2 / 2);
         const e1 = [c[0] + (p[0] - c[0]) / l1 * rr, c[1] + (p[1] - c[1]) / l1 * rr], e2 = [c[0] + (n[0] - c[0]) / l2 * rr, c[1] + (n[1] - c[1]) / l2 * rr];
-        dd += 'L' + e1[0] + ' ' + e1[1] + 'Q' + c[0] + ' ' + c[1] + ' ' + e2[0] + ' ' + e2[1];
+        dd += 'L' + X(e1) + ' ' + Y(e1) + 'Q' + X(c) + ' ' + Y(c) + ' ' + X(e2) + ' ' + Y(e2);
         for (let t = .2; t < .9; t += .2) { const u = 1 - t; chk.push([u * u * e1[0] + 2 * u * t * c[0] + t * t * e2[0], u * u * e1[1] + 2 * u * t * c[1] + t * t * e2[1]]); }
       }
-      return [dd + 'L' + E[E.length - 1][0] + ' ' + E[E.length - 1][1], chk];
+      return [dd + 'L' + X(E[E.length - 1]) + ' ' + Y(E[E.length - 1]), chk];
     };
     let out;
-    for (const cap of [1e9, 110 * z, 70 * z, 46 * z, 28 * z]) { out = build(cap); if (!out[1].some(p => rects.some(r => p[0] > r.x && p[0] < r.x + r.w && p[1] > r.y && p[1] < r.y + r.h))) break; }
+    for (const cap of [1e9, 110, 70, 46, 28]) { out = build(cap); if (!out[1].some(p => rects.some(r => p[0] > r.x && p[0] < r.x + r.w && p[1] > r.y && p[1] < r.y + r.h))) break; }
     return out[0];
   }
   function drawWires() {
@@ -2831,11 +2850,11 @@
   /* open / close */
   function openAuto() {
     dock.classList.add('away'); shareDock.classList.add('away'); autoDock.classList.add('open'); autoDock.setAttribute('aria-expanded', 'true'); select(null);
-    autoOpen = true; renderRows(); applyView(); if (!lightRaf) lightRaf = requestAnimationFrame(lightTick);
+    autoOpen = true; renderRows(); applyView(); setTimeout(() => Object.values(cursors).forEach(putCur), 700); if (!lightRaf) lightRaf = requestAnimationFrame(lightTick);
   }
   function closeAuto() {
     closePick(); dock.classList.remove('away'); shareDock.classList.remove('away'); autoDock.classList.remove('open'); autoDock.setAttribute('aria-expanded', 'false');
-    autoOpen = false; binding = null;
+    autoOpen = false; binding = null; Object.values(cursors).forEach(putCur);
   }
   autoDock.addEventListener('click', () => { if (!autoDock.classList.contains('open')) openAuto(); });
   autoDock.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && !autoDock.classList.contains('open') && e.target === autoDock) { e.preventDefault(); openAuto(); } });
