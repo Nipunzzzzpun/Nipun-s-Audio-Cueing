@@ -1,5 +1,3 @@
-<p align="center"><img src="assets/Automation.png" alt="Automation" width="100%"></p>
-
 ## About
 
 A single-page cue board for running sound effects, images and text live: for a show, a stream, a class, or a game night. Drop buttons on a dotted-grid stage, press them when you need them, and (optionally) wire them together with a node editor so one press can trigger a whole sequence.
