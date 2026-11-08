@@ -69,7 +69,7 @@
   .audio .restart svg { width: 100%; height: 100%; transform: scale(.62); }
   .audio .play svg { width: 100%; height: 100%; transform: scale(.6); }
   .audio .pill {
-    display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 6px 0 13px;
+    display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 13px;
     background: #000; color: #fff; border-radius: 999px; font-size: 11px; font-weight: 500;
     min-width: 90px; max-width: 220px;
   }
@@ -2869,7 +2869,11 @@
     auto.links.push([from, to, p, fp]); save();
   }
 
-  acanvas.addEventListener('contextmenu', e => { if (e.target.closest('.anode')) e.preventDefault(); });      // everything for a node lives on the bar above the selection
+  acanvas.addEventListener('contextmenu', e => {                       // right-click a node: just selects it, so the bar above it (colour, caption, move, duplicate, delete) is the one place for actions
+    const el = e.target.closest('.anode'); if (!el) return; e.preventDefault();
+    const n = nodeById(el.dataset.id); if (!n) return;
+    if (!selSet.has(n.id)) { selSet.clear(); selSet.add(n.id); syncNodes(); }
+  });
   acanvas.addEventListener('pointerdown', e => {
     if (e.button === 2 || e.target.closest('.azoom, button, input')) return;
     const port = e.target.closest('.port'), node = e.target.closest('.anode'), r = acanvas.getBoundingClientRect();
