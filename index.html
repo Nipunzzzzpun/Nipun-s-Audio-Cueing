@@ -395,9 +395,10 @@
   .anode.t-matrix { display: block; padding: 0; border-radius: 30px; --lc: #fff; box-sizing: border-box; transition: width .3s var(--spring), height .3s var(--spring), box-shadow .2s; }
   .anode.t-matrix .ip { margin: 0; transition: left .3s var(--spring), top .3s var(--spring), transform .25s var(--spring), background .2s, opacity .2s; }
   .anode.t-matrix .ip.gone { opacity: 0; pointer-events: none; transform: scale(.3); }
-  .anode .mgrid { position: absolute; left: 36px; top: 34px; display: grid; grid-template-columns: repeat(16, 14px); grid-auto-rows: 14px; gap: 6px; overflow: hidden; transition: width .3s var(--spring), height .3s var(--spring); }
-  .anode .mc { width: 14px; height: 14px; border-radius: 50%; background: #555; cursor: pointer; transition: background .12s, box-shadow .12s; }
-  .anode .mc.on { background: var(--lc); box-shadow: 0 0 10px 1px var(--lc); }
+  .anode .mgrid { position: absolute; left: 36px; top: 34px; display: grid; grid-template-columns: repeat(16, 14px); grid-auto-rows: 14px; gap: 6px; transition: width .3s var(--spring), height .3s var(--spring); }
+  .anode .mc { width: 14px; height: 14px; border-radius: 50%; background: #555; cursor: pointer; transition: background .12s, box-shadow .12s, opacity .25s, transform .3s var(--spring); }
+  .anode .mc.on { background: var(--lc); box-shadow: 0 0 9px 0 var(--lc); }
+  .anode .mc.gone { opacity: 0; transform: scale(.2); pointer-events: none; box-shadow: none; }       /* cells outside the current size fade away instead of being clipped (clipping cut the glow off) */
   .anode .mlb { position: absolute; font-size: 10px; font-weight: 600; color: rgba(255,255,255,.38); pointer-events: none; text-align: center; width: 44px; transition: left .3s var(--spring), top .3s var(--spring); }
   .anode .mrz { position: absolute; right: 5px; bottom: 5px; width: 16px; height: 16px; cursor: nwse-resize; opacity: 0; transition: opacity .2s; }
   .anode .mrz::before { content: ''; position: absolute; right: 3px; bottom: 3px; width: 8px; height: 8px; border-right: 2.5px solid rgba(255,255,255,.55); border-bottom: 2.5px solid rgba(255,255,255,.55); border-radius: 0 0 6px 0; }
@@ -2009,6 +2010,7 @@
   function layoutMatrix(n, el) {
     const gw = n.mw * MPITCH - 6, gh = n.mh * MPITCH - 6, W = ML + gw + MR, H = MT + gh + MB, g = el.querySelector('.mgrid');
     el.style.width = W + 'px'; el.style.height = H + 'px'; g.style.width = gw + 'px'; g.style.height = gh + 'px';
+    el.querySelectorAll('.mc').forEach((c, i) => c.classList.toggle('gone', (i & 15) >= n.mw || (i >> 4) >= n.mh));
     el.querySelectorAll('.ip').forEach(ip => {
       const p = +ip.dataset.p; ip.classList.toggle('gone', !matVisible(n, p)); let x, y;
       if (p === 0) { x = ML + gw - 7; y = H; } else if (p === 1) { x = ML + 7; y = H; }
