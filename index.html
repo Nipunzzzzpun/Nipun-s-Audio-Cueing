@@ -1800,8 +1800,8 @@
     if: { ins: 2, out: true, multi: true }, loop: { ins: 4, out: true, outs: 2, multi: true }, random: { ins: 3, out: true, multi: true }, print: { ins: 2, out: true, multi: true }, light: { ins: 1, out: false, multi: true }, split: { ins: 1, out: true, outs: 1, multi: true }
   };
   const insOf = n => n.t === 'split' ? n.si : SPEC[n.t].ins, outsOf = n => n.t === 'split' ? n.so : (SPEC[n.t].outs || 1);
-  const SW = 38, SR = 19, MAXPIN = 12;
-  const sdim = n => [Math.max(SW, Math.min(400, +n.sw || SW)), Math.max(66, Math.min(600, +n.sh || (38 + Math.max(n.si, n.so) * 24)))];      // [width, height]; older / untouched Splitters size themselves to their pins
+  const SW = 38, SR = 19, MAXPIN = 64;
+  const sdim = n => [Math.max(SW, Math.min(1500, +n.sw || SW)), Math.max(66, Math.min(1500, +n.sh || (38 + Math.max(n.si, n.so) * 24)))];      // [width, height]; older / untouched Splitters size themselves to their pins
   /* Splitter pins sit anywhere on its rounded border: u is the fraction round the edge (0 = top of the left side, running down the left, along the bottom, up the right, back along the top) */
   const geo = (W, H) => { const R = SR, Lv = H - 2 * R, Lh = W - 2 * R, q = Math.PI * R / 2; return { R, Lv, Lh, q, P: 2 * Lv + 2 * Lh + 4 * q }; };
   const splitCap = (W, H) => Math.min(MAXPIN, Math.floor(geo(W, H).P / 48));       // the bigger the Splitter, the more pins fit
@@ -1854,10 +1854,10 @@
   const GATE = { and: (a, b) => a && b, or: (a, b) => a || b, nor: (a, b) => !(a || b), xor: (a, b) => a !== b, xand: (a, b) => a === b };
   function cleanSplit(n) {                       // Splitter: how many pins, which input feeds which output, and where each pin sits on the border
     const si = Math.max(1, Math.min(MAXPIN, Math.round(+n.si) || 1)), so = Math.max(1, Math.min(MAXPIN, Math.round(+n.so) || 1)), seen = new Set(), sc = [];
-    if (Array.isArray(n.sc)) n.sc.slice(0, 40).forEach(c => { if (!Array.isArray(c)) return; const a = c[0] | 0, b = c[1] | 0, k = a + ',' + b; if (a >= 0 && a < si && b >= 0 && b < so && !seen.has(k)) { seen.add(k); sc.push([a, b]); } });
+    if (Array.isArray(n.sc)) n.sc.slice(0, 4096).forEach(c => { if (!Array.isArray(c)) return; const a = c[0] | 0, b = c[1] | 0, k = a + ',' + b; if (a >= 0 && a < si && b >= 0 && b < so && !seen.has(k)) { seen.add(k); sc.push([a, b]); } });
     else sc.push([0, 0]);
     const side = a => Array.isArray(a) ? a.slice(0, MAXPIN).filter(p => p && typeof p === 'object' && isFinite(p.u)).map(p => ({ u: ((+p.u % 1) + 1) % 1 })) : [];
-    return { si, so, sc, sw: isFinite(n.sw) && n.sw ? Math.max(SW, Math.min(400, +n.sw)) : null, sh: isFinite(n.sh) && n.sh ? Math.max(66, Math.min(600, +n.sh)) : null,
+    return { si, so, sc, sw: isFinite(n.sw) && n.sw ? Math.max(SW, Math.min(1500, +n.sw)) : null, sh: isFinite(n.sh) && n.sh ? Math.max(66, Math.min(1500, +n.sh)) : null,
       sp: n.sp && typeof n.sp === 'object' ? { i: side(n.sp.i), o: side(n.sp.o), w: isFinite(n.sp.w) ? +n.sp.w : 0, h: isFinite(n.sp.h) ? +n.sp.h : 0 } : null };
   }
   const idOk = x => typeof x === 'string' && /^[a-z0-9]{3,16}$/.test(x);
@@ -2035,7 +2035,7 @@
   let rz = null;                                                  // a Splitter being resized from its corner
   function resizeSplit(e) {
     const n = rz.n, el = nodeEls[n.id]; if (!el) return;
-    const w = Math.max(SW, Math.min(400, Math.round(rz.w + (e.clientX - rz.sx) / v.z))), h = Math.max(66, Math.min(600, Math.round(rz.h + (e.clientY - rz.sy) / v.z)));
+    const w = Math.max(SW, Math.min(1500, Math.round(rz.w + (e.clientX - rz.sx) / v.z))), h = Math.max(66, Math.min(1500, Math.round(rz.h + (e.clientY - rz.sy) / v.z)));
     if (splitCap(w, h) < Math.max(n.si, n.so)) return;              // never squeeze it below the pins it already has
     n.sw = w; n.sh = h; layoutSplit(n, el); drawWires(); drawGroups(); placeBar(true);
   }
@@ -2234,6 +2234,7 @@
   asb.innerHTML = '<button class="col" title="Change the colour of the selected nodes"><span class="sw"></span>Colour</button>'
     + '<button class="grp" title="Group the selected nodes so they move together"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4" stroke-dasharray="3 3.2"/><rect x="8" y="8" width="8" height="8" rx="2"/></svg><span>Group</span></button>'
     + '<button class="mv" title="Drag from here to move the selection"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>Move</button>'
+    + '<button class="dup" title="Duplicate the selected nodes and the wires between them (Ctrl+D)"><svg viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="3.5"/><path d="M15.5 8.5V6.5a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h2"/></svg>Duplicate</button>'
     + '<button class="del" title="Delete the selected nodes (Delete key)"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13M10 11v6M14 11v6"/></svg>Delete</button>';
   /* Alt held: anything the square touches counts. No Alt: the square must fully engulf a node. */
   function hitIds(alt) {
@@ -2284,6 +2285,23 @@
     const gone = new Set(selSet); gone.forEach(clearWaits); selSet.clear();
     auto.nodes = auto.nodes.filter(n => !gone.has(n.id)); auto.links = auto.links.filter(l => !gone.has(l[0]) && !gone.has(l[1])); save();
   }
+  function dupSel() {                                              // copies of the selected nodes, with the wires between them, a little down and to the right
+    const ns = selNodes(); if (!ns.length) return;
+    const ids = new Map(), grp = new Map(), RT = ['cnt', 'valCur', 'waits', 'loops', 'pend', 'rv', 'lit'];
+    const copies = ns.map(n => {
+      const c = JSON.parse(JSON.stringify(n, (k, val) => RT.includes(k) ? undefined : val)); c.id = uid(); ids.set(n.id, c.id);
+      c.x += 36; c.y += 36; if (n.g) { if (!grp.has(n.g)) grp.set(n.g, 'g' + Math.random().toString(36).slice(2, 8)); c.g = grp.get(n.g); } return c;
+    });
+    auto.nodes.push(...copies);
+    auto.links.filter(l => ids.has(l[0]) && ids.has(l[1])).forEach(l => auto.links.push([ids.get(l[0]), ids.get(l[1]), l[2], l[3]]));
+    selSet.clear(); copies.forEach(c => selSet.add(c.id)); save(); syncNodes();
+  }
+  asb.querySelector('.dup').addEventListener('click', dupSel);
+  addEventListener('keydown', e => {
+    if (!autoOpen || !selSet.size || !(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey || e.key.toLowerCase() !== 'd') return;
+    if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || document.activeElement.isContentEditable) return;
+    e.preventDefault(); e.stopPropagation(); dupSel();
+  }, true);
   asb.addEventListener('pointerdown', e => e.stopPropagation());
   asb.querySelector('.del').addEventListener('click', delSel);
   asb.querySelector('.grp').addEventListener('click', () => {
@@ -2318,15 +2336,73 @@
     const nn = nodeById(to), dir = !nn ? 'l' : nn.t === 'split' ? (ip.dataset.s || 'l') : nn.t === 'loop' ? (p === 2 ? 't' : p >= 3 ? 'b' : 'l') : VP[nn.t] !== undefined && p >= VP[nn.t] ? 'b' : 'l';
     return [v.x + (parseFloat(el.style.left) + ip.offsetLeft + ip.offsetWidth / 2) * v.z, v.y + (parseFloat(el.style.top) + ip.offsetTop + ip.offsetHeight / 2) * v.z, dir];
   }
+  /* dynamic wires: a wire runs as its normal loose curve, but if that curve would cross a node it is re-routed around the nodes in the way */
+  function nodeRects() {
+    return auto.nodes.map(n => { const el = nodeEls[n.id]; return el ? { x: v.x + parseFloat(el.style.left) * v.z, y: v.y + parseFloat(el.style.top) * v.z, w: el.offsetWidth * v.z, h: el.offsetHeight * v.z } : null; }).filter(Boolean);
+  }
+  function routeWire(a, b, rects) {
+    const z = v.z, plain = wirePath(a[0], a[1], b[0], b[1], b[2], a[2]);
+    if (!rects.length) return plain;
+    // does the loose curve touch a node? (sample it, ignoring the very ends where it leaves / enters its own pins)
+    const k = Math.max(50 * z, Math.abs(b[0] - a[0]) * .5), kk = Math.max(46 * z, Math.abs(b[1] - a[1]) * .5), sv = VEC[a[2]] || VEC.r, ev = VEC[b[2]] || VEC.l, ln = q => q[0] ? k : kk;
+    const c1 = [a[0] + sv[0] * ln(sv), a[1] + sv[1] * ln(sv)], c2 = [b[0] + ev[0] * ln(ev), b[1] + ev[1] * ln(ev)];
+    let hit = false;
+    for (let i = 1; i < 24 && !hit; i++) {
+      const t = i / 24, u = 1 - t, x = u * u * u * a[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * b[0], y = u * u * u * a[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * b[1];
+      hit = rects.some(r => x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h);
+    }
+    if (!hit) return plain;
+    const m = 24 * z, g = 14 * z, A = [a[0] + sv[0] * m, a[1] + sv[1] * m], B = [b[0] + ev[0] * m, b[1] + ev[1] * m];
+    // nodes near the two ends are the only ones that can matter
+    const lo = [Math.min(A[0], B[0]) - 160 * z, Math.min(A[1], B[1]) - 160 * z], hi = [Math.max(A[0], B[0]) + 160 * z, Math.max(A[1], B[1]) + 160 * z];
+    const R = rects.filter(r => r.x < hi[0] && r.x + r.w > lo[0] && r.y < hi[1] && r.y + r.h > lo[1]).slice(0, 12).map(r => ({ x: r.x - g, y: r.y - g, w: r.w + 2 * g, h: r.h + 2 * g }));
+    const inside = (x, y) => R.some(r => x > r.x + .01 && x < r.x + r.w - .01 && y > r.y + .01 && y < r.y + r.h - .01);
+    if (inside(A[0], A[1]) || inside(B[0], B[1])) return plain;
+    const xs = [...new Set([A[0], B[0], ...R.flatMap(r => [r.x, r.x + r.w])])].sort((p, q) => p - q), ys = [...new Set([A[1], B[1], ...R.flatMap(r => [r.y, r.y + r.h])])].sort((p, q) => p - q);
+    const blockH = (y, x1, x2) => R.some(r => y > r.y + .01 && y < r.y + r.h - .01 && Math.min(x1, x2) < r.x + r.w - .01 && Math.max(x1, x2) > r.x + .01);
+    const blockV = (x, y1, y2) => R.some(r => x > r.x + .01 && x < r.x + r.w - .01 && Math.min(y1, y2) < r.y + r.h - .01 && Math.max(y1, y2) > r.y + .01);
+    const NX = xs.length, NY = ys.length, id = (i, j, d) => (j * NX + i) * 4 + d, turn = 40 * z;
+    const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]], d0 = a[2] === 'l' ? 1 : a[2] === 't' ? 3 : a[2] === 'b' ? 2 : 0;
+    const need = b[2] === 'l' ? 0 : b[2] === 'r' ? 1 : b[2] === 't' ? 2 : 3;          // direction of travel when arriving (opposite the pin's outward side)
+    const iA = xs.indexOf(A[0]), jA = ys.indexOf(A[1]), iB = xs.indexOf(B[0]), jB = ys.indexOf(B[1]);
+    const dist = new Map(), prev = new Map(), heap = [];
+    const push = (c, s) => { heap.push([c, s]); let i = heap.length - 1; while (i) { const p = (i - 1) >> 1; if (heap[p][0] <= heap[i][0]) break; [heap[p], heap[i]] = [heap[i], heap[p]]; i = p; } };
+    const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; let i = 0; for (;;) { let l = 2 * i + 1, rr = l + 1, m2 = i; if (l < heap.length && heap[l][0] < heap[m2][0]) m2 = l; if (rr < heap.length && heap[rr][0] < heap[m2][0]) m2 = rr; if (m2 === i) break; [heap[m2], heap[i]] = [heap[i], heap[m2]]; i = m2; } } return top; };
+    const s0 = id(iA, jA, d0); dist.set(s0, 0); push(0, s0);
+    let goal = -1, best = 1e18, steps = 0;
+    while (heap.length && steps++ < 6000) {
+      const [c, st] = pop(); if (c > (dist.get(st) ?? 1e18)) continue; if (c >= best) break;
+      const d = st % 4, cell = (st - d) / 4, i = cell % NX, j = (cell - i) / NX;
+      if (i === iB && j === jB) { const tot = c + (d === need ? 0 : turn); if (tot < best) { best = tot; goal = st; } continue; }
+      dirs.forEach((dv, nd) => {
+        const ni = i + dv[0], nj = j + dv[1]; if (ni < 0 || nj < 0 || ni >= NX || nj >= NY) return;
+        if (nd === (d ^ 1) && d !== d0) return;                       // no instant U-turns
+        const blocked = dv[1] === 0 ? blockH(ys[j], xs[i], xs[ni]) : blockV(xs[i], ys[j], ys[nj]); if (blocked) return;
+        const cost = c + Math.abs(xs[ni] - xs[i]) + Math.abs(ys[nj] - ys[j]) + (nd === d ? 0 : turn), ns = id(ni, nj, nd);
+        if (cost < (dist.get(ns) ?? 1e18)) { dist.set(ns, cost); prev.set(ns, st); push(cost, ns); }
+      });
+    }
+    if (goal < 0) return plain;
+    const pts = []; for (let st = goal; st !== undefined; st = prev.get(st)) { const cell = (st - st % 4) / 4; pts.push([xs[cell % NX], ys[(cell - cell % NX) / NX]]); }
+    pts.reverse(); pts.unshift([a[0], a[1]]); pts.push([b[0], b[1]]);
+    const P = pts.filter((p, i) => !i || Math.abs(p[0] - pts[i - 1][0]) + Math.abs(p[1] - pts[i - 1][1]) > .5);
+    const Q = P.filter((p, i) => i === 0 || i === P.length - 1 || !((P[i - 1][0] === p[0] && p[0] === P[i + 1][0]) || (P[i - 1][1] === p[1] && p[1] === P[i + 1][1])));   // drop points on a straight run
+    let dd = 'M' + Q[0][0] + ' ' + Q[0][1];
+    for (let i = 1; i < Q.length - 1; i++) {                           // round the corners
+      const p = Q[i - 1], c = Q[i], n = Q[i + 1], l1 = Math.hypot(c[0] - p[0], c[1] - p[1]), l2 = Math.hypot(n[0] - c[0], n[1] - c[1]), rr = Math.min(18 * z, l1 / 2, l2 / 2);
+      dd += 'L' + (c[0] + (p[0] - c[0]) / l1 * rr) + ' ' + (c[1] + (p[1] - c[1]) / l1 * rr) + 'Q' + c[0] + ' ' + c[1] + ' ' + (c[0] + (n[0] - c[0]) / l2 * rr) + ' ' + (c[1] + (n[1] - c[1]) / l2 * rr);
+    }
+    return dd + 'L' + Q[Q.length - 1][0] + ' ' + Q[Q.length - 1][1];
+  }
   function drawWires() {
     if (!autoOpen) return;
     const W = acanvas.offsetWidth + GAPX, H = acanvas.offsetHeight;
     awires.style.setProperty('--z', v.z); awires.setAttribute('width', W); awires.setAttribute('height', H);
     let s = '', defs = '';
-    const nowT = performance.now();
+    const nowT = performance.now(), rects = nodeRects();
     auto.links.forEach((l, n) => {
       const a = outPos(l[0], l[3]), b = inPos(l[1], l[2], W); if (!a || !b) return;
-      const d = wirePath(a[0], a[1], b[0], b[1], b[2], a[2]);
+      const d = routeWire(a, b, rects);
       s += '<g class="wg' + (badLink(l) ? ' bad' : '') + ((lglow.get(l[0] + l[1] + l[2]) || 0) > nowT ? ' on' : '') + '" data-n="' + n + '" style="--wc:' + wireFill(l, n, a, b, (x) => { defs += x; }) + '"><path class="hit" d="' + d + '"/><path class="vis" d="' + d + '"/></g>';
     });
     if (wd) { const a = outPos(wd.id, wd.fp); if (a) s += '<path class="tmp" style="--wc:' + pinColor(nodeById(wd.id), outKey(wd.fp)) + '" d="' + wirePath(a[0], a[1], wd.cx, wd.cy, wd.snapB ? wd.snapB[2] : undefined, a[2]) + '"/>'; }
