@@ -24,12 +24,13 @@
     --grid: 20px;
     --mono: 'Major Mono Display', 'Roboto Mono', monospace;
   }
+  @property --dot { syntax: '<color>'; inherits: true; initial-value: #cdd0da; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; width: 100%; height: 100%; }
   body {
     font-family: 'Montserrat', system-ui, sans-serif;
     background-color: #fff;
-    background-image: radial-gradient(circle at center, #cdd0da 1.7px, transparent 2.3px);
+    --dot: #cdd0da; background-image: radial-gradient(circle at center, var(--dot) 1.7px, transparent 2.3px);
     background-size: var(--grid) var(--grid);
     background-position: calc(var(--grid) / -2) calc(var(--grid) / -2);
     overflow: hidden;
@@ -37,6 +38,21 @@
     user-select: none;
     -webkit-user-select: none;
   }
+  body.dark { background-color: #333; --dot: #4a4a4d; }
+  body.fading, body.fading *:not(.theme):not(.theme *):not(.recenter) { transition: background-color .7s ease, color .7s ease, border-color .7s ease, --dot .7s ease, fill .7s ease, box-shadow .7s ease !important; }
+  .theme { position: fixed; bottom: 116px; right: 16px; z-index: 100; width: 40px; height: 40px; padding: 0; border-radius: 20px; background: var(--glass); background-clip: padding-box; border: 2px solid var(--glass-border); -webkit-backdrop-filter: blur(6px) saturate(1.4); backdrop-filter: blur(6px) saturate(1.4); cursor: pointer; display: grid; place-items: center; transition: transform .3s var(--spring), background .2s; }
+  .theme:hover { transform: scale(1.08); } .theme:active { transform: scale(.92); }
+  .theme svg { width: 24px; height: 24px; fill: #fff; stroke: #fff; overflow: visible; }
+  .theme .tgd { stroke: none; transform: scale(.556); transform-origin: 12px 12px; }
+  .theme .tgc { transform: translate(24px,-24px); transform-origin: 12px 12px; }
+  .theme .tgr { transform-origin: 12px 12px; }
+  .theme .tgr line { stroke-width: 2; stroke-linecap: round; }
+  .theme .tgs { transform-origin: 12px 12px; transform: rotate(90deg); }
+  .theme.moon .tgd { transform: scale(1); } .theme.moon .tgc { transform: translate(5px,-5px); }
+  .theme.moon .tgr { transform: rotate(90deg) scale(.15); opacity: 0; } .theme.moon .tgs { transform: rotate(0deg); }
+  .theme.rdy .tgd, .theme.rdy .tgc { transition: transform .75s cubic-bezier(.65,0,.25,1); }
+  .theme.rdy .tgr { transition: transform .6s cubic-bezier(.65,0,.25,1), opacity .5s ease; }
+  .theme.rdy .tgs { transition: transform .9s cubic-bezier(.65,0,.25,1); }
   body.placing, body.placing * { cursor: crosshair !important; }
   button { font: inherit; color: inherit; }
   svg { fill: #fff; display: block; }
@@ -477,6 +493,7 @@
   .kguide .kk { display: flex; align-items: center; gap: 3px; margin: 0 7px; } .kguide .kk span { margin-left: 4px; }
   .kguide .kk > span, .kguide > span:not(.kk) { display: inline-block; color: #fff; background: rgba(20,20,22,.78); padding: 3px 9px; border-radius: 9px; font-size: 10px; }   /* its own dark chip, so the words stay readable on the page and on the board */
   .kguide.show { opacity: 1; transform: translate(-50%, 0); }
+  .kguide .kk { transition: opacity .18s ease; } .kguide .kk.dim { opacity: .3; } .kguide kbd.down { background: #fff !important; color: #111 !important; transform: translateY(1px) scale(.96); } .kguide kbd { transition: background .12s, color .12s, transform .12s; }
   .kguide kbd { font: 600 9px 'Montserrat', sans-serif; color: #fff; background: #555; border: 2px solid rgba(0,0,0,.18); background-clip: padding-box; border-radius: 7px; padding: 4px 8px; }
   .popwrap { position: fixed; left: 50%; bottom: 72px; transform: translateX(-50%); z-index: 400; display: flex; flex-direction: column-reverse; align-items: center; gap: 8px; pointer-events: none; width: max-content; max-width: calc(100vw - 32px); }
   .popmsg { pointer-events: auto; cursor: pointer; display: flex; justify-content: center; overflow: hidden; border-radius: 999px; background: rgba(0,0,0,.74); border: 2px solid rgba(0,0,0,.35); background-clip: padding-box; color: #fff;
@@ -522,9 +539,6 @@
   .anode.t-mover .mvs { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; display: none; }
   .anode.t-mover .mvs path { fill: none; stroke: rgba(255,255,255,.55); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; transition: d .25s var(--spring); }
   .anode.t-mover.single .mvs { display: block; } .anode.t-mover.single .mvl { display: none; }
-  .anode.t-mover .mrot { position: absolute; top: -9px; right: -9px; width: 22px; height: 22px; padding: 0; border: 0; border-radius: 50%; background: #5a5a5a; display: grid; place-items: center; cursor: pointer; opacity: 0; transform: scale(.5); transition: opacity .2s, transform .3s var(--spring); z-index: 2; }
-  .anode.t-mover:hover .mrot, .anode.t-mover.picked .mrot { opacity: 1; transform: none; } .anode.t-mover .mrot:hover { transform: scale(1.15); }
-  .anode.t-mover .mrot svg { width: 14px; height: 14px; fill: #fff; transform: scaleX(-1); } .anode.t-mover.mvert .mrot svg { transform: none; }
   .anode.t-mover .mvz { position: absolute; right: -8px; bottom: -8px; width: 20px; height: 20px; cursor: nwse-resize; opacity: 0; transition: opacity .2s; z-index: 2; }
   .anode.t-mover .mvz::before { content: ''; position: absolute; right: 5px; bottom: 5px; width: 9px; height: 9px; border-right: 3px solid rgba(255,255,255,.8); border-bottom: 3px solid rgba(255,255,255,.8); border-radius: 0 0 8px 0; }
   .anode.t-mover:hover .mvz, .anode.t-mover.picked .mvz { opacity: 1; }
@@ -651,9 +665,9 @@
   .dtip.show { opacity: 1; transform: none; }
   .dtip svg { position: absolute; left: 0; top: 0; overflow: visible; z-index: -1; }
   .dtip { isolation: isolate; }
-  .recenter { position: fixed; right: 16px; bottom: 68px; z-index: 90; width: 44px; height: 44px; padding: 0; border: 0; background: none; cursor: pointer;
-    -webkit-backdrop-filter: invert(1); backdrop-filter: invert(1);                                   /* the icon shape just inverts whatever is behind it */
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13.5,13.5v1.75q0,0.32-0.21,0.54T12.75,16t-0.54-0.21T12,15.25V13.5q0-0.63 0.44-1.06T13.5,12h1.75q0.33,0 0.54,0.21Q16,12.43 16,12.75t-0.21,0.54T15.25,13.5H13.5Zm0,7h1.75q0.33,0 0.54,0.21Q16,20.93 16,21.25t-0.21,0.54T15.25,22H13.5q-0.63,0-1.06-0.44T12,20.5V18.75q0-0.32 0.21-0.54T12.75,18t0.54,0.21q0.21,0.21 0.21,0.54V20.5Zm7-7H18.75q-0.32,0-0.54-0.21T18,12.75t0.21-0.54T18.75,12H20.5q0.63,0 1.06,0.44T22,13.5v1.75q0,0.32-0.21,0.54T21.25,16q-0.32,0-0.54-0.21T20.5,15.25V13.5Zm0,7V18.75q0-0.32 0.21-0.54T21.25,18t0.54,0.21Q22,18.43 22,18.75V20.5q0,0.63-0.44,1.06T20.5,22H18.75q-0.32,0-0.54-0.21T18,21.25t0.21-0.54t0.54-0.21H20.5ZM12,5Q9.08,5 7.04,7.04T5,12q0,1.8 0.81,3.3T8,17.75V16q0-0.43 0.29-0.71Q8.58,15 9,15q0.43,0 0.71,0.29T10,16v4q0,0.43-0.29,0.71T9,21H5q-0.42,0-0.71-0.29Q4,20.43 4,20t0.29-0.71T5,19H6.35Q4.8,17.75 3.9,15.94T3,12q0-1.88 0.71-3.51T5.64,5.64Q6.85,4.42 8.49,3.71T12,3q2.85,0 5.1,1.56t3.25,4.06q0.15,0.4 0,0.77T19.8,9.92t-0.79,0q-0.39-0.15-0.54-0.55Q17.7,7.43 15.96,6.21T12,5Z'/%3E%3C/svg%3E") center / 30px 30px no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13.5,13.5v1.75q0,0.32-0.21,0.54T12.75,16t-0.54-0.21T12,15.25V13.5q0-0.63 0.44-1.06T13.5,12h1.75q0.33,0 0.54,0.21Q16,12.43 16,12.75t-0.21,0.54T15.25,13.5H13.5Zm0,7h1.75q0.33,0 0.54,0.21Q16,20.93 16,21.25t-0.21,0.54T15.25,22H13.5q-0.63,0-1.06-0.44T12,20.5V18.75q0-0.32 0.21-0.54T12.75,18t0.54,0.21q0.21,0.21 0.21,0.54V20.5Zm7-7H18.75q-0.32,0-0.54-0.21T18,12.75t0.21-0.54T18.75,12H20.5q0.63,0 1.06,0.44T22,13.5v1.75q0,0.32-0.21,0.54T21.25,16q-0.32,0-0.54-0.21T20.5,15.25V13.5Zm0,7V18.75q0-0.32 0.21-0.54T21.25,18t0.54,0.21Q22,18.43 22,18.75V20.5q0,0.63-0.44,1.06T20.5,22H18.75q-0.32,0-0.54-0.21T18,21.25t0.21-0.54t0.54-0.21H20.5ZM12,5Q9.08,5 7.04,7.04T5,12q0,1.8 0.81,3.3T8,17.75V16q0-0.43 0.29-0.71Q8.58,15 9,15q0.43,0 0.71,0.29T10,16v4q0,0.43-0.29,0.71T9,21H5q-0.42,0-0.71-0.29Q4,20.43 4,20t0.29-0.71T5,19H6.35Q4.8,17.75 3.9,15.94T3,12q0-1.88 0.71-3.51T5.64,5.64Q6.85,4.42 8.49,3.71T12,3q2.85,0 5.1,1.56t3.25,4.06q0.15,0.4 0,0.77T19.8,9.92t-0.79,0q-0.39-0.15-0.54-0.55Q17.7,7.43 15.96,6.21T12,5Z'/%3E%3C/svg%3E") center / 30px 30px no-repeat; }
+  .recenter { position: fixed; right: 16px; bottom: 68px; z-index: 90; width: 40px; height: 40px; padding: 0; border-radius: 20px; background: var(--glass); background-clip: padding-box; border: 2px solid var(--glass-border); -webkit-backdrop-filter: blur(6px) saturate(1.4); backdrop-filter: blur(6px) saturate(1.4); cursor: pointer; transition: transform .3s var(--spring); }
+  .recenter:hover { transform: scale(1.08); } .recenter:active { transform: scale(.92); }
+  .recenter::before { content: ''; position: absolute; inset: 0; background: #fff; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13.5,13.5v1.75q0,0.32-0.21,0.54T12.75,16t-0.54-0.21T12,15.25V13.5q0-0.63 0.44-1.06T13.5,12h1.75q0.33,0 0.54,0.21Q16,12.43 16,12.75t-0.21,0.54T15.25,13.5H13.5Zm0,7h1.75q0.33,0 0.54,0.21Q16,20.93 16,21.25t-0.21,0.54T15.25,22H13.5q-0.63,0-1.06-0.44T12,20.5V18.75q0-0.32 0.21-0.54T12.75,18t0.54,0.21q0.21,0.21 0.21,0.54V20.5Zm7-7H18.75q-0.32,0-0.54-0.21T18,12.75t0.21-0.54T18.75,12H20.5q0.63,0 1.06,0.44T22,13.5v1.75q0,0.32-0.21,0.54T21.25,16q-0.32,0-0.54-0.21T20.5,15.25V13.5Zm0,7V18.75q0-0.32 0.21-0.54T21.25,18t0.54,0.21Q22,18.43 22,18.75V20.5q0,0.63-0.44,1.06T20.5,22H18.75q-0.32,0-0.54-0.21T18,21.25t0.21-0.54t0.54-0.21H20.5ZM12,5Q9.08,5 7.04,7.04T5,12q0,1.8 0.81,3.3T8,17.75V16q0-0.43 0.29-0.71Q8.58,15 9,15q0.43,0 0.71,0.29T10,16v4q0,0.43-0.29,0.71T9,21H5q-0.42,0-0.71-0.29Q4,20.43 4,20t0.29-0.71T5,19H6.35Q4.8,17.75 3.9,15.94T3,12q0-1.88 0.71-3.51T5.64,5.64Q6.85,4.42 8.49,3.71T12,3q2.85,0 5.1,1.56t3.25,4.06q0.15,0.4 0,0.77T19.8,9.92t-0.79,0q-0.39-0.15-0.54-0.55Q17.7,7.43 15.96,6.21T12,5Z'/%3E%3C/svg%3E") center / 26px 26px no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13.5,13.5v1.75q0,0.32-0.21,0.54T12.75,16t-0.54-0.21T12,15.25V13.5q0-0.63 0.44-1.06T13.5,12h1.75q0.33,0 0.54,0.21Q16,12.43 16,12.75t-0.21,0.54T15.25,13.5H13.5Zm0,7h1.75q0.33,0 0.54,0.21Q16,20.93 16,21.25t-0.21,0.54T15.25,22H13.5q-0.63,0-1.06-0.44T12,20.5V18.75q0-0.32 0.21-0.54T12.75,18t0.54,0.21q0.21,0.21 0.21,0.54V20.5Zm7-7H18.75q-0.32,0-0.54-0.21T18,12.75t0.21-0.54T18.75,12H20.5q0.63,0 1.06,0.44T22,13.5v1.75q0,0.32-0.21,0.54T21.25,16q-0.32,0-0.54-0.21T20.5,15.25V13.5Zm0,7V18.75q0-0.32 0.21-0.54T21.25,18t0.54,0.21Q22,18.43 22,18.75V20.5q0,0.63-0.44,1.06T20.5,22H18.75q-0.32,0-0.54-0.21T18,21.25t0.21-0.54t0.54-0.21H20.5ZM12,5Q9.08,5 7.04,7.04T5,12q0,1.8 0.81,3.3T8,17.75V16q0-0.43 0.29-0.71Q8.58,15 9,15q0.43,0 0.71,0.29T10,16v4q0,0.43-0.29,0.71T9,21H5q-0.42,0-0.71-0.29Q4,20.43 4,20t0.29-0.71T5,19H6.35Q4.8,17.75 3.9,15.94T3,12q0-1.88 0.71-3.51T5.64,5.64Q6.85,4.42 8.49,3.71T12,3q2.85,0 5.1,1.56t3.25,4.06q0.15,0.4 0,0.77T19.8,9.92t-0.79,0q-0.39-0.15-0.54-0.55Q17.7,7.43 15.96,6.21T12,5Z'/%3E%3C/svg%3E") center / 26px 26px no-repeat; }
   .save { position: fixed; right: 16px; bottom: 16px; z-index: 90; display: flex; gap: 8px; }
   .save button {
     height: 40px; padding: 0 16px; border-radius: 20px; border: 2px solid var(--glass-border);
@@ -828,6 +842,7 @@
 
 <a class="gh" id="gh" href="https://github.com/" target="_blank" rel="noopener" title="View the source on GitHub"><svg viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg>GitHub</a>
 
+<button class="theme" id="theme" aria-label="Switch between light and dark"></button>
 <button class="recenter" id="recenter" title="Reset the view to the centre" aria-label="Reset the view"></button>
 
 <div class="save">
@@ -902,6 +917,16 @@
   };
   const SAFE_SRC = /^data:((image|audio)\/[a-z0-9.+-]+|application\/octet-stream);base64,/i;
   const ubHeld = new Set(); let ubBind = null;
+  let darkOn = (() => { try { return localStorage.getItem('cueTheme') === 'dark'; } catch (e) { return false; } })();
+  const THEME_ICON = { dark: '<svg viewBox="0 0 24 24"><path d="M8.46,15.54Q7,14.08 7,12Q7,9.92 8.46,8.46T12,7t3.54,1.46T17,12t-1.46,3.54T12,17q-2.07,0-3.54-1.46ZM2,13q-0.42,0-0.71-0.29Q1,12.43 1,12t0.29-0.71T2,11H4q0.42,0 0.71,0.29T5,12T4.71,12.71T4,13H2Zm18,0q-0.42,0-0.71-0.29Q19,12.43 19,12t0.29-0.71T20,11h2q0.43,0 0.71,0.29T23,12t-0.29,0.71T22,13H20ZM11.29,4.71Q11,4.42 11,4V2q0-0.43 0.29-0.71T12,1t0.71,0.29T13,2V4q0,0.42-0.29,0.71T12,5T11.29,4.71Zm0,18Q11,22.43 11,22V20q0-0.43 0.29-0.71T12,19t0.71,0.29T13,20v2q0,0.43-0.29,0.71T12,23t-0.71-0.29ZM5.65,7.05L4.58,6Q4.28,5.72 4.29,5.3T4.58,4.57q0.3-0.3 0.73-0.3T6,4.57L7.05,5.65q0.27,0.3 0.27,0.7T7.05,7.05T6.36,7.34T5.65,7.05ZM18,19.43l-1.05-1.07q-0.27-0.3-0.27-0.71q0-0.41 0.27-0.69q0.28-0.3 0.69-0.29t0.71,0.29L19.43,18q0.3,0.27 0.29,0.7t-0.29,0.73q-0.3,0.3-0.73,0.3q-0.42,0-0.7-0.3ZM16.95,7.05q-0.3-0.28-0.29-0.69t0.29-0.71L18,4.57q0.28-0.3 0.7-0.29q0.43,0.01 0.73,0.29q0.3,0.3 0.3,0.73q0,0.42-0.3,0.7L18.35,7.05q-0.3,0.27-0.7,0.27t-0.7-0.27ZM4.58,19.43q-0.3-0.3-0.3-0.73T4.58,18l1.08-1.05q0.3-0.27 0.71-0.27t0.69,0.27q0.3,0.28 0.29,0.69T7.05,18.35L6,19.43q-0.27,0.3-0.7,0.29T4.58,19.43Z"/></svg>', light: '<svg viewBox="0 0 24 24"><path d="M12,21q-3.78,0-6.39-2.61Q3,15.78 3,12Q3,8.55 5.25,6.01T11,3.05Q11.33,3 11.58,3.14t0.4,0.36q0.15,0.22 0.16,0.52T11.95,4.6q-0.43,0.65-0.64,1.38T11.1,7.5q0,2.25 1.57,3.82T16.5,12.9q0.78,0 1.54-0.22t1.36-0.63q0.27-0.17 0.56-0.16t0.51,0.14q0.25,0.13 0.39,0.38T20.95,13q-0.35,3.45-2.94,5.73Q15.43,21 12,21Z"/></svg>' };
+  const THEME_SVG = '<svg viewBox="0 0 24 24"><defs><mask id="tgm"><rect width="24" height="24" fill="#fff" stroke="none"/><circle class="tgc" cx="12" cy="12" r="7" fill="#000" stroke="none"/></mask></defs><g class="tgs"><circle class="tgd" cx="12" cy="12" r="9" mask="url(#tgm)"/><g class="tgr"><line x1="12" y1="1.5" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22.5" y2="12"/><line x1="4.6" y1="4.6" x2="6.4" y2="6.4"/><line x1="17.6" y1="17.6" x2="19.4" y2="19.4"/><line x1="4.6" y1="19.4" x2="6.4" y2="17.6"/><line x1="17.6" y1="6.4" x2="19.4" y2="4.6"/></g></g></svg>';
+  function applyTheme(on, save1) {
+    if (document.body.classList.contains('dark') !== on && document.getElementById('theme') && document.getElementById('theme').classList.contains('rdy')) { document.body.classList.add('fading'); clearTimeout(applyTheme.t); applyTheme.t = setTimeout(() => document.body.classList.remove('fading'), 800); }
+    darkOn = on; document.body.classList.toggle('dark', on);
+    const tb = document.getElementById('theme'); if (tb) { if (!tb.firstChild) tb.innerHTML = THEME_SVG; tb.classList.toggle('moon', on); if (!tb.classList.contains('rdy')) requestAnimationFrame(() => requestAnimationFrame(() => tb.classList.add('rdy'))); tb.title = on ? 'Switch to light mode' : 'Switch to dark mode'; }
+    if (save1) { try { localStorage.setItem('cueTheme', on ? 'dark' : 'light'); } catch (e) {} }
+    if (typeof items !== 'undefined') items.forEach(i => { if (i.type === 'text' && els[i.id]) styleText(i, els[i.id]); });
+  }
   let items = [], els = {}, players = {}, selId = null, placing = null, editingId = null, pickFor = null, ro;
   const GRID = 20;                                   // keep in sync with --grid in the CSS
   const snap = v => Math.round(v / GRID) * GRID;
@@ -1187,7 +1212,7 @@
   }
   function styleText(it, el) {
     const c = el.querySelector('.content');
-    c.style.fontFamily = fam(it.font); c.style.fontSize = it.fs + 'px'; c.style.color = it.color;
+    c.style.fontFamily = fam(it.font); c.style.fontSize = it.fs + 'px'; c.style.color = darkOn && /^#111111$/i.test(it.color) ? '#f2f2f2' : it.color;      // the default black text turns white on the dark board
     c.style.fontWeight = it.bold ? 700 : 400; c.style.fontStyle = it.italic ? 'italic' : 'normal';
     el.style.width = it.w + 'px';
   }
@@ -1264,6 +1289,7 @@
   }
   const kickBoard = () => { if (!bRaf) { bT = performance.now(); bRaf = requestAnimationFrame(bstep); } };
   // (no zooming on the board: scrolling is left alone, only panning)
+  applyTheme(darkOn); $('#theme').addEventListener('click', () => applyTheme(!darkOn, true));
   $('#recenter').addEventListener('click', () => { bvt = { x: 0, y: 0, z: 1 }; kickBoard(); });
   world.addEventListener('dblclick', e => { if (e.target === world) { bvt = { x: 0, y: 0, z: 1 }; kickBoard(); } });         // double-click empty space: back to the start view
   addEventListener('pointerup', () => { bpn = null; world.classList.remove('panning'); }); addEventListener('pointercancel', () => { bpn = null; world.classList.remove('panning'); });
@@ -2348,7 +2374,7 @@
     else if (n.t === 'light') h += '<span class="lamp"></span><span class="nm">Light</span>';
     else if (n.t === 'rgb') h += '<div class="rgbw"><div class="rrows">' + [0, 1, 2].map(i => '<label class="rrow"><input class="ni rc" data-c="' + i + '" type="number" min="0" max="255" step="1" title="' + ['Red', 'Green', 'Blue'][i] + ' (0-255). Wire a value into the pin to drive it"></label>').join('') + '</div><span class="rsw"></span></div>';
     else if (n.t === 'matrix') h += '<span class="mlb mlc">colour</span><span class="mlb mlr">Clear</span><div class="mgrid">' + '<i class="mc"></i>'.repeat(256) + '</div><i class="mrz" title="Drag to resize the grid"></i>';
-    else if (n.t === 'mover') h += '<div class="mvt" title="Click to put the line here"></div><div class="mvl"></div><svg class="mvs"><path/></svg><button class="mrot" title="Turn it to the other side of the matrix"><svg viewBox="0 0 24 24"><path d="M19.75,12.05q-0.3,0-0.59-0.21q-0.29-0.21-0.36-0.54q-0.13-0.47-0.31-0.94T18.05,9.48Q17.88,9.2 17.93,8.86T18.2,8.3Q18.58,7.95 19.06,8T19.8,8.48q0.32,0.55 0.57,1.13q0.25,0.57 0.4,1.2q0.13,0.5-0.19,0.88t-0.84,0.38Zm-6.7,8.7q0-0.3 0.21-0.59T13.8,19.8q0.47-0.13 0.94-0.31t0.89-0.44q0.28-0.18 0.61-0.13T16.8,19.2q0.35,0.38 0.3,0.86T16.63,20.8q-0.57,0.32-1.15,0.56T14.3,21.78q-0.5,0.13-0.88-0.17t-0.38-0.85ZM18.2,17.8q-0.22-0.2-0.27-0.55t0.13-0.63q0.25-0.43 0.44-0.89q0.19-0.46 0.31-0.94q0.07-0.32 0.35-0.54t0.6-0.21q0.55,0 0.85,0.38t0.18,0.88q-0.18,0.6-0.41,1.18T19.8,17.63q-0.25,0.43-0.74,0.48T18.2,17.8ZM9.83,21.75q-2.98-0.8-4.88-3.2t-1.9-5.5q0-3.75 2.63-6.37t6.38-2.63H12.2L11.33,3.17q-0.28-0.27-0.28-0.7t0.3-0.72q0.27-0.28 0.7-0.28t0.72,0.28l2.58,2.6Q15.5,4.5 15.56,4.67t0.06,0.38T15.56,5.43T15.35,5.75l-2.6,2.6q-0.27,0.28-0.7,0.28t-0.7-0.28t-0.28-0.7t0.28-0.7l0.9-0.9h-0.2q-2.93,0-4.96,2.04q-2.04,2.04-2.04,4.96q0,2.43 1.47,4.29T10.3,19.8q0.32,0.07 0.54,0.35q0.21,0.28 0.21,0.6q0,0.52-0.36,0.82T9.83,21.75Z"/></svg></button><i class="mvz" title="Drag to make it wider or narrower"></i>';
+    else if (n.t === 'mover') h += '<div class="mvt" title="Click to put the line here"></div><div class="mvl"></div><svg class="mvs"><path/></svg><i class="mvz" title="Drag to make it wider or narrower"></i>';
     else if (n.t === 'split') { h += '<svg class="slines"></svg><i class="srz" title="Drag to resize. A bigger Splitter fits more pins"></i>'; }
     else h += '<span class="nm">' + LABEL[n.t] + '</span>';
     if (sp.out && n.t !== 'split') for (let o = 0; o < (sp.outs || 1); o++) h += '<i class="port" data-o="' + o + '"></i>';
@@ -2365,7 +2391,6 @@
     }
     else if (nk) nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, (n.t === 'ui' ? items.filter(o => o.type === 'button') : auto.btns).map((b, i) => ({ id: b.id, sm: i + 1, label: b.name })), id => { n.btn = id; save(); }); });
     if (n.t === 'mover') {
-      el.querySelector('.mrot').addEventListener('click', e => { e.stopPropagation(); n.mvr = n.mvr ? 0 : 1; save(); drawWires(); });
       el.querySelector('.mvt').addEventListener('click', e => {             // click the pill to put the line there
         const r = el.getBoundingClientRect(), c = ((n.mvr ? e.clientY - r.top : e.clientX - r.left) / v.z - MVE) / MVP, k = Math.max(0, Math.min(n.mvw - 1, Math.floor(c)));
         if (e.target.closest('.ip, .port')) return; n.mvk = k; mvcur[n.id] = k; updMover(n); save();
@@ -2600,6 +2625,14 @@
   /* key guide: a small "[Key] does something" hint at the bottom-middle while a modifier key is useful */
   const kg = document.createElement('div'); kg.className = 'kguide'; document.body.appendChild(kg);
   let kgKey = '';
+  const kgHeld = new Set(), kgName = k => ({ Control: 'Ctrl', Escape: 'Esc', ' ': 'Space' }[k] || (k.length === 1 ? k.toUpperCase() : k));
+  function kgLight() {                                   // holding keys lights them up; chords that don't include everything you hold fade away
+    kg.querySelectorAll('kbd').forEach(k => k.classList.toggle('down', kgHeld.has(k.textContent)));
+    kg.querySelectorAll('.kk').forEach(c => { const keys = [...c.querySelectorAll('kbd')].map(k => k.textContent), hit = !kgHeld.size || [...kgHeld].every(h => keys.includes(h)); c.classList.toggle('dim', !hit); c.classList.toggle('hit', !!kgHeld.size && hit); });
+  }
+  addEventListener('keydown', e => { kgHeld.add(kgName(e.key)); kgLight(); }, true);
+  addEventListener('keyup', e => { kgHeld.delete(kgName(e.key)); if (e.key === 'Control' || e.key === 'Meta') kgHeld.delete('Ctrl'); kgLight(); }, true);
+  addEventListener('blur', () => { kgHeld.clear(); kgLight(); });
   setInterval(() => {
     let g = null;
     if (typeof placing !== 'undefined' && placing) g = ['Esc', 'to cancel placing'];
@@ -2609,7 +2642,7 @@
     else if (typeof autoOpen !== 'undefined' && autoOpen && !(typeof popWrap !== 'undefined' && 0)) g = [[['Ctrl', 'Z'], 'undo'], [['Ctrl', 'Shift', 'Z'], 'redo'], [['Ctrl', 'D'], 'duplicate']];
     const key = g ? JSON.stringify(g) : '';
     if (key === kgKey) return; kgKey = key;
-    if (g) { kg.innerHTML = typeof g[0] === 'string' ? '<kbd>' + g[0] + '</kbd><span>' + g[1] + '</span>' : g.map(([ks, t]) => '<span class="kk">' + ks.map(k => '<kbd>' + k + '</kbd>').join('') + '<span>' + t + '</span></span>').join(''); kg.classList.add('show'); } else kg.classList.remove('show');
+    if (g) { kg.innerHTML = typeof g[0] === 'string' ? '<kbd>' + g[0] + '</kbd><span>' + g[1] + '</span>' : g.map(([ks, t]) => '<span class="kk">' + ks.map(k => '<kbd>' + k + '</kbd>').join('') + '<span>' + t + '</span></span>').join(''); kgLight(); kg.classList.add('show'); } else kg.classList.remove('show');
   }, 120);
 
   /* text pop-ups (from the Print node) */
@@ -2663,7 +2696,8 @@
   const asb = document.createElement('div'); asb.className = 'asbar'; acanvas.appendChild(asb);
   asb.innerHTML = '<button class="col" title="Change pin colours: inputs, outputs, values or properties"><span class="sw"></span>Colour</button>'
     + '<button class="cap" title="Add or edit a caption under the node (clear the text to remove it)"><svg viewBox="0 0 24 24"><path d="M4 8h16M4 12h16M4 16h9"/></svg><span>Caption</span></button>'
-    + '<button class="mvm" title="Many input pins, or one pin that the line points at"><svg viewBox="0 0 24 24"><path d="M12 4v8M6 12h12M6 12v8M18 12v8"/></svg><span>Single input pin</span></button>'
+    + '<button class="rot" title="Turn it to the other side of the matrix"><svg viewBox="0 0 24 24" style="transform:scaleX(-1)"><path d="M19.75,12.05q-0.3,0-0.59-0.21q-0.29-0.21-0.36-0.54q-0.13-0.47-0.31-0.94T18.05,9.48Q17.88,9.2 17.93,8.86T18.2,8.3Q18.58,7.95 19.06,8T19.8,8.48q0.32,0.55 0.57,1.13q0.25,0.57 0.4,1.2q0.13,0.5-0.19,0.88t-0.84,0.38Zm-6.7,8.7q0-0.3 0.21-0.59T13.8,19.8q0.47-0.13 0.94-0.31t0.89-0.44q0.28-0.18 0.61-0.13T16.8,19.2q0.35,0.38 0.3,0.86T16.63,20.8q-0.57,0.32-1.15,0.56T14.3,21.78q-0.5,0.13-0.88-0.17t-0.38-0.85ZM18.2,17.8q-0.22-0.2-0.27-0.55t0.13-0.63q0.25-0.43 0.44-0.89q0.19-0.46 0.31-0.94q0.07-0.32 0.35-0.54t0.6-0.21q0.55,0 0.85,0.38t0.18,0.88q-0.18,0.6-0.41,1.18T19.8,17.63q-0.25,0.43-0.74,0.48T18.2,17.8ZM9.83,21.75q-2.98-0.8-4.88-3.2t-1.9-5.5q0-3.75 2.63-6.37t6.38-2.63H12.2L11.33,3.17q-0.28-0.27-0.28-0.7t0.3-0.72q0.27-0.28 0.7-0.28t0.72,0.28l2.58,2.6Q15.5,4.5 15.56,4.67t0.06,0.38T15.56,5.43T15.35,5.75l-2.6,2.6q-0.27,0.28-0.7,0.28t-0.7-0.28t-0.28-0.7t0.28-0.7l0.9-0.9h-0.2q-2.93,0-4.96,2.04q-2.04,2.04-2.04,4.96q0,2.43 1.47,4.29T10.3,19.8q0.32,0.07 0.54,0.35q0.21,0.28 0.21,0.6q0,0.52-0.36,0.82T9.83,21.75Z"/></svg><span>Rotate</span></button>'
+    + '<button class="mvm" title="Many input pins, or one pin that the line points at"><svg viewBox="0 0 24 24"><path d="M12 4v8M6 12h12M6 12v8M18 12v8"/></svg><span>Single-Pin Mode</span></button>'
     + '<button class="grp" title="Group the selected nodes so they move together"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4" stroke-dasharray="3 3.2"/><rect x="8" y="8" width="8" height="8" rx="2"/></svg><span>Group</span></button>'
     + '<button class="mv" title="Drag from here to move the selection"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>Move</button>'
     + '<button class="dup" title="Duplicate the selected nodes and the wires between them (Ctrl+D)"><svg viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="3.5"/><path d="M15.5 8.5V6.5a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h2"/></svg>Duplicate</button>'
@@ -2696,7 +2730,8 @@
     if (instant) { selBox.classList.add('inst'); requestAnimationFrame(() => selBox.classList.remove('inst')); }
     Object.assign(selBox.style, { left: x0 - 12 + 'px', top: y0 - 12 + 'px', width: x1 - x0 + 24 + 'px', height: y1 - y0 + 24 + 'px' });
     const grpBtn = asb.querySelector('.grp'), un = isOneGroup(ns);
-    const mvBtn = asb.querySelector('.mvm'); mvBtn.style.display = ns.length === 1 && ns[0].t === 'mover' ? '' : 'none'; if (ns.length === 1) mvBtn.querySelector('span').textContent = ns[0].mvs ? 'Many input pins' : 'Single input pin';
+    const rotBtn = asb.querySelector('.rot'); rotBtn.style.display = ns.length === 1 && ns[0].t === 'mover' ? '' : 'none';
+    const mvBtn = asb.querySelector('.mvm'); mvBtn.style.display = ns.length === 1 && ns[0].t === 'mover' ? '' : 'none'; if (ns.length === 1) mvBtn.querySelector('span').textContent = ns[0].mvs ? 'Multi-Pin Mode' : 'Single-Pin Mode';
     const capBtn = asb.querySelector('.cap'); capBtn.style.display = ns.length === 1 ? '' : 'none'; capBtn.querySelector('span').textContent = ns.length === 1 && ns[0].cap ? 'Edit caption' : 'Add caption';
     grpBtn.style.display = ns.length > 1 || ns[0].g ? '' : 'none'; grpBtn.querySelector('span').textContent = un ? 'Ungroup' : 'Group';
     asb.style.display = 'flex'; const w = asb.offsetWidth, h = asb.offsetHeight, W = acanvas.clientWidth, H = acanvas.clientHeight;
@@ -2733,6 +2768,7 @@
     selSet.clear(); copies.forEach(c => selSet.add(c.id)); save(); syncNodes();
   }
   asb.querySelector('.dup').addEventListener('click', dupSel);
+  asb.querySelector('.rot').addEventListener('click', e => { e.stopPropagation(); const ns = selNodes(), n = ns[0]; if (ns.length !== 1 || n.t !== 'mover') return; n.mvr = n.mvr ? 0 : 1; save(); drawWires(); placeBar(); });
   asb.querySelector('.mvm').addEventListener('click', e => { e.stopPropagation(); const ns = selNodes(), n = ns[0]; if (ns.length !== 1 || n.t !== 'mover') return; n.mvs = n.mvs ? 0 : 1; if (n.mvs) auto.links = auto.links.filter(l => !(l[1] === n.id && l[2] > 0 && l[2] < 16)); save(); drawWires(); placeBar(); });
   asb.querySelector('.cap').addEventListener('click', e => { e.stopPropagation(); const ns = selNodes(); if (ns.length === 1 && nodeEls[ns[0].id]) editCap(ns[0], nodeEls[ns[0].id]); });
   addEventListener('keydown', e => {
@@ -3407,7 +3443,7 @@
   /* what's new: edit this list when something ships (newest first) */
   const CHANGES = [
     { id: '2026-11-08', date: '8 Nov 2026', title: 'Nodes, menus and speed', groups: [
-      ['New nodes', ['Board Buttons got smaller, with an optional icon square: pick any Material icon, change the square\'s colour (the icon turns black or white by itself), or remove the square and colour the icon directly. Choosing a key is now a quiet fade instead of a pulse', 'Right-click any element on the main board (Audio, Images, Text, Button) for its menu: rename, files, keys, delete. Board Buttons can now be dragged too', 'A new [[UI Button]] node, at the top of the list, listens to a Button you place on the main board (+ menu). Click the board button, or press the key shown on its badge, and the node fires. Double-click the name to rename it', '[[Mover Setter]]: a signal into the top pin makes the Mover jump straight to the pin number held in it (or wired into the bottom pin), instantly, in both pin modes. Its L and R pins must both go to the same Mover\'s left and right pins', '[[Mover]]: a pill with a moving line. Signals into its left / right pins slide the line, and only the input the line sits on gets through. Many-pin or single-pin mode (right-click it), turn it with the corner button, drag the corner to resize', '[[RGB]] node and [[LED Matrix]] (resizable, each LED keeps the colour it was lit with)', '[[Property Changer]], plus property pins on [[IF]], [[VALUE]] and [[LOOP]]', '[[IF]] has a new pin under Value / Text to choose what it checks, so it can read a [[VALUE]]', 'The count on [[LOOP]] is now a value pin along the bottom', '[[Splitter]] nodes pass numbers straight through']],
+      ['New nodes', ['A moon / sun button in the top-right corner switches the board between light and dark, and remembers your choice', 'The shortcut hints light up the keys you are holding, and fade the shortcuts that do not include them', 'Board Buttons got smaller, with an optional icon square: pick any Material icon, change the square\'s colour (the icon turns black or white by itself), or remove the square and colour the icon directly. Choosing a key is now a quiet fade instead of a pulse', 'Right-click any element on the main board (Audio, Images, Text, Button) for its menu: rename, files, keys, delete. Board Buttons can now be dragged too', 'A new [[UI Button]] node, at the top of the list, listens to a Button you place on the main board (+ menu). Click the board button, or press the key shown on its badge, and the node fires. Double-click the name to rename it', '[[Mover Setter]]: a signal into the top pin makes the Mover jump straight to the pin number held in it (or wired into the bottom pin), instantly, in both pin modes. Its L and R pins must both go to the same Mover\'s left and right pins', '[[Mover]]: a pill with a moving line. Signals into its left / right pins slide the line, and only the input the line sits on gets through. Many-pin or single-pin mode (right-click it), turn it with the corner button, drag the corner to resize', '[[RGB]] node and [[LED Matrix]] (resizable, each LED keeps the colour it was lit with)', '[[Property Changer]], plus property pins on [[IF]], [[VALUE]] and [[LOOP]]', '[[IF]] has a new pin under Value / Text to choose what it checks, so it can read a [[VALUE]]', 'The count on [[LOOP]] is now a value pin along the bottom', '[[Splitter]] nodes pass numbers straight through']],
       ['Editing', ['Everything for a node is on the bar above the selection: colour, caption, a Mover\'s pin mode, group, move, duplicate and delete. Right-click no longer opens a menu', 'Captions under nodes, and click a group\'s label to rename it', 'Colour pins by kind: inputs, outputs, values or properties, on any number of pins', 'Keyboard hints in the node editor, and no dotted ring on selected nodes', 'The [[Splitter]] editor is 30% bigger']],
       ['Fixes and speed', ['Signals redraw the wires once per frame instead of once per wire, so big graphs no longer slow down and LED numbers come out right', '[[LED Matrix]] only combines a row and a column fired in the same moment', 'Wires no longer flip shape while zooming', 'Cursors: random colours, shown only on the board you are on, with presence dots on the tabs', 'Phones and tablets now see a "open this on a computer" note instead of the board']]
     ] },
