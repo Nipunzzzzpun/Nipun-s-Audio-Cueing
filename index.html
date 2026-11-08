@@ -2492,6 +2492,7 @@
   /* ---------- selection toolbar (colour / group / move / delete) and group frames ---------- */
   const asb = document.createElement('div'); asb.className = 'asbar'; acanvas.appendChild(asb);
   asb.innerHTML = '<button class="col" title="Change pin colours: inputs, outputs, values or properties"><span class="sw"></span>Colour</button>'
+    + '<button class="cap" title="Add or edit a caption under the node (clear the text to remove it)"><svg viewBox="0 0 24 24"><path d="M4 8h16M4 12h16M4 16h9"/></svg><span>Caption</span></button>'
     + '<button class="grp" title="Group the selected nodes so they move together"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4" stroke-dasharray="3 3.2"/><rect x="8" y="8" width="8" height="8" rx="2"/></svg><span>Group</span></button>'
     + '<button class="mv" title="Drag from here to move the selection"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>Move</button>'
     + '<button class="dup" title="Duplicate the selected nodes and the wires between them (Ctrl+D)"><svg viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="3.5"/><path d="M15.5 8.5V6.5a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h2"/></svg>Duplicate</button>'
@@ -2524,6 +2525,7 @@
     if (instant) { selBox.classList.add('inst'); requestAnimationFrame(() => selBox.classList.remove('inst')); }
     Object.assign(selBox.style, { left: x0 - 12 + 'px', top: y0 - 12 + 'px', width: x1 - x0 + 24 + 'px', height: y1 - y0 + 24 + 'px' });
     const grpBtn = asb.querySelector('.grp'), un = isOneGroup(ns);
+    const capBtn = asb.querySelector('.cap'); capBtn.style.display = ns.length === 1 ? '' : 'none'; capBtn.querySelector('span').textContent = ns.length === 1 && ns[0].cap ? 'Edit caption' : 'Add caption';
     grpBtn.style.display = ns.length > 1 || ns[0].g ? '' : 'none'; grpBtn.querySelector('span').textContent = un ? 'Ungroup' : 'Group';
     asb.style.display = 'flex'; const w = asb.offsetWidth, h = asb.offsetHeight, W = acanvas.clientWidth, H = acanvas.clientHeight;
     let top = y0 - h - 26; if (top < 6) top = Math.min(H - h - 6, y1 + 26);
@@ -2559,6 +2561,7 @@
     selSet.clear(); copies.forEach(c => selSet.add(c.id)); save(); syncNodes();
   }
   asb.querySelector('.dup').addEventListener('click', dupSel);
+  asb.querySelector('.cap').addEventListener('click', e => { e.stopPropagation(); const ns = selNodes(); if (ns.length === 1 && nodeEls[ns[0].id]) editCap(ns[0], nodeEls[ns[0].id]); });
   addEventListener('keydown', e => {
     if (!autoOpen || !selSet.size || !(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey || e.key.toLowerCase() !== 'd') return;
     if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || document.activeElement.isContentEditable) return;
@@ -2794,17 +2797,16 @@
     auto.links.push([from, to, p, fp]); save();
   }
 
-  /* right-click a node: the things the selection bar doesn't have (caption, Mover mode) */
+  /* right-click a node: the things the selection bar doesn't have (Mover mode; colour, caption, duplicate and delete are on the bar) */
   acanvas.addEventListener('contextmenu', e => {
     const node = e.target.closest('.anode'); if (!node) return; e.preventDefault();
     const n = nodeById(node.dataset.id); if (!n) return;
     if (!selSet.has(n.id)) { selSet.clear(); selSet.add(n.id); if (n.g) expandSel(); syncNodes(); }
     const many = selSet.size > 1, ents = [];
-    if (!many) { ents.push({ id: 'cap', sm: 'Aa', label: n.cap ? 'Edit caption' : 'Add caption' }); if (n.cap) ents.push({ id: 'nocap', sm: '–', label: 'Remove caption' }); }
     if (!many && n.t === 'mover') ents.push({ id: 'mvs', sm: '┬', label: n.mvs ? 'Many input pins' : 'Single input pin' });
     if (!ents.length) return;                                              // colour, duplicate and delete live on the bar above the selection
     pickList({ getBoundingClientRect: () => ({ left: e.clientX, bottom: e.clientY - 6 }) }, ents, id => {
-      if (id === 'mvs') { n.mvs = n.mvs ? 0 : 1; if (n.mvs) auto.links = auto.links.filter(l => !(l[1] === n.id && l[2] > 0 && l[2] < 16)); save(); drawWires(); } else if (id === 'cap') editCap(n, nodeEls[n.id]); else if (id === 'nocap') { n.cap = ''; save(); }
+      if (id === 'mvs') { n.mvs = n.mvs ? 0 : 1; if (n.mvs) auto.links = auto.links.filter(l => !(l[1] === n.id && l[2] > 0 && l[2] < 16)); save(); drawWires(); } 
     });
   });
   acanvas.addEventListener('pointerdown', e => {
@@ -3231,7 +3233,7 @@
   const CHANGES = [
     { id: '2026-11-08', date: '8 Nov 2026', title: 'Nodes, menus and speed', groups: [
       ['New nodes', ['[[Mover Setter]]: holds a number; a signal or number into its bottom pin makes the Mover wired to its left / right pins jump straight to that pin, instantly', '[[Mover]]: a pill with a moving line. Signals into its left / right pins slide the line, and only the input the line sits on gets through. Many-pin or single-pin mode (right-click it), turn it with the corner button, drag the corner to resize', '[[RGB]] node and [[LED Matrix]] (resizable, each LED keeps the colour it was lit with)', '[[Property Changer]], plus property pins on [[IF]], [[VALUE]] and [[LOOP]]', '[[IF]] has a new pin under Value / Text to choose what it checks, so it can read a [[VALUE]]', 'The count on [[LOOP]] is now a value pin along the bottom', '[[Splitter]] nodes pass numbers straight through']],
-      ['Editing', ['Right-click a node to add a caption (and switch a Mover\'s mode); colour, duplicate and delete are on the bar above the selection (the old ✕ and pencil buttons are gone)', 'Captions under nodes, and click a group\'s label to rename it', 'Colour pins by kind: inputs, outputs, values or properties, on any number of pins', 'Keyboard hints in the node editor, and no dotted ring on selected nodes', 'The [[Splitter]] editor is 30% bigger']],
+      ['Editing', ['Colour, caption, duplicate and delete are all on the bar above the selection; right-click is only for a Mover\'s pin mode', 'Captions under nodes, and click a group\'s label to rename it', 'Colour pins by kind: inputs, outputs, values or properties, on any number of pins', 'Keyboard hints in the node editor, and no dotted ring on selected nodes', 'The [[Splitter]] editor is 30% bigger']],
       ['Fixes and speed', ['Signals redraw the wires once per frame instead of once per wire, so big graphs no longer slow down and LED numbers come out right', '[[LED Matrix]] only combines a row and a column fired in the same moment', 'Wires no longer flip shape while zooming', 'Cursors: random colours, shown only on the board you are on, with presence dots on the tabs', 'Phones and tablets now see a "open this on a computer" note instead of the board']]
     ] },
     { id: 'earlier', date: 'Earlier', title: 'The basics', groups: [
