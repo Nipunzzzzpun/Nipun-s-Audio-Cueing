@@ -2068,7 +2068,7 @@
   }
   const matColor = n => { const l = inputsL(n.id, 1)[0], src = l && nodeById(l[0]); return src && src.t === 'rgb' ? '#' + rgbVal(src).map(x => x.toString(16).padStart(2, '0')).join('') : '#ffffff'; };
   function matLight(n) {                                            // row + column on together light that LED (and it stays lit until cleared)
-    const now = performance.now(), on = p => ((n.pt && n.pt[p]) || 0) > now || pin(n.id, p, new Set());
+    const now = performance.now(), on = p => ((n.pp && n.pp[p]) || 0) > now || pin(n.id, p, new Set());      // a pulse only counts for the burst it fired in (~30ms), so later signals don't join it
     const rs = [], cs = []; for (let r = 0; r < n.mh; r++) if (on(18 + r)) rs.push(r); for (let c = 0; c < n.mw; c++) if (on(2 + c)) cs.push(c);
     if (!rs.length || !cs.length) return;
     const rows = mrun[n.id] || (mrun[n.id] = n.mx.slice());
@@ -2920,7 +2920,7 @@
     else if (SPEC[n.t].gate) { if (val(to, prev)) emit(to, seen, st); }                      // a gate lets the event through only while its condition is true
     else if (n.t === 'prop') { if (p === 0) triggerProp(n); }
     else if (n.t === 'light') n.lit = performance.now() + 600;
-    else if (n.t === 'matrix') { if (p === 0) mrun[to] = Array(16).fill(0); else if (p >= 2) { (n.pt = n.pt || {})[p] = performance.now() + 600; matLight(n); } }
+    else if (n.t === 'matrix') { if (p === 0) mrun[to] = Array(16).fill(0); else if (p >= 2) { (n.pp = n.pp || {})[p] = performance.now() + 30; matLight(n); } }
   }
   function runBtn(b) {
     applyProps();
