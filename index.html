@@ -1792,7 +1792,7 @@
 
   /* ---------- automations: a small node graph that runs when a mapped button is pressed ---------- */
   const autoDock = $('#autoDock'), acanvas = $('#acanvas'), aworld = $('#aworld'), awires = $('#awires'), amaps = $('#amaps'), mlist = $('#mlist'), minner = $('#minner'), azp = $('#azp'), autoin = autoDock.querySelector('.autoin');
-  const RY0 = 24, RPITCH = 46, GAPX = 12, MAXB = 200, PURPLE = '#e0a8f0', VALC = 'cornflowerblue', STOPC = '#ff9a9a', DARK = '#3d3d3d';
+  const RY0 = 24, RPITCH = 46, GAPX = 0, MAXB = 200, PURPLE = '#e0a8f0', VALC = 'cornflowerblue', STOPC = '#ff9a9a', DARK = '#3d3d3d';
   const SPEC = {
     audio: { ins: 4, out: true, multi: true }, value: { ins: 4, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, counter: { ins: 2, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
     and: { ins: 2, out: true, multi: true, gate: true }, or: { ins: 2, out: true, multi: true, gate: true }, nor: { ins: 2, out: true, multi: true, gate: true },
@@ -2340,7 +2340,14 @@
   function nodeRects() {
     return auto.nodes.map(n => { const el = nodeEls[n.id]; return el ? { x: v.x + parseFloat(el.style.left) * v.z, y: v.y + parseFloat(el.style.top) * v.z, w: el.offsetWidth * v.z, h: el.offsetHeight * v.z } : null; }).filter(Boolean);
   }
-  function routeWire(a, b, rects) {
+  /* re-routed wires glide to their new shape instead of snapping (waypoints are eased in board space, so panning and zooming never make them lag) */
+  let wst = new Map(), wstNext = new Map(), wLast = 0, wKick = 0, wEase = 1, wBusy = false;
+  const easeRoute = (key, Q) => {
+    const w = Q.map(p => [(p[0] - v.x) / v.z, (p[1] - v.y) / v.z]), old = wst.get(key);
+    const cur = old && old.length === w.length ? w.map((p, i) => { if (!i || i === w.length - 1) return p; const dx = p[0] - old[i][0], dy = p[1] - old[i][1]; if (Math.abs(dx) + Math.abs(dy) > .3) wBusy = true; return [old[i][0] + dx * wEase, old[i][1] + dy * wEase]; }) : w;
+    wstNext.set(key, cur); return cur.map(p => [v.x + p[0] * v.z, v.y + p[1] * v.z]);
+  };
+  function routeWire(a, b, rects, key) {
     const z = v.z, plain = wirePath(a[0], a[1], b[0], b[1], b[2], a[2]);
     if (!rects.length) return plain;
     // does the loose curve touch a node? (sample it, ignoring the very ends where it leaves / enters its own pins)
@@ -2349,10 +2356,11 @@
     let hit = false;
     for (let i = 1; i < 24 && !hit; i++) {
       const t = i / 24, u = 1 - t, x = u * u * u * a[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * b[0], y = u * u * u * a[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * b[1];
-      hit = rects.some(r => x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h);
+      const pad = wst.has(key) ? 26 * z : -2 * z;                   // once a wire has been re-routed it stays routed until it is clearly in the clear (no flip-flopping)
+      hit = rects.some(r => x > r.x - pad && x < r.x + r.w + pad && y > r.y - pad && y < r.y + r.h + pad);
     }
     if (!hit) return plain;
-    const m = 24 * z, g = 14 * z, A = [a[0] + sv[0] * m, a[1] + sv[1] * m], B = [b[0] + ev[0] * m, b[1] + ev[1] * m];
+    const m = 30 * z, g = 12 * z, A = [a[0] + sv[0] * m, a[1] + sv[1] * m], B = [b[0] + ev[0] * m, b[1] + ev[1] * m];
     // nodes near the two ends are the only ones that can matter
     const lo = [Math.min(A[0], B[0]) - 160 * z, Math.min(A[1], B[1]) - 160 * z], hi = [Math.max(A[0], B[0]) + 160 * z, Math.max(A[1], B[1]) + 160 * z];
     const R = rects.filter(r => r.x < hi[0] && r.x + r.w > lo[0] && r.y < hi[1] && r.y + r.h > lo[1]).slice(0, 12).map(r => ({ x: r.x - g, y: r.y - g, w: r.w + 2 * g, h: r.h + 2 * g }));
@@ -2387,25 +2395,35 @@
     pts.reverse(); pts.unshift([a[0], a[1]]); pts.push([b[0], b[1]]);
     const P = pts.filter((p, i) => !i || Math.abs(p[0] - pts[i - 1][0]) + Math.abs(p[1] - pts[i - 1][1]) > .5);
     const Q = P.filter((p, i) => i === 0 || i === P.length - 1 || !((P[i - 1][0] === p[0] && p[0] === P[i + 1][0]) || (P[i - 1][1] === p[1] && p[1] === P[i + 1][1])));   // drop points on a straight run
-    let dd = 'M' + Q[0][0] + ' ' + Q[0][1];
-    for (let i = 1; i < Q.length - 1; i++) {                           // round the corners
-      const p = Q[i - 1], c = Q[i], n = Q[i + 1], l1 = Math.hypot(c[0] - p[0], c[1] - p[1]), l2 = Math.hypot(n[0] - c[0], n[1] - c[1]), rr = Math.min(18 * z, l1 / 2, l2 / 2);
-      dd += 'L' + (c[0] + (p[0] - c[0]) / l1 * rr) + ' ' + (c[1] + (p[1] - c[1]) / l1 * rr) + 'Q' + c[0] + ' ' + c[1] + ' ' + (c[0] + (n[0] - c[0]) / l2 * rr) + ' ' + (c[1] + (n[1] - c[1]) / l2 * rr);
-    }
-    return dd + 'L' + Q[Q.length - 1][0] + ' ' + Q[Q.length - 1][1];
+    const E = easeRoute(key, Q);
+    // flowing corners: as generous as the space allows, eased back only as far as needed to keep clear of the nodes
+    const build = cap => {
+      let dd = 'M' + E[0][0] + ' ' + E[0][1]; const chk = [];
+      for (let i = 1; i < E.length - 1; i++) {
+        const p = E[i - 1], c = E[i], n = E[i + 1], l1 = Math.hypot(c[0] - p[0], c[1] - p[1]) || 1, l2 = Math.hypot(n[0] - c[0], n[1] - c[1]) || 1, rr = Math.min(cap, l1 / 2, l2 / 2);
+        const e1 = [c[0] + (p[0] - c[0]) / l1 * rr, c[1] + (p[1] - c[1]) / l1 * rr], e2 = [c[0] + (n[0] - c[0]) / l2 * rr, c[1] + (n[1] - c[1]) / l2 * rr];
+        dd += 'L' + e1[0] + ' ' + e1[1] + 'Q' + c[0] + ' ' + c[1] + ' ' + e2[0] + ' ' + e2[1];
+        for (let t = .2; t < .9; t += .2) { const u = 1 - t; chk.push([u * u * e1[0] + 2 * u * t * c[0] + t * t * e2[0], u * u * e1[1] + 2 * u * t * c[1] + t * t * e2[1]]); }
+      }
+      return [dd + 'L' + E[E.length - 1][0] + ' ' + E[E.length - 1][1], chk];
+    };
+    let out;
+    for (const cap of [1e9, 110 * z, 70 * z, 46 * z, 28 * z]) { out = build(cap); if (!out[1].some(p => rects.some(r => p[0] > r.x && p[0] < r.x + r.w && p[1] > r.y && p[1] < r.y + r.h))) break; }
+    return out[0];
   }
   function drawWires() {
     if (!autoOpen) return;
     const W = acanvas.offsetWidth + GAPX, H = acanvas.offsetHeight;
     awires.style.setProperty('--z', v.z); awires.setAttribute('width', W); awires.setAttribute('height', H);
     let s = '', defs = '';
-    const nowT = performance.now(), rects = nodeRects();
+    const nowT = performance.now(), rects = nodeRects(); wEase = 1 - Math.exp(-Math.min(50, nowT - wLast || 16) / 70); wLast = nowT; wBusy = false; wstNext = new Map();
     auto.links.forEach((l, n) => {
       const a = outPos(l[0], l[3]), b = inPos(l[1], l[2], W); if (!a || !b) return;
-      const d = routeWire(a, b, rects);
+      const d = routeWire(a, b, rects, l[0] + '>' + l[1] + ':' + l[2] + '/' + (l[3] || 0));
       s += '<g class="wg' + (badLink(l) ? ' bad' : '') + ((lglow.get(l[0] + l[1] + l[2]) || 0) > nowT ? ' on' : '') + '" data-n="' + n + '" style="--wc:' + wireFill(l, n, a, b, (x) => { defs += x; }) + '"><path class="hit" d="' + d + '"/><path class="vis" d="' + d + '"/></g>';
     });
     if (wd) { const a = outPos(wd.id, wd.fp); if (a) s += '<path class="tmp" style="--wc:' + pinColor(nodeById(wd.id), outKey(wd.fp)) + '" d="' + wirePath(a[0], a[1], wd.cx, wd.cy, wd.snapB ? wd.snapB[2] : undefined, a[2]) + '"/>'; }
+    wst = wstNext; if (wBusy && !wKick) wKick = requestAnimationFrame(() => { wKick = 0; drawWires(); });
     awires.innerHTML = '<defs>' + defs + '</defs>' + s;
     awires.querySelectorAll('.wg.bad').forEach(g => {          // a wire into a pin that is switched off: broken line with an × in the gap
       const vis = g.querySelector('.vis'), L = vis.getTotalLength(), gap = 30 * v.z, h = Math.max(0, (L - gap) / 2), pt = vis.getPointAtLength(L / 2), k = 6 * v.z;
