@@ -398,8 +398,9 @@
   .anode.t-matrix .ip { margin: 0; transition: left .3s var(--spring), top .3s var(--spring), transform .25s var(--spring), background .2s, opacity .2s; }
   .anode.t-matrix .ip.gone { opacity: 0; pointer-events: none; transform: scale(.3); }
   .anode .mgrid { position: absolute; left: 36px; top: 34px; display: grid; grid-template-columns: repeat(16, 14px); grid-auto-rows: 14px; gap: 6px; transition: width .3s var(--spring), height .3s var(--spring); }
-  .anode .mc { width: 14px; height: 14px; border-radius: 50%; background: #555; cursor: pointer; transition: background .12s, box-shadow .12s, opacity .25s, transform .3s var(--spring); }
-  .anode .mc.on { background: var(--lc); box-shadow: 0 0 9px 0 var(--lc); }
+  @property --lcol { syntax: '<color>'; inherits: false; initial-value: #555555; }
+  .anode .mc { --lcol: #555; width: 14px; height: 14px; aspect-ratio: 1; align-self: start; justify-self: start; box-sizing: border-box; border-radius: 50%; background: radial-gradient(circle closest-side, var(--lcol) calc(100% - 1px), transparent 100%); cursor: pointer; transition: --lcol .12s, box-shadow .12s, opacity .25s, transform .3s var(--spring); }      /* drawn as a gradient circle so it stays round even when the page scale makes the box snap to whole pixels */
+  .anode .mc.on { --lcol: var(--lc); box-shadow: 0 0 9px 0 var(--lc); }
   .anode .mc.gone { opacity: 0; transform: scale(.2); pointer-events: none; box-shadow: none; }       /* cells outside the current size fade away instead of being clipped (clipping cut the glow off) */
   .anode .mlb { position: absolute; font-size: 10px; font-weight: 600; color: rgba(255,255,255,.38); pointer-events: none; text-align: center; width: 44px; transition: left .3s var(--spring), top .3s var(--spring); }
   .anode .mrz { position: absolute; right: 5px; bottom: 5px; width: 16px; height: 16px; cursor: nwse-resize; opacity: 0; transition: opacity .2s; }
@@ -421,6 +422,7 @@
   .anode.t-value { min-width: 376px; }
   .anode.t-value .r2 { grid-template-columns: auto auto auto; justify-content: space-between; gap: 10px; }
   .anode.t-value .nk { flex: none; }
+  .anode.t-if .ip[data-p="4"] { top: 0; margin: -8px 0 0 -8px; }
   .anode.t-value .ip[data-p="2"], .anode.t-value .ip[data-p="3"], .anode.t-value .ip[data-p="4"], .anode.t-loop .ip[data-p="4"], .anode.t-if .ip[data-p="2"], .anode.t-if .ip[data-p="3"] { top: 100%; margin: -8px 0 0 -8px; }
   .anode .nk.plink { pointer-events: none; color: #fff; }
   .anode.t-prop { padding: 0 18px 0 22px; }
@@ -473,6 +475,8 @@
   .anode .nk.op, .anode .nk.im { min-width: 28px; padding: 0 10px; font-size: 12.5px; background: rgba(255,255,255,.22); color: #fff; }
   .anode .nk.set { color: #fff; background: rgba(255,255,255,.3); } .anode .nk.wait { color: #000; background: #e0a8f0; animation: livePulse 1.2s ease-in-out infinite; }
   /* Mover: inputs on one side, outputs on the other, and one line joining a single pair. A signal into the left / right pin slides the line, and only the input the line sits on gets through */
+  .anode.t-mvset { padding: 0 30px; } .anode .ml { position: absolute; top: 50%; transform: translateY(-50%); font: 600 10px 'Montserrat', sans-serif; color: rgba(255,255,255,.4); pointer-events: none; } .anode .ml.l { left: 17px; } .anode .ml.r { right: 17px; } .anode.t-mvset .ip[data-p="0"] { left: 50%; top: 100%; margin: -8px 0 0 -8px; } .anode.t-mvset .port[data-o="0"] { right: auto; left: -8px; }
+  .anode.t-mvset .ni { width: 54px; height: 24px; font-size: 14px; }
   .anode.t-mover { display: block; padding: 0; border-radius: 16px; box-sizing: border-box; }
   .anode.t-mover .ip, .anode.t-mover .port { margin: 0; right: auto; bottom: auto; transition: transform .25s var(--spring), background .2s, opacity .2s; }
   .anode.t-mover .ip.gone, .anode.t-mover .port.gone { opacity: 0; pointer-events: none; transform: scale(.3); }
@@ -726,7 +730,7 @@
       <svg class="awires" id="awires"></svg>
     </div>
     <div class="amaps" id="amaps"><div class="mlist" id="mlist"><div class="minner" id="minner"></div></div><div class="mctl"><button id="mminus" title="Remove the last mapped button"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><button id="mplus" title="Add a mapped button"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></svg></button></div></div>
-    <div class="apal" id="apal"><button data-t="audio">Audio</button><button data-t="key">Button Input</button><button data-t="counter">Counter</button><button data-t="wait">Wait</button><button data-t="number">Number</button><button data-t="value">VALUE</button><button data-t="and">AND</button><button data-t="if">IF</button><button data-t="nor">NOR</button><button data-t="or">OR</button><button data-t="xor">XOR</button><button data-t="xand">XAND</button><button data-t="random">RANDOM</button><button data-t="loop">LOOP</button><button data-t="print">Print</button><button data-t="split">Splitter</button><button data-t="light">Light</button><button data-t="prop">Property Changer</button><button data-t="rgb">RGB</button><button data-t="matrix">LED Matrix</button><button data-t="mover">Mover</button></div>
+    <div class="apal" id="apal"><button data-t="audio">Audio</button><button data-t="key">Button Input</button><button data-t="counter">Counter</button><button data-t="wait">Wait</button><button data-t="number">Number</button><button data-t="mvset">Mover Setter</button><button data-t="value">VALUE</button><button data-t="and">AND</button><button data-t="if">IF</button><button data-t="nor">NOR</button><button data-t="or">OR</button><button data-t="xor">XOR</button><button data-t="xand">XAND</button><button data-t="random">RANDOM</button><button data-t="loop">LOOP</button><button data-t="print">Print</button><button data-t="split">Splitter</button><button data-t="light">Light</button><button data-t="prop">Property Changer</button><button data-t="rgb">RGB</button><button data-t="matrix">LED Matrix</button><button data-t="mover">Mover</button></div>
   </div>
 </div>
 
@@ -1891,7 +1895,7 @@
     audio: { ins: 4, out: true, multi: true }, value: { ins: 5, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, counter: { ins: 2, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
     and: { ins: 2, out: true, multi: true, gate: true }, or: { ins: 2, out: true, multi: true, gate: true }, nor: { ins: 2, out: true, multi: true, gate: true },
     xor: { ins: 2, out: true, multi: true, gate: true }, xand: { ins: 2, out: true, multi: true, gate: true },
-    if: { ins: 4, out: true, multi: true }, prop: { ins: 1, out: true, multi: true }, loop: { ins: 5, out: true, outs: 2, multi: true }, random: { ins: 3, out: true, multi: true }, print: { ins: 2, out: true, multi: true }, light: { ins: 1, out: false, multi: true }, rgb: { ins: 3, out: true, multi: true }, matrix: { ins: 34, out: false, multi: true }, mover: { ins: 18, out: true, outs: 16, multi: true }, split: { ins: 1, out: true, outs: 1, multi: true }
+    if: { ins: 5, out: true, multi: true }, prop: { ins: 1, out: true, multi: true }, loop: { ins: 5, out: true, outs: 2, multi: true }, random: { ins: 3, out: true, multi: true }, print: { ins: 2, out: true, multi: true }, light: { ins: 1, out: false, multi: true }, rgb: { ins: 3, out: true, multi: true }, matrix: { ins: 34, out: false, multi: true }, mover: { ins: 18, out: true, outs: 16, multi: true }, mvset: { ins: 1, out: true, outs: 2, multi: true }, split: { ins: 1, out: true, outs: 1, multi: true }
   };
   const insOf = n => n.t === 'split' ? n.si : SPEC[n.t].ins, outsOf = n => n.t === 'split' ? n.so : (SPEC[n.t].outs || 1);
   const SW = 38, SR = 19, MAXPIN = 64;
@@ -1928,7 +1932,7 @@
     });
     sp.w = W; sp.h = H; return sp;
   }
-  const VP = { audio: 2, value: 2, loop: 2, counter: 1, wait: 1, if: 1, number: 1, random: 1, print: 1 };      // first input pin of each node that carries a value (not a signal)
+  const VP = { mvset: 0, audio: 2, value: 2, loop: 2, counter: 1, wait: 1, if: 1, number: 1, random: 1, print: 1 };      // first input pin of each node that carries a value (not a signal)
   const OPS = [['<', 'less than'], ['>', 'greater than'], ['=', 'equal to'], ['≤', 'at most'], ['≥', 'at least'], ['≠', 'not equal to']];
   const CMP = { '<': (a, b) => a < b, '>': (a, b) => a > b, '=': (a, b) => a === b, '≤': (a, b) => a <= b, '≥': (a, b) => a >= b, '≠': (a, b) => a !== b };
   const TOPS = [['is', 'Is', '='], ['isnt', 'Isn’t', '≠'], ['has', 'Contains', '∋']];
@@ -1937,14 +1941,16 @@
   const PROPC = '#ffc15e';
   const PROPS = [...VMODES.map(m => ({ id: m[0], label: 'VALUE: ' + m[1], sm: m[2], short: m[1] })), ...OPS.map(o => ({ id: o[0], label: 'IF: ' + o[1], sm: o[0], short: o[1] })), ...TOPS.map(o => ({ id: o[0], label: 'IF text: ' + o[1], sm: o[2], short: o[1] })),
     { id: 'value', label: 'IF: compare a Value', sm: '#', short: 'Value' }, { id: 'text', label: 'IF: compare Text', sm: 'Aa', short: 'Text' }, { id: 'until', label: 'LOOP: until', sm: '↻', short: 'Until' }, { id: 'forever', label: 'LOOP: forever', sm: '∞', short: 'Forever' }];
-  const PPIN = { value: [4, '.vm'], loop: [4, '.lm'], if: [2, '.op'] };
+  const PPIN = { value: [[4, '.vm']], loop: [[4, '.lm']], if: [[2, '.op'], [3, '.im']] };       // [pin, the chip it sits under]
   const OPTFOR = { value: VMODES.map(m => m[0]), loop: ['until', 'forever'], if: [...OPS.map(o => o[0]), ...TOPS.map(o => o[0]), 'value', 'text'] };
-  const propOpts = src => {                                          // a Property Changer only offers what the nodes it is wired into can use
-    const ts = [...new Set(auto.links.filter(l => l[0] === src.id).map(l => nodeById(l[1])).filter(t => t && isPropPin(t, auto.links.find(k => k[0] === src.id && k[1] === t.id && isPropPin(t, k[2]))?.[2])).map(t => t.t))];
-    return ts.length ? PROPS.filter(o => ts.some(t => OPTFOR[t].includes(o.id))) : PROPS;
+  const optsAt = (t, p) => t.t === 'if' ? (p === 3 ? ['value', 'text'] : [...OPS.map(o => o[0]), ...TOPS.map(o => o[0])]) : OPTFOR[t.t];
+  const propOpts = src => {                                          // a Property Changer only offers what the pins it is wired into can use
+    const ids = new Set(); let any = false;
+    auto.links.filter(l => l[0] === src.id).forEach(l => { const t = nodeById(l[1]); if (t && isPropPin(t, l[2])) { any = true; optsAt(t, l[2]).forEach(x => ids.add(x)); } });
+    return any ? PROPS.filter(o => ids.has(o.id)) : PROPS;
   };
-  const isPropPin = (n, p) => !!n && !!PPIN[n.t] && PPIN[n.t][0] === p;
-  const PLIST = { value: VMODES.map(m => m[0]), if: OPS.map(o => o[0]), loop: ['until', 'forever'] };
+  const isPropPin = (n, p) => !!n && !!PPIN[n.t] && PPIN[n.t].some(x => x[0] === p);
+  const PLIST = { value: VMODES.map(m => m[0]), if: OPS.map(o => o[0]), loop: ['until', 'forever'] }, plistAt = (n, p) => n.t === 'if' && p === 3 ? ['value', 'text'] : PLIST[n.t];
   function applyOpt(n, id) {                                         // true if that changed the node
     if (n.t === 'value' && VMODES.some(m => m[0] === id) && n.vm !== id) { n.vm = id; return true; }
     if (n.t === 'loop' && (id === 'until' || id === 'forever') && n.lm !== id) { n.lm = id; return true; }
@@ -1961,11 +1967,13 @@
     let ch = false;
     auto.nodes.forEach(n => { if (n.t === 'prop') { const o = propOpts(n); if (!o.some(x => x.id === n.pr)) { n.pr = o[0].id; ch = true; } } });      // follows what it is wired into
     auto.nodes.forEach(n => {
-      if (!PPIN[n.t]) return; const l = inputsL(n.id, PPIN[n.t][0])[0]; if (!l) return; const src = nodeById(l[0]); if (!src) return;
-      let id = null;
-      if (src.t === 'prop') return;                                  // a Property Changer only acts when a signal comes through it
-      else { const L = PLIST[n.t], i = Math.round(+numOf(l[0], new Set([n.id]), l[3]) || 0); id = L[((i % L.length) + L.length) % L.length]; }
-      if (id && applyOpt(n, id)) ch = true;
+      (PPIN[n.t] || []).forEach(([pp]) => {
+        const l = inputsL(n.id, pp)[0]; if (!l) return; const src = nodeById(l[0]); if (!src) return;
+        let id = null;
+        if (src.t === 'prop') return;                                  // a Property Changer only acts when a signal comes through it
+        else { const L = plistAt(n, pp), i = Math.round(+numOf(l[0], new Set([n.id]), l[3]) || 0); id = L[((i % L.length) + L.length) % L.length]; }
+        if (id && applyOpt(n, id)) ch = true;
+      });
     });
     if (ch) { save(); if (autoOpen) syncNodes(); }
   }
@@ -1980,6 +1988,7 @@
   const vby = n => liveIn(n, 2, n.vx), vstart = n => liveIn(n, 3, n.vs);        // 'by' and 'start' can be driven by wires into the bottom pins
   const cN = n => Math.max(1, Math.min(99, Math.round(liveIn(n, 1, n.n)) || 1));
   const wSec = n => Math.max(0, Math.min(3600, liveIn(n, 1, n.sec)));
+  const mvV = n => { const l = inputsL(n.id, 0)[0], f = l && nodeById(l[0]); return f && ['number', 'value', 'random', 'counter', 'loop', 'split'].includes(f.t) ? liveIn(n, 0, n.v) : n.v; };      // only a number source drives it; a plain signal just makes it jump to its own number
   const ifK = n => liveIn(n, 1, n.k), numV = n => liveIn(n, 1, n.v);
   const lEvery = n => Math.max(.05, Math.min(3600, liveIn(n, 3, n.lt)));
   const rRange = n => { const a = Math.round(liveIn(n, 1, n.rmin)), b = Math.round(liveIn(n, 2, n.rmax)); return [Math.min(a, b), Math.max(a, b)]; };
@@ -1998,7 +2007,7 @@
   const idOk = x => typeof x === 'string' && /^[a-z0-9]{3,16}$/.test(x);
   const HEX = /^#[0-9a-f]{6}$/i;
   const mkBtn = n => ({ id: uid(), name: 'Mapped Button ' + n, key: '' });
-  const defaultAuto = () => ({ btns: [], nodes: [], links: [], gn: {} });
+  const defaultAuto = () => ({ btns: [], nodes: [], links: [], gn: {}, ifm: 1 });
   let auto = defaultAuto(), autoOpen = false, binding = null;
   const num = (x, lim) => Math.max(-lim, Math.min(lim, +x));
   function loadAuto(a) {
@@ -2023,11 +2032,13 @@
           const from = out.nodes.find(n => n.id === l[0]); if (!SPEC[from.t].out) return;
           const tn = out.nodes.find(n => n.id === l[1]), tb = out.btns.some(b => b.id === l[1]), p = l[2] | 0;
           if (!tn || p < 0 || p >= insOf(tn)) return;
-          const fp = from.t === 'mover' ? Math.max(0, Math.min(from.mvw - 1, l[3] | 0)) : from.t === 'split' ? Math.max(0, Math.min(from.so - 1, l[3] | 0)) : (from.t === 'audio' || from.t === 'loop') && l[3] === 1 ? 1 : 0, k = l[0] + l[1] + p + fp; if (seen.has(k)) return; seen.add(k); out.links.push([l[0], l[1], p, fp]);
+          const fp = from.t === 'mover' ? Math.max(0, Math.min(from.mvw - 1, l[3] | 0)) : from.t === 'split' ? Math.max(0, Math.min(from.so - 1, l[3] | 0)) : (from.t === 'audio' || from.t === 'loop' || from.t === 'mvset') && l[3] === 1 ? 1 : 0, k = l[0] + l[1] + p + fp; if (seen.has(k)) return; seen.add(k); out.links.push([l[0], l[1], p, fp]);
         });
       }
     }
     if (a && a.gn && typeof a.gn === 'object') Object.entries(a.gn).slice(0, 80).forEach(([k, nm]) => { if (/^g[a-z0-9]{1,15}$/.test(k) && typeof nm === 'string' && nm.trim()) out.gn[k] = nm.trim().slice(0, 30); });      // group names
+    if (!(a && a.ifm)) out.links.forEach(l => { const t = out.nodes.find(n => n.id === l[1]), f = out.nodes.find(n => n.id === l[0]); if (t && t.t === 'if' && l[2] === 3 && f && f.t !== 'prop') l[2] = 4; });      // older saves: the IF "what to check" wire moved from pin 3 to pin 4 (pin 3 is now the Value / Text property pin)
+    out.ifm = 1;
     out.links = out.links.filter(l => { const t = out.nodes.find(n => n.id === l[1]); return !(t && t.t === 'print' && l[2] === 1); });      // Print's value pin isn't available yet
     auto = out;
   }
@@ -2040,7 +2051,7 @@
   const rowY = i => RY0 + i * RPITCH;
   const RGBPIN = ['#ff5a5a', '#c4ff6a', '#5a78ff'], inDef = (n, p) => n && n.t === 'rgb' ? RGBPIN[p] : isPropPin(n, p) ? PROPC : isValIn(n, p) ? VALC : '';
   const isValSrc = n => n && (n.t === 'number' || n.t === 'value'), isValIn = (n, p) => n && VP[n.t] !== undefined && p >= VP[n.t];     // value pins default to cornflower blue
-  const pinColor = (n, k) => (n && n.pc && n.pc[k]) || (k === 'o' ? (n && n.t === 'prop' ? PROPC : isValSrc(n) ? VALC : PURPLE) : k === 'o1' ? (n && n.t === 'split' ? PURPLE : STOPC) : /^o\d+$/.test(k) ? PURPLE : DARK);
+  const pinColor = (n, k) => (n && n.pc && n.pc[k]) || (k === 'o' ? (n && n.t === 'prop' ? PROPC : isValSrc(n) ? VALC : PURPLE) : k === 'o1' ? (n && (n.t === 'split' || n.t === 'mvset') ? PURPLE : STOPC) : /^o\d+$/.test(k) ? PURPLE : DARK);
   function autoDropCue(id) {
     const gone = auto.nodes.filter(n => n.t === 'audio' && n.cue === id).map(n => n.id);
     if (!gone.length) return;
@@ -2084,7 +2095,7 @@
   /* nodes */
   const selSet = new Set();
   const nodeEls = {}, cnt = {}, SVG_X = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>', SVG_PEN = '<svg viewBox="0 0 24 24"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19z"/></svg>';
-  const LABEL = { split: 'Splitter', value: 'VALUE', number: 'Number', wait: 'Wait', and: 'AND', or: 'OR', nor: 'NOR', xor: 'XOR', xand: 'XAND', if: 'IF', random: 'RANDOM', counter: 'Counter', light: 'Light', prop: 'Property Changer', rgb: 'RGB', matrix: 'LED Matrix', mover: 'Mover', loop: 'LOOP', print: 'Print', key: 'Button Input' };
+  const LABEL = { split: 'Splitter', value: 'VALUE', number: 'Number', wait: 'Wait', and: 'AND', or: 'OR', nor: 'NOR', xor: 'XOR', xand: 'XAND', if: 'IF', random: 'RANDOM', counter: 'Counter', light: 'Light', prop: 'Property Changer', rgb: 'RGB', matrix: 'LED Matrix', mover: 'Mover', mvset: 'Mover Setter', loop: 'LOOP', print: 'Print', key: 'Button Input' };
   function reachBtns(id) {
     const seen = new Set(), out = new Set();
     (function go(c) { if (seen.has(c)) return; seen.add(c); auto.links.forEach(l => { if (l[0] !== c) return; const bi = auto.btns.findIndex(b => b.id === l[1]); if (bi >= 0) out.add(bi + 1); else go(l[1]); }); })(id);
@@ -2157,6 +2168,7 @@
     else if (n.t === 'loop') h += '<div class="ac"><div class="r1"><span class="nm">LOOP</span><small class="cc"></small></div><div class="r2"><button class="nk op lm" title="Loop mode"></button><label class="cell"><small>×</small><input class="ni lc" type="number" min="0" max="99999" step="1" title="How many times to loop (wire a value into the top pin to change it live)"></label><label class="cell"><small>every</small><input class="ni lt" type="number" min="0.05" max="3600" step="0.05" title="Seconds between each loop"><small>s</small></label></div></div>';
     else if (n.t === 'random') h += '<span class="nm">RANDOM</span><input class="ni rmin" type="number" step="1" title="Lowest number it can pick"><small>to</small><input class="ni rmax" type="number" step="1" title="Highest number it can pick"><small class="cc"></small>';
     else if (n.t === 'print') h += '<span class="nm">Print</span><input class="ni pt" type="text" maxlength="80" placeholder="message" title="Text to pop up. Wire a value into the pin below to show it after the text">';
+    else if (n.t === 'mvset') h += '<span class="ml l">L</span><span class="ml r">R</span><input class="ni nv" type="number" step="1" title="Mover Setter: the pin the line jumps to (0 is the first). Wire the left / right pins into a Mover&#39;s left / right pins, and a signal or number into the bottom pin">';
     else if (n.t === 'number') h += '<span class="nm">Number</span><input class="ni nv" type="number" step="any" title="A number other nodes can read">';
     else if (n.t === 'if') h += '<span class="nm">IF</span><button class="nk im" title="Compare a number (Value) or words (Text)"></button><button class="nk op" title="How to compare"></button><input class="ni ik" type="number" step="any" title="Number to compare with"><input class="ni tx" type="text" maxlength="60" placeholder="text" title="Text to compare with">';
     else if (n.t === 'prop') h += '<button class="nk pp" title="The mode this sends. Wire its output into a property pin"></button>';
@@ -2375,7 +2387,7 @@
       el.style.left = n.x + 'px'; el.style.top = n.y + 'px'; el.classList.toggle('picked', selSet.has(n.id)); el.classList.toggle('ingrp', !!n.g); { const cp = el.querySelector('.ncap'); if (cp && !cp.querySelector('input') && cp.textContent !== (n.cap || '')) cp.textContent = n.cap || ''; }
       if (n.t === 'split') layoutSplit(n, el);
       el.querySelectorAll('.ip').forEach(ip => { ip.style.background = n.pc && n.pc[ip.dataset.p] ? n.pc[ip.dataset.p] : inDef(n, +ip.dataset.p); });
-      el.querySelectorAll('.port').forEach(pt => { const c = n.pc && n.pc[outKey(+pt.dataset.o)]; pt.style.background = c || (pt.dataset.o === '1' && n.t !== 'split' && n.t !== 'mover' ? STOPC : n.t === 'prop' ? PROPC : isValSrc(n) ? VALC : ''); });
+      el.querySelectorAll('.port').forEach(pt => { const c = n.pc && n.pc[outKey(+pt.dataset.o)]; pt.style.background = c || (pt.dataset.o === '1' && n.t !== 'split' && n.t !== 'mover' && n.t !== 'mvset' ? STOPC : n.t === 'prop' ? PROPC : isValSrc(n) ? VALC : ''); });
       if (n.t === 'audio') {
         const it = get(n.cue);
         el.querySelector('.nm').textContent = it ? it.name : 'Choose a cue'; el.classList.toggle('dim', !it || !it.src);
@@ -2384,7 +2396,7 @@
         const nk = el.querySelector('.nk'), b = auto.btns.find(x => x.id === n.btn); nk.textContent = b ? b.name : 'link a button'; nk.classList.toggle('set', !!b);
       } else if (n.t === 'counter') { const ni = el.querySelector('.ni'); if (document.activeElement !== ni && !ni.classList.contains('driven')) ni.value = n.n; updCounter(n); }
       else if (n.t === 'wait') { const ni = el.querySelector('.ni'); if (document.activeElement !== ni && !ni.classList.contains('driven')) ni.value = n.sec; }
-      else if (n.t === 'number') { const ni = el.querySelector('.ni'); if (document.activeElement !== ni && !ni.classList.contains('driven')) ni.value = n.v; }
+      else if (n.t === 'number' || n.t === 'mvset') { const ni = el.querySelector('.ni'); if (document.activeElement !== ni && !ni.classList.contains('driven')) ni.value = n.v; }
       else if (n.t === 'value') { const x = el.querySelector('.vx'), st = el.querySelector('.vs'); if (document.activeElement !== x && !x.classList.contains('driven')) x.value = n.vx; if (document.activeElement !== st && !st.classList.contains('driven')) st.value = n.vs; el.querySelector('.vm').textContent = VMODES.find(m => m[0] === n.vm)[1]; updValue(n); }
       else if (n.t === 'loop') {
         const lc = el.querySelector('.lc'), lt = el.querySelector('.lt');
@@ -2592,10 +2604,10 @@
     const len = q => q[0] ? k : kk;
     return 'M' + x1 + ' ' + y1 + ' C' + (x1 + sv[0] * len(sv)) + ' ' + (y1 + sv[1] * len(sv)) + ',' + (x2 + ev[0] * len(ev)) + ' ' + (y2 + ev[1] * len(ev)) + ',' + x2 + ' ' + y2;
   };
-  const outPos = (id, fp) => { const el = nodeEls[id], pt = el && el.querySelectorAll('.port')[fp || 0]; return pt ? [v.x + (parseFloat(el.style.left) + pt.offsetLeft + pt.offsetWidth / 2) * v.z, v.y + (parseFloat(el.style.top) + pt.offsetTop + pt.offsetHeight / 2) * v.z, pt.dataset.s || (nodeById(id) && nodeById(id).t === 'prop' ? 't' : 'r')] : null; };
+  const outPos = (id, fp) => { const el = nodeEls[id], pt = el && el.querySelectorAll('.port')[fp || 0]; return pt ? [v.x + (parseFloat(el.style.left) + pt.offsetLeft + pt.offsetWidth / 2) * v.z, v.y + (parseFloat(el.style.top) + pt.offsetTop + pt.offsetHeight / 2) * v.z, pt.dataset.s || (nodeById(id) && nodeById(id).t === 'prop' ? 't' : nodeById(id) && nodeById(id).t === 'mvset' && !fp ? 'l' : 'r')] : null; };
   function inPos(to, p, W) {
     const el = nodeEls[to], ip = el && el.querySelector('.ip[data-p="' + p + '"]'); if (!ip) return null;
-    const nn = nodeById(to), dir = !nn ? 'l' : nn.t === 'split' ? (ip.dataset.s || 'l') : nn.t === 'matrix' ? (p < 2 ? 'b' : p < 18 ? 't' : 'l') : nn.t === 'mover' ? (p === 16 ? (nn.mvr ? 't' : 'l') : p === 17 ? (nn.mvr ? 'b' : 'r') : nn.mvr ? 'l' : 't') : nn.t === 'loop' ? (p >= 2 ? 'b' : 'l') : VP[nn.t] !== undefined && p >= VP[nn.t] ? 'b' : 'l';
+    const nn = nodeById(to), dir = !nn ? 'l' : nn.t === 'split' ? (ip.dataset.s || 'l') : nn.t === 'matrix' ? (p < 2 ? 'b' : p < 18 ? 't' : 'l') : nn.t === 'if' && p === 4 ? 't' : nn.t === 'mover' ? (p === 16 ? (nn.mvr ? 't' : 'l') : p === 17 ? (nn.mvr ? 'b' : 'r') : nn.mvr ? 'l' : 't') : nn.t === 'loop' ? (p >= 2 ? 'b' : 'l') : VP[nn.t] !== undefined && p >= VP[nn.t] ? 'b' : 'l';
     return [v.x + (parseFloat(el.style.left) + ip.offsetLeft + ip.offsetWidth / 2) * v.z, v.y + (parseFloat(el.style.top) + ip.offsetTop + ip.offsetHeight / 2) * v.z, dir];
   }
   /* dynamic wires: a wire runs as its normal loose curve, but if that curve would cross a node it is re-routed around the nodes in the way.
@@ -2782,7 +2794,7 @@
     auto.links.push([from, to, p, fp]); save();
   }
 
-  /* right-click a node: caption, duplicate, delete (acts on the whole selection when the node is part of it) */
+  /* right-click a node: the things the selection bar doesn't have (caption, Mover mode) */
   acanvas.addEventListener('contextmenu', e => {
     const node = e.target.closest('.anode'); if (!node) return; e.preventDefault();
     const n = nodeById(node.dataset.id); if (!n) return;
@@ -2790,9 +2802,9 @@
     const many = selSet.size > 1, ents = [];
     if (!many) { ents.push({ id: 'cap', sm: 'Aa', label: n.cap ? 'Edit caption' : 'Add caption' }); if (n.cap) ents.push({ id: 'nocap', sm: '–', label: 'Remove caption' }); }
     if (!many && n.t === 'mover') ents.push({ id: 'mvs', sm: '┬', label: n.mvs ? 'Many input pins' : 'Single input pin' });
-    ents.push({ id: 'col', sm: '●', label: 'Colour…' }, { id: 'dup', sm: '⧉', label: many ? 'Duplicate ' + selSet.size : 'Duplicate' }, { id: 'del', sm: '✕', label: many ? 'Delete ' + selSet.size : 'Delete' });
+    if (!ents.length) return;                                              // colour, duplicate and delete live on the bar above the selection
     pickList({ getBoundingClientRect: () => ({ left: e.clientX, bottom: e.clientY - 6 }) }, ents, id => {
-      if (id === 'mvs') { n.mvs = n.mvs ? 0 : 1; if (n.mvs) auto.links = auto.links.filter(l => !(l[1] === n.id && l[2] > 0 && l[2] < 16)); save(); drawWires(); } else if (id === 'cap') editCap(n, nodeEls[n.id]); else if (id === 'nocap') { n.cap = ''; save(); } else if (id === 'col') colourFlow(selNodes(), { getBoundingClientRect: () => ({ left: e.clientX, right: e.clientX, top: e.clientY, bottom: e.clientY, width: 0, height: 0 }) }); else if (id === 'dup') dupSel(); else if (id === 'del') delSel();
+      if (id === 'mvs') { n.mvs = n.mvs ? 0 : 1; if (n.mvs) auto.links = auto.links.filter(l => !(l[1] === n.id && l[2] > 0 && l[2] < 16)); save(); drawWires(); } else if (id === 'cap') editCap(n, nodeEls[n.id]); else if (id === 'nocap') { n.cap = ''; save(); }
     });
   });
   acanvas.addEventListener('pointerdown', e => {
@@ -2937,7 +2949,7 @@
     return fmtV(+numOf(id, new Set([id])) || 0);
   }
   function ifTest(n, src, seen) {
-    const sl = inputsL(n.id, 3)[0], sid = sl ? sl[0] : src;                  // a wire into the pin under "Value"/"Text" picks what gets checked (say a VALUE node); otherwise it's whatever sent the signal
+    const sl = inputsL(n.id, 4)[0], sid = sl ? sl[0] : src;                  // a wire into the pin on top picks what gets checked (say a VALUE node); otherwise it's whatever sent the signal
     if (n.im !== 'text') return CMP[n.op](numOf(sid, seen, sl ? sl[3] : undefined), ifK(n));
     const a = textOf(sid).trim().toLowerCase(), b = (n.tx || '').trim().toLowerCase();
     return n.it === 'has' ? a.includes(b) : n.it === 'isnt' ? a !== b : a === b;
@@ -2996,7 +3008,7 @@
   }
   function deliver(to, p, src, prev, st) {
     const n = nodeById(to); if (!n || (prev.has(to) && !(n.t === 'loop' && p === 1))) return; const seen = new Set(prev).add(to);
-    if (VP[n.t] !== undefined && p >= VP[n.t]) return;     // those pins carry values, not signals
+    if (VP[n.t] !== undefined && p >= VP[n.t] && n.t !== 'mvset') return;     // those pins carry values, not signals (a Mover Setter's one pin is both: a signal makes it jump)
     flash(to);
     if (n.t === 'audio') {
       const it = get(n.cue), pl = it && player(it);
@@ -3038,6 +3050,10 @@
     else if (SPEC[n.t].gate) { if (val(to, prev)) emit(to, seen, st); }                      // a gate lets the event through only while its condition is true
     else if (n.t === 'prop') { if (p === 0) triggerProp(n); }
     else if (n.t === 'light') n.lit = performance.now() + 600;
+    else if (n.t === 'mvset') {                                                                   // jump every wired Mover straight to this pin, no sliding
+      const x = Math.round(mvV(n));
+      auto.links.filter(l => l[0] === to).forEach(l => { const t = nodeById(l[1]); if (!t || t.t !== 'mover' || l[2] < 16) return; glowLink(l); mvcur[t.id] = Math.max(0, Math.min(t.mvw - 1, x)); updMover(t); });
+    }
     else if (n.t === 'mover') {
       if (p >= 16) { mvcur[to] = Math.max(0, Math.min(n.mvw - 1, mvCur(n) + (p === 17 ? 1 : -1))); updMover(n); }                      // slide the line
       else if (n.mvs ? p === 0 : p < n.mvw && p === mvCur(n)) emit(to, seen, st, n.mvs ? mvCur(n) : p);                                                             // only the pin the line sits on gets through
@@ -3052,7 +3068,7 @@
     if (srcs.length && st.miss && !st.played && !st.stopped && !st.delayed) toast('That cue has no audio file yet');
     const row = minner.querySelector('.mrow[data-id="' + b.id + '"]'); if (row) { row.classList.remove('ran'); void row.offsetWidth; row.classList.add('ran'); }
   }
-  const VPIN = { loop: [[2, '.lc', n => loopTotal(n)], [3, '.lt', lEvery]], counter: [[1, '.ni', cN]], wait: [[1, '.ni', wSec]], if: [[1, n => n.im === 'text' ? '.tx' : '.ik', n => n.im === 'text' ? null : ifK(n)], [3, '.im', null]], number: [[1, '.ni', numV]], print: [[1, '.pt', null]], random: [[1, '.rmin', n => rRange(n)[0]], [2, '.rmax', n => rRange(n)[1]]] };
+  const VPIN = { loop: [[2, '.lc', n => loopTotal(n)], [3, '.lt', lEvery]], counter: [[1, '.ni', cN]], wait: [[1, '.ni', wSec]], if: [[1, n => n.im === 'text' ? '.tx' : '.ik', n => n.im === 'text' ? null : ifK(n)], [4, '.nm', null]], number: [[1, '.ni', numV]], mvset: [[0, '.ni', n => mvV(n)]], print: [[1, '.pt', null]], random: [[1, '.rmin', n => rRange(n)[0]], [2, '.rmax', n => rRange(n)[1]]] };
   const rgbVal = n => [0, 1, 2].map(i => { const l = inputsL(n.id, i)[0]; return Math.max(0, Math.min(255, Math.round(l ? +numOf(l[0], new Set([n.id]), l[3]) || 0 : n['c' + 'rgb'[i]] || 0))); });
   let lightRaf = 0;
   function lightTick() {
@@ -3069,11 +3085,10 @@
         box.classList.toggle('driven', !!l); box.readOnly = !!l;
         if (l && document.activeElement !== box) { const str = fmtV(fv); if (box.value !== str) box.value = str; }
       });
-      const pp = PPIN[n.t];
-      if (pp) {
+      (PPIN[n.t] || []).forEach(pp => {
         const box = el.querySelector(pp[1]), ip = el.querySelector('.ip[data-p="' + pp[0] + '"]');
         if (box && ip) { const lx = (box.offsetLeft + box.offsetWidth / 2) + 'px'; if (ip.style.left !== lx) { ip.style.left = lx; moved = true; } box.classList.toggle('plink', !!inputsL(n.id, pp[0]).length); }
-      }
+      });
       if (n.t === 'light') el.querySelector('.lamp').classList.toggle('on', pin(n.id, 0, new Set()) || (n.lit || 0) > now);
       else if (n.t === 'audio') {
         const p = players[n.cue], it = get(n.cue), on = !!(p && !p.paused); el.classList.toggle('live', on); if (on && it) applyAudio(n, it, p);
@@ -3139,7 +3154,7 @@
 
   /* undo / redo for the node editor (keeps the last HIST_MAX changes) */
   const HIST_MAX = 200, hist = { u: [], r: [], cur: '' };
-  const autoJSON = () => JSON.stringify({ btns: auto.btns, nodes: auto.nodes.map(({ pend, rv, lit, ...n }) => n), links: auto.links, gn: auto.gn });
+  const autoJSON = () => JSON.stringify({ btns: auto.btns, nodes: auto.nodes.map(({ pend, rv, lit, ...n }) => n), links: auto.links, gn: auto.gn, ifm: 1 });
   function updHist() { $('#aundo').disabled = !hist.u.length; $('#aredo').disabled = !hist.r.length; }
   function autoHist() {
     const j = autoJSON(); if (j === hist.cur) return;
@@ -3215,8 +3230,8 @@
   /* what's new: edit this list when something ships (newest first) */
   const CHANGES = [
     { id: '2026-11-08', date: '8 Nov 2026', title: 'Nodes, menus and speed', groups: [
-      ['New nodes', ['[[Mover]]: a pill with a moving line. Signals into its left / right pins slide the line, and only the input the line sits on gets through. Many-pin or single-pin mode (right-click it), turn it with the corner button, drag the corner to resize', '[[RGB]] node and [[LED Matrix]] (resizable, each LED keeps the colour it was lit with)', '[[Property Changer]], plus property pins on [[IF]], [[VALUE]] and [[LOOP]]', '[[IF]] has a new pin under Value / Text to choose what it checks, so it can read a [[VALUE]]', 'The count on [[LOOP]] is now a value pin along the bottom', '[[Splitter]] nodes pass numbers straight through']],
-      ['Editing', ['Right-click a node: caption, colour, duplicate, delete (the old ✕ and pencil buttons are gone)', 'Captions under nodes, and click a group\'s label to rename it', 'Colour pins by kind: inputs, outputs, values or properties, on any number of pins', 'Keyboard hints in the node editor, and no dotted ring on selected nodes', 'The [[Splitter]] editor is 30% bigger']],
+      ['New nodes', ['[[Mover Setter]]: holds a number; a signal or number into its bottom pin makes the Mover wired to its left / right pins jump straight to that pin, instantly', '[[Mover]]: a pill with a moving line. Signals into its left / right pins slide the line, and only the input the line sits on gets through. Many-pin or single-pin mode (right-click it), turn it with the corner button, drag the corner to resize', '[[RGB]] node and [[LED Matrix]] (resizable, each LED keeps the colour it was lit with)', '[[Property Changer]], plus property pins on [[IF]], [[VALUE]] and [[LOOP]]', '[[IF]] has a new pin under Value / Text to choose what it checks, so it can read a [[VALUE]]', 'The count on [[LOOP]] is now a value pin along the bottom', '[[Splitter]] nodes pass numbers straight through']],
+      ['Editing', ['Right-click a node to add a caption (and switch a Mover\'s mode); colour, duplicate and delete are on the bar above the selection (the old ✕ and pencil buttons are gone)', 'Captions under nodes, and click a group\'s label to rename it', 'Colour pins by kind: inputs, outputs, values or properties, on any number of pins', 'Keyboard hints in the node editor, and no dotted ring on selected nodes', 'The [[Splitter]] editor is 30% bigger']],
       ['Fixes and speed', ['Signals redraw the wires once per frame instead of once per wire, so big graphs no longer slow down and LED numbers come out right', '[[LED Matrix]] only combines a row and a column fired in the same moment', 'Wires no longer flip shape while zooming', 'Cursors: random colours, shown only on the board you are on, with presence dots on the tabs', 'Phones and tablets now see a "open this on a computer" note instead of the board']]
     ] },
     { id: 'earlier', date: 'Earlier', title: 'The basics', groups: [
