@@ -1704,14 +1704,18 @@
   function startJoin(code) {
     net.joining = true; toast('Connecting…');
     const peer = new Peer(undefined, PEERCFG); net.peer = peer;
+    let stage = 'A: could not reach the PeerJS server (network or firewall blocks it)', ice = '';
+    peer.on('disconnected', () => { stage = 'A: lost the PeerJS server'; });
     peer.on('open', () => {
+      stage = 'B: server reached, but the host did not answer (network blocks device-to-device links, or the host is not online)';
       const c = peer.connect('cueboard-' + code, { reliable: true, serialization: 'json' }); net.conn = c;
+      const poll = setInterval(() => { const pc = c.peerConnection; if (pc) ice = pc.iceConnectionState; if (!net.joining) clearInterval(poll); }, 500);
       c.on('open', () => c.send({ t: 'hello', name: profile.name, color: profile.color }));
       c.on('data', m => onData(m, c));
       c.on('close', () => { if (net.role === 'guest') { toast('The host ended the session'); stopShare(true); } });
     });
-    peer.on('error', e => { toast(e.type === 'peer-unavailable' ? 'No room with that code' : 'Could not connect: ' + e.type); closeProfile(); stopShare(true); });
-    setTimeout(() => { if (net.peer === peer && net.joining && !(net.conn && net.conn.open)) { toast('Could not reach that room — check the code, or try another network'); stopShare(true); } }, 25000);
+    peer.on('error', e => { console.warn('peer error', e); toast(e.type === 'peer-unavailable' ? 'No room with that code' : 'Could not connect: ' + e.type); closeProfile(); stopShare(true); });
+    setTimeout(() => { if (net.peer === peer && net.joining && !(net.conn && net.conn.open)) { toast('Could not join. Step ' + stage + (ice ? ' [ice: ' + ice + ']' : '')); console.warn('join failed', stage, ice); stopShare(true); } }, 25000);
   }
 
   function stopShare(silent) {
