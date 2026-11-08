@@ -527,6 +527,9 @@
   #codeOverlay { background: rgba(0,0,0,.92); cursor: pointer; z-index: 250; }
 
   /* other people's cursors */
+  .pres { position: fixed; left: 0; top: 0; z-index: 130; align-items: center; gap: 3px; pointer-events: none; }
+  .pres i { width: 11px; height: 11px; border-radius: 50%; background: var(--c); border: 2px solid #fff; box-sizing: content-box; box-shadow: 0 0 0 1px rgba(0,0,0,.18); }
+  .pres b { min-width: 15px; height: 15px; padding: 0 3px; box-sizing: border-box; border-radius: 999px; background: #fff; color: #111; font: 700 9px/15px 'Montserrat', sans-serif; text-align: center; }
   .rcur { position: fixed; z-index: 2000; left: 0; top: 0; pointer-events: none; transition: left .08s linear, top .08s linear, opacity .4s ease; --c: #f43f5e; }
   .rcur svg { width: 24px; height: 24px; margin: -4px 0 0 -4px; transform: scaleX(-1); fill: var(--c); stroke: #fff; stroke-width: 1.6px; paint-order: stroke; filter: drop-shadow(0 1px 3px rgba(0,0,0,.45)); }
   .rcur b { position: absolute; left: 18px; top: 20px; background: var(--c); color: #fff; font: 600 11px 'Montserrat', sans-serif; padding: 3px 9px; border-radius: 999px; white-space: nowrap;
@@ -1033,7 +1036,9 @@
   let bv = { x: 0, y: 0, z: 1 }, bvt = { x: 0, y: 0, z: 1 }, bRaf = 0, bT = 0, bpn = null;
   function putCur(el) {
     if (el._wx === undefined) return; let x, y, show = true;
-    if (el._a) {                                                  // this person is inside the node editor: their position is in the editor's own board
+    { const t = tabs.get(el._uid); if (t && t.tab !== 'main') show = false; }       // cursors only show while that person is on the main board
+    if (!show) { }
+    else if (el._a) {                                                  // this person is inside the node editor: their position is in the editor's own board
       if (typeof autoOpen === 'undefined' || !autoOpen) show = false;
       else { const r = acanvas.getBoundingClientRect(), px = r.left + v.x + el._wx * v.z, py = r.top + v.y + el._wy * v.z; show = px >= r.left && px <= r.right && py >= r.top && py <= r.bottom; x = px + 'px'; y = py + 'px'; }
     } else { x = el._wx * bv.z + bv.x + 'px'; y = el._wy * bv.z + bv.y + 'px'; }
@@ -1493,6 +1498,8 @@
   const genCode = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), b => ALPHA[b % ALPHA.length]).join('');
   const CODE_RE = /^[a-z0-9]{6}$/;
   let cursors = {};
+  let presReady = false; const TABS = ['main', 'auto', 'add', 'share'];
+  const tabs = new Map();                                         // who is in which tab: id -> { tab: 'main' | 'auto' | 'add' | 'share', at }
   const dropCursor = el => { el.remove(); if (el._ar) el._ar.remove(); };
   const curSvg = '<svg viewBox="0 0 24 24"><path d="M10.05,13.95L3.58,11.33Q3.25,11.2 3.1,10.94T2.95,10.4q0-0.27 0.16-0.54T3.6,9.48l15.35-5.7q0.3-0.13 0.58-0.05T20,4t0.28,0.47T20.23,5.05L14.53,20.4q-0.13,0.33-0.39,0.49T13.6,21.05T13.06,20.9t-0.39-0.47l-2.63-6.48Z"/></svg>';
 
@@ -1514,6 +1521,8 @@
       li.append(d, n, t); ulist.appendChild(li);
     });
     Object.keys(cursors).forEach(id => { if (!net.users.some(u => u.id === id)) { dropCursor(cursors[id]); delete cursors[id]; } });
+    tabs.forEach((_, id) => { if (!net.users.some(u => u.id === id)) tabs.delete(id); });
+    tabsChanged();
   }
   function live(on) {
     const guest = on && net.role === 'guest', stopB = $('#stopShare');
@@ -1617,7 +1626,7 @@
     if (!el) { el = document.createElement('div'); el.className = 'rcur'; el.innerHTML = curSvg + '<b></b>'; document.body.appendChild(el); cursors[u.id] = el; }
     el.style.setProperty('--c', u.color); el.querySelector('b').textContent = u.name; el.classList.toggle('host', u.id === 'host');
     el.classList.remove('idle');
-    el._wx = m.x; el._wy = m.y; el._a = !!m.a; putCur(el);                          // cursors travel in board coordinates, so they line up whatever each person's pan / zoom
+    el._wx = m.x; el._wy = m.y; el._a = !!m.a; el._uid = u.id; putCur(el);                          // cursors travel in board coordinates, so they line up whatever each person's pan / zoom
     clearTimeout(el._t); el._t = setTimeout(() => { el.classList.add('idle'); if (el._ar) el._ar.classList.add('idle'); }, 6000);
   }
   addEventListener('pointermove', e => {
@@ -1646,6 +1655,7 @@
       if (from._u) { Object.assign(from._u, { name, color }); }
       else { from._u = { id: from.peer, name, color }; net.conns.add(from); net.users.push(from._u); toast(name + ' joined'); }
       tx(from, { t: 'welcome', you: from._u, users: net.users, items: JSON.parse(JSON.stringify(items)) });
+      tx(from, { t: 'tabs', list: [...tabs].filter(([id]) => id !== from._u.id).map(([id, p]) => ({ u: id, tab: p.tab, ago: Date.now() - p.at })) });
       relay({ t: 'users', users: net.users }, from); renderUsers();
     }
     else if (m.t === 'colortaken' && net.joining) { openProfile(net.joinCode, 'That colour is too close to someone else’s. Pick another one.', 'join'); }
@@ -1656,13 +1666,21 @@
       if (net.role === 'host') relay(m, from);
     }
     else if (m.t === 'cur') { showCursor(m); if (net.role === 'host') relay(m, from); }
+    else if (m.t === 'tab' && TABS.includes(m.tab) && (net.role === 'host' ? from && from._u : typeof m.u === 'string')) {
+      if (net.role === 'host') m.u = from._u.id;                                     // a guest can only speak for themselves
+      tabs.set(m.u, { tab: m.tab, at: Date.now() }); if (net.role === 'host') relay(m, from); tabsChanged();
+    }
+    else if (m.t === 'tabs' && net.role === 'guest' && Array.isArray(m.list)) {
+      m.list.slice(0, 32).forEach(p => { if (p && typeof p.u === 'string' && TABS.includes(p.tab) && !(net.me && p.u === net.me.id)) tabs.set(p.u, { tab: p.tab, at: Date.now() - Math.max(0, Math.min(1e7, +p.ago || 0)) }); });
+      tabsChanged();
+    }
     else if (m.t === 'users' && net.role === 'guest') { net.users = cleanUsers(m.users); renderUsers(); }
     else if (m.t === 'welcome' && net.joining) {
       net.role = 'guest'; net.joining = false; net.code = net.joinCode; codeText.textContent = net.joinCode; codeText.classList.remove('empty');
       net.me = cleanUsers([m.you])[0]; net.users = cleanUsers(m.users);
       net.backup = JSON.parse(JSON.stringify(items));                 // your own board comes back when you leave
       applying = true; loadItems(Array.isArray(m.items) ? m.items : []); applying = false;
-      resetLast(); live(true); toast('Joined room ' + net.joinCode);
+      resetLast(); live(true); toast('Joined room ' + net.joinCode); announceTab(true);
     }
   }
 
@@ -1678,7 +1696,7 @@
     peer.on('open', () => {
       net.role = 'host'; net.code = code; net.me = { id: 'host', name: profile.name, color: profile.color }; net.users = [net.me];
       codeText.textContent = code; codeText.classList.remove('empty');
-      resetLast(); live(true); toast('Sharing started — send people the code');
+      resetLast(); live(true); toast('Sharing started — send people the code'); announceTab(true);
     });
     peer.on('connection', hostConn);
     peer.on('error', e => {
@@ -1718,7 +1736,7 @@
     net.conns.forEach(c => { try { c.close(); } catch (e) {} }); net.conns.clear();
     if (net.conn) { try { net.conn.close(); } catch (e) {} }
     if (net.peer) { try { net.peer.destroy(); } catch (e) {} }
-    Object.values(cursors).forEach(dropCursor); cursors = {};
+    Object.values(cursors).forEach(dropCursor); cursors = {}; tabs.clear(); tabsChanged();
     const backup = net.backup;
     net.role = null; net.peer = null; net.conn = null; net.me = null; net.users = []; net.joining = false; net.backup = null;
     lastSent.clear();
@@ -2361,14 +2379,21 @@
     return auto.nodes.map(n => { const el = nodeEls[n.id]; return el ? { x: parseFloat(el.style.left), y: parseFloat(el.style.top), w: el.offsetWidth, h: el.offsetHeight } : null; }).filter(Boolean);
   }
   let wst = new Map(), wstNext = new Map(), wLast = 0, wKick = 0, wEase = 1, wBusy = false;
+  const resample = (P, n) => {                                    // the same polyline with n points spaced evenly along its length
+    const L = [0]; for (let i = 1; i < P.length; i++) L.push(L[i - 1] + Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]));
+    const T = L[L.length - 1] || 1, out = []; let k = 1;
+    for (let i = 0; i < n; i++) { const d = T * i / (n - 1); while (k < P.length - 1 && L[k] < d) k++; const a = P[k - 1], b = P[k], l = (L[k] - L[k - 1]) || 1, t = Math.max(0, Math.min(1, (d - L[k - 1]) / l)); out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]); }
+    return out;
+  };
   const easeRoute = (key, w) => {
-    const old = wst.get(key);
-    const cur = old && old.length === w.length ? w.map((p, i) => { if (!i || i === w.length - 1) return p; const dx = p[0] - old[i][0], dy = p[1] - old[i][1]; if (Math.abs(dx) + Math.abs(dy) > .3) { wBusy = true; return [old[i][0] + dx * wEase, old[i][1] + dy * wEase]; } return p; }) : w;
+    const old = wst.get(key); let o = old;
+    if (old && old.length !== w.length) o = resample(old, w.length);   // a route that changes shape morphs into the new one instead of popping
+    const cur = o ? w.map((p, i) => { if (!i || i === w.length - 1) return p; const dx = p[0] - o[i][0], dy = p[1] - o[i][1]; if (Math.abs(dx) + Math.abs(dy) > .3) { wBusy = true; return [o[i][0] + dx * wEase, o[i][1] + dy * wEase]; } return p; }) : w;
     wstNext.set(key, cur); return cur;
   };
-  function routeWire(a, b, rects, key) {
-    const z = v.z, plain = wirePath(a[0], a[1], b[0], b[1], b[2], a[2]);
-    if (!rects.length) return plain;
+  function routeCore(a, b, rects, key) {
+    const z = v.z;
+    if (!rects.length) return null;
     const aw = [(a[0] - v.x) / z, (a[1] - v.y) / z, a[2]], bw = [(b[0] - v.x) / z, (b[1] - v.y) / z, b[2]];
     const k = Math.max(50, Math.abs(bw[0] - aw[0]) * .5), kk = Math.max(46, Math.abs(bw[1] - aw[1]) * .5), sv = VEC[a[2]] || VEC.r, ev = VEC[b[2]] || VEC.l, ln = q => q[0] ? k : kk;
     const c1 = [aw[0] + sv[0] * ln(sv), aw[1] + sv[1] * ln(sv)], c2 = [bw[0] + ev[0] * ln(ev), bw[1] + ev[1] * ln(ev)];
@@ -2378,12 +2403,12 @@
       const t = i / 24, u = 1 - t, x = u * u * u * aw[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * bw[0], y = u * u * u * aw[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * bw[1];
       hit = rects.some(r => x > r.x - pad && x < r.x + r.w + pad && y > r.y - pad && y < r.y + r.h + pad);
     }
-    if (!hit) return plain;
+    if (!hit) return null;
     const m = 30, g = 12, A = [aw[0] + sv[0] * m, aw[1] + sv[1] * m], B = [bw[0] + ev[0] * m, bw[1] + ev[1] * m];
     const lo = [Math.min(A[0], B[0]) - 160, Math.min(A[1], B[1]) - 160], hi = [Math.max(A[0], B[0]) + 160, Math.max(A[1], B[1]) + 160];
     const R = rects.filter(r => r.x < hi[0] && r.x + r.w > lo[0] && r.y < hi[1] && r.y + r.h > lo[1]).slice(0, 12).map(r => ({ x: r.x - g, y: r.y - g, w: r.w + 2 * g, h: r.h + 2 * g }));
     const inside = (x, y) => R.some(r => x > r.x + .01 && x < r.x + r.w - .01 && y > r.y + .01 && y < r.y + r.h - .01);
-    if (inside(A[0], A[1]) || inside(B[0], B[1])) return plain;
+    if (inside(A[0], A[1]) || inside(B[0], B[1])) return null;
     const xs = [...new Set([A[0], B[0], ...R.flatMap(r => [r.x, r.x + r.w])])].sort((p, q) => p - q), ys = [...new Set([A[1], B[1], ...R.flatMap(r => [r.y, r.y + r.h])])].sort((p, q) => p - q);
     const blockH = (y, x1, x2) => R.some(r => y > r.y + .01 && y < r.y + r.h - .01 && Math.min(x1, x2) < r.x + r.w - .01 && Math.max(x1, x2) > r.x + .01);
     const blockV = (x, y1, y2) => R.some(r => x > r.x + .01 && x < r.x + r.w - .01 && Math.min(y1, y2) < r.y + r.h - .01 && Math.max(y1, y2) > r.y + .01);
@@ -2408,26 +2433,48 @@
         if (cost < (dist.get(ns) ?? 1e18)) { dist.set(ns, cost); prev.set(ns, st); push(cost, ns); }
       });
     }
-    if (goal < 0) return plain;
+    if (goal < 0) return null;
     const pts = []; for (let st = goal; st !== undefined; st = prev.get(st)) { const cell = (st - st % 4) / 4; pts.push([xs[cell % NX], ys[(cell - cell % NX) / NX]]); }
     pts.reverse(); pts.unshift([aw[0], aw[1]]); pts.push([bw[0], bw[1]]);
     const P = pts.filter((p, i) => !i || Math.abs(p[0] - pts[i - 1][0]) + Math.abs(p[1] - pts[i - 1][1]) > .5);
     const Q = P.filter((p, i) => i === 0 || i === P.length - 1 || !((P[i - 1][0] === p[0] && p[0] === P[i + 1][0]) || (P[i - 1][1] === p[1] && p[1] === P[i + 1][1])));   // drop points on a straight run
     const E = easeRoute(key, Q), X = p => v.x + p[0] * z, Y = p => v.y + p[1] * z;
-    // flowing corners: as generous as the space allows, eased back only as far as needed to keep clear of the nodes
-    const build = cap => {
-      let dd = 'M' + X(E[0]) + ' ' + Y(E[0]); const chk = [];
-      for (let i = 1; i < E.length - 1; i++) {
-        const p = E[i - 1], c = E[i], n = E[i + 1], l1 = Math.hypot(c[0] - p[0], c[1] - p[1]) || 1, l2 = Math.hypot(n[0] - c[0], n[1] - c[1]) || 1, rr = Math.min(cap, l1 / 2, l2 / 2);
-        const e1 = [c[0] + (p[0] - c[0]) / l1 * rr, c[1] + (p[1] - c[1]) / l1 * rr], e2 = [c[0] + (n[0] - c[0]) / l2 * rr, c[1] + (n[1] - c[1]) / l2 * rr];
-        dd += 'L' + X(e1) + ' ' + Y(e1) + 'Q' + X(c) + ' ' + Y(c) + ' ' + X(e2) + ' ' + Y(e2);
-        for (let t = .2; t < .9; t += .2) { const u = 1 - t; chk.push([u * u * e1[0] + 2 * u * t * c[0] + t * t * e2[0], u * u * e1[1] + 2 * u * t * c[1] + t * t * e2[1]]); }
+    // flowing corners: each one as generous as the space allows, shrunk smoothly (never in jumps) only as far as needed to keep clear of the nodes
+    let dd = 'M' + X(E[0]) + ' ' + Y(E[0]); const PTS = [E[0]];
+    for (let i = 1; i < E.length - 1; i++) {
+      const p = E[i - 1], c = E[i], n = E[i + 1], l1 = Math.hypot(c[0] - p[0], c[1] - p[1]) || 1, l2 = Math.hypot(n[0] - c[0], n[1] - c[1]) || 1;
+      let rr = Math.min(110, l1 / 2, l2 / 2), e1, e2;
+      for (let tries = 0; tries < 12; tries++) {
+        e1 = [c[0] + (p[0] - c[0]) / l1 * rr, c[1] + (p[1] - c[1]) / l1 * rr]; e2 = [c[0] + (n[0] - c[0]) / l2 * rr, c[1] + (n[1] - c[1]) / l2 * rr];
+        let bad = false; for (let t = .2; t < .9 && !bad; t += .2) { const u = 1 - t, x = u * u * e1[0] + 2 * u * t * c[0] + t * t * e2[0], y = u * u * e1[1] + 2 * u * t * c[1] + t * t * e2[1]; bad = rects.some(r => x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h); }
+        if (!bad) break; rr *= .85;
       }
-      return [dd + 'L' + X(E[E.length - 1]) + ' ' + Y(E[E.length - 1]), chk];
-    };
-    let out;
-    for (const cap of [1e9, 110, 70, 46, 28]) { out = build(cap); if (!out[1].some(p => rects.some(r => p[0] > r.x && p[0] < r.x + r.w && p[1] > r.y && p[1] < r.y + r.h))) break; }
-    return out[0];
+      dd += 'L' + X(e1) + ' ' + Y(e1) + 'Q' + X(c) + ' ' + Y(c) + ' ' + X(e2) + ' ' + Y(e2);
+      PTS.push(e1); for (let t = .25; t < .9; t += .25) { const u = 1 - t; PTS.push([u * u * e1[0] + 2 * u * t * c[0] + t * t * e2[0], u * u * e1[1] + 2 * u * t * c[1] + t * t * e2[1]]); } PTS.push(e2);
+    }
+    PTS.push(E[E.length - 1]);
+    return { d: dd + 'L' + X(E[E.length - 1]) + ' ' + Y(E[E.length - 1]), P: PTS };
+  }
+  /* a wire switching between its loose curve and a detour glides from one to the other (a blend of the two shapes) instead of popping */
+  const wmix = new Map(), wmixNext = new Map(), wlastR = new Map(), NPT = 48;
+  function plainWorld(a, b) {
+    const z = v.z, aw = [(a[0] - v.x) / z, (a[1] - v.y) / z], bw = [(b[0] - v.x) / z, (b[1] - v.y) / z];
+    const k = Math.max(50, Math.abs(bw[0] - aw[0]) * .5), kk = Math.max(46, Math.abs(bw[1] - aw[1]) * .5), sv = VEC[a[2]] || VEC.r, ev = VEC[b[2]] || VEC.l, ln = q => q[0] ? k : kk;
+    const c1 = [aw[0] + sv[0] * ln(sv), aw[1] + sv[1] * ln(sv)], c2 = [bw[0] + ev[0] * ln(ev), bw[1] + ev[1] * ln(ev)], P = [];
+    for (let i = 0; i <= 96; i++) { const t = i / 96, u = 1 - t; P.push([u * u * u * aw[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * bw[0], u * u * u * aw[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * bw[1]]); }
+    return P;
+  }
+  function routeWire(a, b, rects, key) {
+    const plain = wirePath(a[0], a[1], b[0], b[1], b[2], a[2]), R = routeCore(a, b, rects, key);
+    let m = wmix.get(key) || 0; const target = R ? 1 : 0;
+    if (R) wlastR.set(key, R.P);
+    if (m !== target) { m += (target - m) * wEase * .4; if (Math.abs(target - m) < .02) m = target; else wBusy = true; }
+    wmixNext.set(key, m);
+    if (m <= 0) { wlastR.delete(key); return plain; }
+    if (m >= 1 && R) return R.d;
+    const rp = R ? R.P : wlastR.get(key); if (!rp) return plain;
+    const A = resample(plainWorld(a, b), NPT), B = resample(rp, NPT), z = v.z;
+    return A.map((p, i) => (i ? 'L' : 'M') + (v.x + (p[0] + (B[i][0] - p[0]) * m) * z) + ' ' + (v.y + (p[1] + (B[i][1] - p[1]) * m) * z)).join('');
   }
   function drawWires() {
     if (!autoOpen) return;
@@ -2441,7 +2488,7 @@
       s += '<g class="wg' + (badLink(l) ? ' bad' : '') + ((lglow.get(l[0] + l[1] + l[2]) || 0) > nowT ? ' on' : '') + '" data-n="' + n + '" style="--wc:' + wireFill(l, n, a, b, (x) => { defs += x; }) + '"><path class="hit" d="' + d + '"/><path class="vis" d="' + d + '"/></g>';
     });
     if (wd) { const a = outPos(wd.id, wd.fp); if (a) s += '<path class="tmp" style="--wc:' + pinColor(nodeById(wd.id), outKey(wd.fp)) + '" d="' + wirePath(a[0], a[1], wd.cx, wd.cy, wd.snapB ? wd.snapB[2] : undefined, a[2]) + '"/>'; }
-    wst = wstNext; if (wBusy && !wKick) wKick = requestAnimationFrame(() => { wKick = 0; drawWires(); });
+    wst = wstNext; wmix.clear(); wmixNext.forEach((x, k) => wmix.set(k, x)); wmixNext.clear(); if (wBusy && !wKick) wKick = requestAnimationFrame(() => { wKick = 0; drawWires(); });
     awires.innerHTML = '<defs>' + defs + '</defs>' + s;
     awires.querySelectorAll('.wg.bad').forEach(g => {          // a wire into a pin that is switched off: broken line with an × in the gap
       const vis = g.querySelector('.vis'), L = vis.getTotalLength(), gap = 30 * v.z, h = Math.max(0, (L - gap) / 2), pt = vis.getPointAtLength(L / 2), k = 6 * v.z;
@@ -2855,6 +2902,38 @@
     closePick(); dock.classList.remove('away'); shareDock.classList.remove('away'); autoDock.classList.remove('open'); autoDock.setAttribute('aria-expanded', 'false');
     autoOpen = false; binding = null; Object.values(cursors).forEach(putCur);
   }
+  /* ---------- presence: a coloured dot on the tab each person is in ---------- */
+  const TABEL = { auto: autoDock, add: dock, share: shareDock };
+  const PRES = {}; Object.entries(TABEL).forEach(([k, d]) => { const p = document.createElement('div'); p.className = 'pres'; document.body.appendChild(p); PRES[k] = p; });
+  let presRaf = 0;
+  function presFollow() {                                         // each badge rides the bottom-left rim of its tab button, whatever size the tab is mid-animation
+    presRaf = 0; let any = false;
+    Object.entries(TABEL).forEach(([k, d]) => {
+      const p = PRES[k], r = d.getBoundingClientRect(), on = p.firstChild && !d.classList.contains('away'); p.style.display = on ? 'flex' : 'none';
+      if (on) { any = true; p.style.left = r.left - 2 + 'px'; p.style.top = r.bottom - 15 + 'px'; }
+    });
+    if (any) presRaf = requestAnimationFrame(presFollow);
+  }
+  const myTab = () => autoDock.classList.contains('open') ? 'auto' : dock.classList.contains('open') ? 'add' : shareDock.classList.contains('open') ? 'share' : 'main';
+  let lastTab = '';
+  function announceTab(force) {
+    if (!presReady) return; const t = myTab(); if (t === lastTab && !force) return; lastTab = t;
+    if (!net.role || !net.me) return;
+    tabs.set(net.me.id, { tab: t, at: Date.now() }); send({ t: 'tab', u: net.me.id, tab: t }); tabsChanged();
+  }
+  function tabsChanged() { Object.values(cursors).forEach(putCur); renderPres(); }
+  function renderPres() {
+    if (!presReady) return;
+    Object.entries(TABEL).forEach(([name, d]) => {
+      const box = PRES[name]; if (!box) return;
+      const here = net.role ? net.users.filter(u => tabs.get(u.id) && tabs.get(u.id).tab === name).sort((a, b) => tabs.get(a.id).at - tabs.get(b.id).at) : [];
+      box.innerHTML = here.length ? '<i style="--c:' + here[0].color + '" title="' + here[0].name.replace(/[<>&"]/g, '') + '"></i>' + (here.length > 1 ? '<b>+' + (here.length - 1) + '</b>' : '') : '';
+    });
+    if (!presRaf) presRaf = requestAnimationFrame(presFollow);
+  }
+  presReady = true;
+  new MutationObserver(() => announceTab()).observe(autoDock, { attributes: true, attributeFilter: ['class'] });
+  [dock, shareDock].forEach(d => new MutationObserver(() => announceTab()).observe(d, { attributes: true, attributeFilter: ['class'] }));
   autoDock.addEventListener('click', () => { if (!autoDock.classList.contains('open')) openAuto(); });
   autoDock.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && !autoDock.classList.contains('open') && e.target === autoDock) { e.preventDefault(); openAuto(); } });
   $('#autoCollapse').addEventListener('click', e => { e.stopPropagation(); closeAuto(); });
