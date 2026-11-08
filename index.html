@@ -271,6 +271,14 @@
   }
   .card:hover, .card:focus-visible { border-color: #fff; background: rgba(0,0,0,.5); outline: none; }
   .card:active { transform: scale(.96); }
+  .item.button { width: max-content; }
+  .item.button .ubw { display: flex; align-items: center; gap: 4px; background: #000; color: #fff; border-radius: 999px; height: 48px; padding: 0 8px 0 0; box-shadow: 0 2px 10px rgba(0,0,0,.25); transition: transform .18s var(--spring), background .15s; }
+  .item.button.down .ubw { transform: scale(.95); background: #2a2a2a; }
+  .item.button .ub { all: unset; box-sizing: border-box; cursor: pointer; height: 48px; display: flex; align-items: center; padding: 0 6px 0 26px; font: 600 20px 'Montserrat', sans-serif; white-space: nowrap; }
+  .item.button .nm { outline: none; min-width: 24px; }
+  .item.button .bdg { all: unset; box-sizing: border-box; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; background: #555; color: #fff; display: grid; place-items: center; font: 600 15px 'Montserrat', sans-serif; transition: background .15s, transform .15s var(--spring); }
+  .item.button .bdg:hover { background: #777; transform: scale(1.08); } .item.button .bdg.none { background: transparent; border: 2px dashed #666; color: #888; } .item.button .bdg.bind { background: #7b4dff; animation: ubpulse 1s ease-in-out infinite; }
+  @keyframes ubpulse { 50% { box-shadow: 0 0 0 6px rgba(123,77,255,.3); } }
   .card svg { width: 92px; height: 92px; margin-bottom: 4px; }
   .card b { font-size: 24px; font-weight: 500; }
   .card small { font-size: 12.5px; font-weight: 400; opacity: .95; }
@@ -736,7 +744,7 @@
       <svg class="awires" id="awires"></svg>
     </div>
     <div class="amaps" id="amaps"><div class="mlist" id="mlist"><div class="minner" id="minner"></div></div><div class="mctl"><button id="mminus" title="Remove the last mapped button"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><button id="mplus" title="Add a mapped button"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></svg></button></div></div>
-    <div class="apal" id="apal"><button data-t="audio">Audio</button><button data-t="key">Button Input</button><button data-t="counter">Counter</button><button data-t="wait">Wait</button><button data-t="number">Number</button><button data-t="value">VALUE</button><button data-t="and">AND</button><button data-t="if">IF</button><button data-t="nor">NOR</button><button data-t="or">OR</button><button data-t="xor">XOR</button><button data-t="xand">XAND</button><button data-t="random">RANDOM</button><button data-t="loop">LOOP</button><button data-t="print">Print</button><button data-t="split">Splitter</button><button data-t="light">Light</button><button data-t="prop">Property Changer</button><button data-t="rgb">RGB</button><button data-t="matrix">LED Matrix</button><button data-t="mover">Mover</button><button data-t="mvset">Mover Setter</button></div>
+    <div class="apal" id="apal"><button data-t="ui">UI Button</button><button data-t="audio">Audio</button><button data-t="key">Button Input</button><button data-t="counter">Counter</button><button data-t="wait">Wait</button><button data-t="number">Number</button><button data-t="value">VALUE</button><button data-t="and">AND</button><button data-t="if">IF</button><button data-t="nor">NOR</button><button data-t="or">OR</button><button data-t="xor">XOR</button><button data-t="xand">XAND</button><button data-t="random">RANDOM</button><button data-t="loop">LOOP</button><button data-t="print">Print</button><button data-t="split">Splitter</button><button data-t="light">Light</button><button data-t="prop">Property Changer</button><button data-t="rgb">RGB</button><button data-t="matrix">LED Matrix</button><button data-t="mover">Mover</button><button data-t="mvset">Mover Setter</button></div>
   </div>
 </div>
 
@@ -746,6 +754,7 @@
   <div class="cards">
     <button class="card" data-type="audio"><span data-icon="audio"></span><b>Audio</b><small>Make audio cue controls</small></button>
     <button class="card" data-type="image"><span data-icon="image"></span><b>Images</b><small>Add images or videos</small></button>
+    <button class="card" data-type="button"><span data-icon="button"></span><b>Button</b><small>For connecting to automation</small></button>
     <button class="card" data-type="text"><span data-icon="text"></span><b>Text</b><small>Add texts and notes</small></button>
   </div>
 </div>
@@ -848,6 +857,7 @@
   if (NOMOB) { document.documentElement.classList.add('nomobile'); document.addEventListener('DOMContentLoaded', () => { document.body.querySelectorAll('body > *:not(#nomob):not(style)').forEach(x => { x.style.display = 'none'; }); }); return; }
   /* ---------- icons ---------- */
   const ICON = {
+    button: '<svg viewBox="0 0 24 24"><path transform="rotate(-90 12 12)" d="M6.28,18.7Q6.1,19.35 5.89,19.98T5.33,21.25q-0.05,0.13-0.2,0.16q-0.15,0.04-0.27-0.04T4.69,21.16T4.73,20.9q1.13-2.17 1.24-4.34T6.08,12q0-2.35-0.11-4.53T4.73,3.15Q4.65,3.02 4.69,2.88Q4.73,2.72 4.85,2.65T5.11,2.63Q5.25,2.67 5.33,2.8Q5.65,3.42 5.88,4.04T6.28,5.3H8.3q1.32,0 2.24,0.97t0.91,2.38v6.73q0,1.4-0.91,2.36T8.3,18.7H6.28Zm9.7-6.35l1.85,1.97q0.1,0.13 0.1,0.25T17.8,14.83t-0.26,0.11T17.3,14.8l-2.18-2.28q-0.2-0.22-0.2-0.52t0.2-0.53L17.3,9.2q0.1-0.13 0.24-0.13T17.8,9.2q0.1,0.1 0.11,0.24q0.01,0.14-0.09,0.26l-1.85,1.95h4.38q0.15,0 0.25,0.1T20.7,12t-0.1,0.25t-0.25,0.1H15.98ZM6.43,18H8.3q1.03,0 1.74-0.77t0.71-1.88V8.63q0-1.07-0.71-1.85T8.3,6H6.43Q6.7,7.43 6.74,8.89T6.78,12T6.74,15.13T6.43,18Zm0.35-6Z"/></svg>',
     image: '<svg viewBox="0 0 24 24"><path d="M5.8,19.7q-0.65,0-1.08-0.43T4.3,18.2V5.8q0-0.65 0.43-1.08T5.8,4.3H18.2q0.65,0 1.08,0.43T19.7,5.8V18.2q0,0.65-0.43,1.07T18.2,19.7H5.8Zm0-0.7H18.2q0.3,0 0.55-0.25T19,18.2V5.8q0-0.3-0.25-0.55T18.2,5H5.8Q5.5,5 5.25,5.25T5,5.8V18.2q0,0.3 0.25,0.55T5.8,19ZM5,19q0,0 0-0.25T5,18.2V5.8Q5,5.5 5,5.25T5,5Q5,5 5,5.25T5,5.8V18.2q0,0.3 0,0.55T5,19Zm3.7-2.65h6.8q0.23,0 0.33-0.2t-0.03-0.4L14,13.33q-0.13-0.15-0.3-0.15t-0.3,0.15l-2.2,2.73l-1.3-1.5q-0.13-0.13-0.29-0.13T9.33,14.58l-0.9,1.18q-0.15,0.2-0.05,0.4t0.33,0.2Z"/></svg>',
     audio: '<svg viewBox="0 0 24 24"><path d="M18.6,11.98q0-2.04-1.11-3.73T14.5,5.72q-0.15-0.07-0.22-0.2T14.27,5.27q0.08-0.14 0.26-0.17t0.35,0.05q2,0.95 3.21,2.77t1.21,4.05t-1.21,4.05T14.88,18.8q-0.17,0.07-0.35,0.05t-0.26-0.17q-0.07-0.13 0.01-0.26t0.22-0.2q1.87-0.84 2.99-2.52t1.11-3.73ZM7.95,13.7H5.45q-0.32,0-0.53-0.22T4.7,12.95v-1.9q0-0.32 0.22-0.53T5.45,10.3h2.5l2.5-2.5q0.17-0.18 0.41-0.08T11.1,8.05v7.9q0,0.24-0.24,0.33T10.45,16.2l-2.5-2.5ZM15.6,12q0,0.75-0.25,1.42t-0.72,1.19q-0.15,0.13-0.34,0.06T14.1,14.4V9.55q0-0.2 0.19-0.28t0.34,0.05q0.47,0.52 0.72,1.22T15.6,12ZM10.4,8.85L8.25,11H5.4v2H8.25l2.15,2.15V8.85ZM7.9,12Z"/></svg>',
     text: '<svg viewBox="0 0 24 24"><path d="M8.31,18.6Q8.2,18.5 8.2,18.35V6.02H3.68q-0.16,0-0.27-0.11T3.3,5.65T3.4,5.4T3.65,5.3h9.8q0.16,0 0.27,0.1t0.11,0.25t-0.1,0.26T13.48,6.02H8.93v12.3q0,0.16-0.1,0.27T8.57,18.7T8.31,18.6Zm8.84,0q-0.1-0.1-0.1-0.25V10.9H14.48q-0.16,0-0.27-0.11T14.1,10.53t0.1-0.25t0.25-0.1h5.88q0.16,0 0.27,0.1t0.11,0.25t-0.1,0.26T20.35,10.9h-2.6v7.45q0,0.15-0.1,0.25T17.4,18.7t-0.25-0.1Z"/></svg>',
@@ -864,9 +874,11 @@
   const DEF = {
     audio: { w: 200, h: 66, name: 'Audio Name', src: '', loop: false, trimStart: 0, trimEnd: 0, speed: 1, keepPitch: true },
     image: { w: 260, h: 190, src: '' },
+    button: { w: 200, h: 48, name: 'Button', key: '' },
     text:  { w: 280, h: 40, html: 'Text', font: 'Montserrat', fs: 32, color: '#111111', bold: false, italic: false }
   };
   const SAFE_SRC = /^data:((image|audio)\/[a-z0-9.+-]+|application\/octet-stream);base64,/i;
+  const ubHeld = new Set(); let ubBind = null;
   let items = [], els = {}, players = {}, selId = null, placing = null, editingId = null, pickFor = null, ro;
   const GRID = 20;                                   // keep in sync with --grid in the CSS
   const snap = v => Math.round(v / GRID) * GRID;
@@ -914,6 +926,7 @@
     if (typeof raw.id === 'string' && /^[a-z0-9]{3,16}$/.test(raw.id)) it.id = raw.id;
     ['x', 'y', 'w', 'h', 'fs', 'trimStart', 'trimEnd', 'speed'].forEach(k => { if (typeof raw[k] === 'number' && isFinite(raw[k])) it[k] = raw[k]; });
     if (raw.type === 'audio') { it.name = String(raw.name || it.name).slice(0, 80); it.loop = !!raw.loop; it.custom = !!raw.custom; it.speed = Math.max(0.25, Math.min(4, it.speed || 1)); it.keepPitch = raw.keepPitch !== false; it.src = SAFE_SRC.test(raw.src) ? raw.src : ''; }
+    if (raw.type === 'button') { it.name = String(raw.name || it.name).slice(0, 40); it.key = typeof raw.key === 'string' ? raw.key.slice(0, 12) : ''; }
     if (raw.type === 'image') it.src = SAFE_SRC.test(raw.src) ? raw.src : '';
     if (raw.type === 'text') {
       it.html = clean(String(raw.html || '')); 
@@ -940,20 +953,20 @@
     if (it.type === 'audio') buildAudio(it, el);
     if (it.type === 'image') buildImage(it, el);
     if (it.type === 'text') buildText(it, el);
+    if (it.type === 'button') buildUIButton(it, el);
     world.appendChild(el); els[it.id] = el;
     ro.observe(el);
     return el;
   }
 
   function buildAudio(it, el) {
-    el.innerHTML = '<div class="row"><button class="restart" aria-label="Restart"></button><button class="play" aria-label="Play / stop"></button><div class="pill"><span class="name"></span><button class="kebab" aria-label="Options"><i></i><i></i><i></i></button></div></div><div class="seek"><div class="track"><div class="buf"></div><div class="fill"></div><div class="knob"></div></div></div>';
+    el.innerHTML = '<div class="row"><button class="restart" aria-label="Restart"></button><button class="play" aria-label="Play / stop"></button><div class="pill"><span class="name"></span></div></div><div class="seek"><div class="track"><div class="buf"></div><div class="fill"></div><div class="knob"></div></div></div>';
     el.querySelector('.restart').innerHTML = ICON.restart;
     el.querySelector('.play').innerHTML = ICON.play;
     el.querySelector('.restart').addEventListener('click', () => restartPlay(it));
     refreshName(it, el);
     el.querySelector('.play').addEventListener('click', () => togglePlay(it));
     el.querySelector('.name').addEventListener('dblclick', () => renameAudio(it));
-    el.querySelector('.kebab').addEventListener('click', e => { e.stopPropagation(); openMenu(it); });
     const seek = el.querySelector('.seek'), track = el.querySelector('.track');
     let seeking = false;
     const seekTo = e => {
@@ -1041,6 +1054,35 @@
     else { const d = document.createElement('div'); d.className = 'empty'; d.innerHTML = ICON.image + '<span>Click to upload</span>'; el.appendChild(d); }
   }
 
+  /* a button on the main board that the node editor's UI Button node listens to (board = front end, automation = back end) */
+  function ubKeyName(k) { return k.length === 1 ? k.toUpperCase() : ({ ' ': 'Space', ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→', Control: 'Ctrl' }[k] || k); }
+  const ubKeyText = it => it.key ? ubKeyName(it.key) : '+';
+  function ubPress(it) { if (ubHeld.has(it.id)) return; ubHeld.add(it.id); const el = els[it.id]; if (el) el.classList.add('down'); runUI(it); }
+  function ubRelease(it) { if (!ubHeld.delete(it.id)) return; const el = els[it.id]; if (el) el.classList.remove('down'); }
+  function ubRefresh(it, el0) { const el = el0 || els[it.id]; if (!el) return; el.querySelector('.nm').textContent = it.name; const b = el.querySelector('.bdg'); b.textContent = ubBind === it.id ? '…' : ubKeyText(it); b.classList.toggle('bind', ubBind === it.id); b.classList.toggle('none', !it.key && ubBind !== it.id); b.title = it.key ? 'Key: ' + ubKeyName(it.key) + '  (click to change)' : 'Click, then press a key to use it for this button'; }
+  function buildUIButton(it, el) {
+    el.innerHTML = '<div class="ubw"><button class="ub" title="Runs the UI Button nodes linked to it"><span class="nm"></span></button><button class="bdg"></button></div>';
+    const ub = el.querySelector('.ub'), bdg = el.querySelector('.bdg'), nm = el.querySelector('.nm');
+    ub.addEventListener('keydown', e => e.stopPropagation());
+    ub.addEventListener('dblclick', () => {
+      nm.contentEditable = 'true'; nm.focus(); const r = document.createRange(); r.selectNodeContents(nm); const sl = getSelection(); sl.removeAllRanges(); sl.addRange(r);
+      const done = () => { nm.contentEditable = 'false'; it.name = (nm.textContent.trim() || 'Button').slice(0, 40); nm.removeEventListener('blur', done); ubRefresh(it); save(); syncSel(); };
+      nm.addEventListener('blur', done); nm.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') { e.preventDefault(); nm.blur(); } });
+    });
+    bdg.addEventListener('click', e => { e.stopPropagation(); const old = ubBind; ubBind = ubBind === it.id ? null : it.id; if (old && get(old)) ubRefresh(get(old)); ubRefresh(it); if (ubBind) toast('Press a key for ' + it.name + '  ·  Esc to clear'); });
+    ubRefresh(it, el);
+  }
+  addEventListener('keydown', e => {
+    if (ubBind) { const it = get(ubBind); if (!it) { ubBind = null; return; } e.preventDefault(); e.stopImmediatePropagation(); if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta') return;
+      if (e.key === 'Escape') it.key = ''; else { const k = e.key.length === 1 ? e.key.toLowerCase() : e.key; items.forEach(o => { if (o.type === 'button' && o.key === k) { o.key = ''; ubRefresh(o); } }); it.key = k; }
+      ubBind = null; ubRefresh(it); save(); return; }
+    if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || editingId || document.activeElement.isContentEditable) return;
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key, it = items.find(o => o.type === 'button' && o.key && o.key === k);
+    if (it) { e.preventDefault(); ubPress(it); }
+  }, true);
+  addEventListener('keyup', e => { const k = e.key.length === 1 ? e.key.toLowerCase() : e.key; items.forEach(o => { if (o.type === 'button' && o.key === k) ubRelease(o); }); }, true);
+
   function buildText(it, el) {
     el.style.width = it.w + 'px';
     const c = document.createElement('div'); c.className = 'content'; c.innerHTML = it.html;
@@ -1090,7 +1132,7 @@
     if (drag && drag.it === it) r = { left: it.x * bv.z + bv.x, top: it.y * bv.z + bv.y, width: (it.type === 'audio' ? el.offsetWidth : it.w) * bv.z, height: (it.type === 'image' ? it.h : el.offsetHeight) * bv.z };
     const f = frameBox(r.left, r.top, r.width, r.height);
     sel.style.left = f.l + 'px'; sel.style.top = f.t + 'px'; sel.style.width = f.w + 'px'; sel.style.height = f.h + 'px';
-    sel.classList.toggle('resizable', it.type !== 'audio'); sel.classList.toggle('is-text', it.type === 'text');
+    sel.classList.toggle('resizable', it.type !== 'audio' && it.type !== 'button'); sel.classList.toggle('is-text', it.type === 'text');
     sel.classList.add('show');
     const showBar = it.type !== 'audio';
     bar.classList.toggle('show', showBar && !drag);
@@ -1162,14 +1204,17 @@
   let drag = null;
   world.addEventListener('pointerdown', e => {
     if (placing) { place(e); return; }
+    if (e.button === 2) { const re = e.target.closest('.item'); if (re) select(re.dataset.id); return; }
     const el = e.target.closest('.item');
     if (!el) { select(null); bpn = { sx: e.clientX, sy: e.clientY, ox: bv.x, oy: bv.y }; world.classList.add('panning'); return; }
     const it = get(el.dataset.id);
     if (e.target.closest('[contenteditable="true"]')) { select(it.id); return; }
     select(it.id);
-    if (e.target.closest('button, .seek')) return;
+    if (e.target.closest('button, .seek') && it.type !== 'button') return;
+    if (it.type === 'button' && e.target.closest('.bdg')) return;
     e.preventDefault();
-    drag = { mode: 'move', it, el, sx: e.clientX, sy: e.clientY, ox: it.x, oy: it.y, moved: false };
+    drag = { mode: 'move', it, el, sx: e.clientX, sy: e.clientY, ox: it.x, oy: it.y, moved: false, press: it.type === 'button' && !!e.target.closest('.ub') };
+    if (drag.press) el.classList.add('down');
     sel.classList.add('nt'); el.classList.add('gl'); el.style.cursor = 'grabbing';
   });
   sel.querySelectorAll('.rh').forEach(h => h.addEventListener('pointerdown', e => {
@@ -1218,6 +1263,7 @@
     if (!drag) return;
     const d = drag; drag = null; sel.classList.remove('nt'); d.el.style.cursor = ''; setTimeout(() => d.el.classList.remove('gl'), 220);
     if (d.mode === 'move' && !d.moved && d.it.type === 'image' && !d.it.src) { pickFor = d.it.id; fileImg.click(); }
+    if (d.press) { d.el.classList.remove('down'); if (!d.moved) { ubPress(d.it); setTimeout(() => ubRelease(d.it), 160); } }
     save(); syncSel();
   });
 
@@ -1251,24 +1297,36 @@
 
   /* ---------- audio menu ---------- */
   const MI = {
+    rename: '<svg viewBox="0 0 24 24" style="fill:#fff;stroke:none"><path d="M14,7H10.5Q9.88,7 9.44,6.56T9,5.5T9.44,4.44T10.5,4h10q0.63,0 1.06,0.44T22,5.5T21.56,6.56T20.5,7H17V18.5q0,0.63-0.44,1.06T15.5,20t-1.06-0.44T14,18.5V7ZM5,12H3.5q-0.63,0-1.06-0.44T2,10.5T2.44,9.44T3.5,9h6q0.63,0 1.06,0.44T11,10.5t-0.44,1.06T9.5,12H8v6.5q0,0.63-0.44,1.06T6.5,20T5.44,19.56T5,18.5V12Z"/></svg>',
     plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
     minus: '<svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>',
     trim: '<svg viewBox="0 0 20 20"><path fill="currentColor" stroke="none" d="M4.88,15.75l0.67,0.67q0.23,0.23 0.23,0.52T5.54,17.46T5.01,17.69T4.48,17.46L2.52,15.52q-0.1-0.1-0.16-0.24T2.31,15t0.05-0.28t0.16-0.24l1.95-1.96q0.23-0.23 0.53-0.23t0.53,0.23q0.23,0.22 0.23,0.53T5.54,13.58L4.88,14.25H15.13l-0.67-0.67q-0.23-0.23-0.22-0.53t0.24-0.53t0.53-0.23t0.53,0.23l1.93,1.96q0.11,0.11 0.16,0.24T17.69,15t-0.05,0.28t-0.16,0.24l-1.96,1.96Q15.29,17.71 15,17.7t-0.52-0.23q-0.23-0.24-0.23-0.54t0.22-0.53l0.65-0.65H4.88Zm4.38-5.5V1.75q0-0.32 0.21-0.53T10,1t0.54,0.22t0.22,0.53v8.5q0,0.32-0.21,0.53T10,11T9.47,10.78T9.25,10.25Zm-3.13-2V3.76q0-0.32 0.21-0.54T6.87,3T7.41,3.22T7.63,3.75V8.24q0,0.32-0.21,0.54T6.88,9T6.34,8.78T6.13,8.25Zm6.25,0V3.76q0-0.32 0.21-0.54T13.12,3t0.54,0.22t0.22,0.53V8.24q0,0.32-0.21,0.54T13.13,9T12.59,8.78T12.38,8.25ZM3,6.5v-1Q3,5.18 3.21,4.97T3.75,4.75T4.28,4.97T4.5,5.5v1q0,0.32-0.21,0.53T3.75,7.25T3.22,7.03T3,6.5Zm12.5,0v-1q0-0.32 0.21-0.53t0.53-0.22t0.54,0.22T17,5.5v1q0,0.32-0.21,0.53T16.25,7.25T15.72,7.03T15.5,6.5Z"/></svg>',
     speed: '<svg viewBox="0 0 24 24"><path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4.5-5.5"/><path d="M12 6v1.5M6.3 8.3l1 1M17.7 8.3l-1 1"/></svg>',
     trash: '<svg viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M7,21q-0.82,0-1.41-0.59T5,19V6Q4.58,6 4.29,5.71Q4,5.43 4,5T4.29,4.29T5,4H9Q9,3.57 9.29,3.29Q9.58,3 10,3h4q0.43,0 0.71,0.29T15,4h4q0.43,0 0.71,0.29T20,5T19.71,5.71T19,6V19q0,0.82-0.59,1.41T17,21H7Zm5-7.1l1.9,1.9q0.28,0.28 0.7,0.28t0.7-0.28q0.28-0.27 0.28-0.7T15.3,14.4l-1.9-1.9l1.9-1.9q0.28-0.28 0.28-0.7q0-0.42-0.28-0.7T14.6,8.92T13.9,9.2L12,11.1L10.1,9.2Q9.83,8.92 9.4,8.92T8.7,9.2T8.43,9.9q0,0.43 0.28,0.7l1.9,1.9L8.7,14.4q-0.28,0.28-0.28,0.7T8.7,15.8q0.27,0.28 0.7,0.28t0.7-0.28L12,13.9Z"/></svg>'
   };
-  function openMenu(it) {
-    const r = els[it.id].querySelector('.pill').getBoundingClientRect();
+  function openMenu(it, pt) {
+    const r = pt ? { left: pt.x, right: pt.x + 2, top: pt.y - 6 } : els[it.id].querySelector('.pill').getBoundingClientRect();
     menu.innerHTML = '';
     const add = (icon, label, fn, cls, disabled) => {
-      const b = document.createElement('button'); b.innerHTML = MI[icon] + '<span>' + label + '</span>';
+      const b = document.createElement('button'); b.innerHTML = (MI[icon] || '') + '<span>' + label + '</span>';
       if (cls) b.className = cls; if (disabled) b.disabled = true;
       b.onclick = () => { closeMenu(); fn(); }; menu.appendChild(b);
     };
-    add('plus', it.src ? 'Replace File' : 'Add File', () => { pickFor = it.id; fileAudio.click(); });
-    add('minus', 'Remove File', () => removeFile(it), '', !it.src);
-    add('trim', 'Edit Length', () => openLength(it), '', !it.src);
-    add('speed', 'Speed', () => openSpeed(it), '', !it.src);
+    if (it.type === 'audio') {
+      add('plus', it.src ? 'Replace File' : 'Add File', () => { pickFor = it.id; fileAudio.click(); });
+      add('rename', 'Rename', () => renameAudio(it), '', !it.src);
+      add('minus', 'Remove File', () => removeFile(it), '', !it.src);
+      add('trim', 'Edit Length', () => openLength(it), '', !it.src);
+      add('speed', 'Speed', () => openSpeed(it), '', !it.src);
+    } else if (it.type === 'button') {
+      add('rename', 'Rename', () => els[it.id].querySelector('.ub').dispatchEvent(new MouseEvent('dblclick', { bubbles: true })));
+      add('', it.key ? 'Change key' : 'Set key', () => els[it.id].querySelector('.bdg').click());
+      if (it.key) add('', 'Clear key', () => { it.key = ''; ubRefresh(it); save(); });
+    } else if (it.type === 'image') {
+      add('plus', it.src ? 'Replace image' : 'Add image', () => { pickFor = it.id; fileImg.click(); });
+    } else if (it.type === 'text') {
+      add('', 'Edit text', () => startEdit(it.id, true));
+    }
     add('trash', 'Delete Element', () => removeItem(it.id), 'danger');
     menu.style.transformOrigin = 'left center';
     let left = r.right + 8; const w = menu.offsetWidth, h = menu.offsetHeight;
@@ -1335,6 +1393,10 @@
   $('#lenDone').addEventListener('click', closeLength);
   lenOverlay.addEventListener('pointerdown', e => { if (e.target === lenOverlay) closeLength(); });
   function closeMenu() { menu.classList.remove('show'); }
+  world.addEventListener('contextmenu', e => {                       // right-click any element: its menu opens right there
+    const el = e.target.closest('.item'); if (!el || e.target.closest('[contenteditable="true"]')) return;
+    e.preventDefault(); const it = get(el.dataset.id); if (!it || placing) return; select(it.id); openMenu(it, { x: e.clientX, y: e.clientY });
+  });
   addEventListener('pointerdown', e => { if (!menu.contains(e.target) && !e.target.closest('.kebab')) closeMenu(); });
 
   function renameAudio(it) {
@@ -1898,7 +1960,7 @@
   const autoDock = $('#autoDock'), acanvas = $('#acanvas'), aworld = $('#aworld'), awires = $('#awires'), amaps = $('#amaps'), mlist = $('#mlist'), minner = $('#minner'), azp = $('#azp'), autoin = autoDock.querySelector('.autoin');
   const RY0 = 24, RPITCH = 46, GAPX = 0, MAXB = 200, PURPLE = '#e0a8f0', VALC = 'cornflowerblue', STOPC = '#ff9a9a', DARK = '#3d3d3d';
   const SPEC = {
-    audio: { ins: 4, out: true, multi: true }, value: { ins: 5, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, counter: { ins: 2, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
+    audio: { ins: 4, out: true, multi: true }, value: { ins: 5, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, ui: { ins: 0, out: true }, counter: { ins: 2, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
     and: { ins: 2, out: true, multi: true, gate: true }, or: { ins: 2, out: true, multi: true, gate: true }, nor: { ins: 2, out: true, multi: true, gate: true },
     xor: { ins: 2, out: true, multi: true, gate: true }, xand: { ins: 2, out: true, multi: true, gate: true },
     if: { ins: 5, out: true, multi: true }, prop: { ins: 1, out: true, multi: true }, loop: { ins: 5, out: true, outs: 2, multi: true }, random: { ins: 3, out: true, multi: true }, print: { ins: 2, out: true, multi: true }, light: { ins: 1, out: false, multi: true }, rgb: { ins: 3, out: true, multi: true }, matrix: { ins: 34, out: false, multi: true }, mover: { ins: 18, out: true, outs: 16, multi: true }, mvset: { ins: 2, out: true, outs: 2, multi: true }, split: { ins: 1, out: true, outs: 1, multi: true }
@@ -2101,7 +2163,7 @@
   /* nodes */
   const selSet = new Set();
   const nodeEls = {}, cnt = {}, SVG_X = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>', SVG_PEN = '<svg viewBox="0 0 24 24"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19z"/></svg>';
-  const LABEL = { split: 'Splitter', value: 'VALUE', number: 'Number', wait: 'Wait', and: 'AND', or: 'OR', nor: 'NOR', xor: 'XOR', xand: 'XAND', if: 'IF', random: 'RANDOM', counter: 'Counter', light: 'Light', prop: 'Property Changer', rgb: 'RGB', matrix: 'LED Matrix', mover: 'Mover', mvset: 'Mover Setter', loop: 'LOOP', print: 'Print', key: 'Button Input' };
+  const LABEL = { ui: 'UI Button', split: 'Splitter', value: 'VALUE', number: 'Number', wait: 'Wait', and: 'AND', or: 'OR', nor: 'NOR', xor: 'XOR', xand: 'XAND', if: 'IF', random: 'RANDOM', counter: 'Counter', light: 'Light', prop: 'Property Changer', rgb: 'RGB', matrix: 'LED Matrix', mover: 'Mover', mvset: 'Mover Setter', loop: 'LOOP', print: 'Print', key: 'Button Input' };
   function reachBtns(id) {
     const seen = new Set(), out = new Set();
     (function go(c) { if (seen.has(c)) return; seen.add(c); auto.links.forEach(l => { if (l[0] !== c) return; const bi = auto.btns.findIndex(b => b.id === l[1]); if (bi >= 0) out.add(bi + 1); else go(l[1]); }); })(id);
@@ -2178,6 +2240,7 @@
     else if (n.t === 'number') h += '<span class="nm">Number</span><input class="ni nv" type="number" step="any" title="A number other nodes can read">';
     else if (n.t === 'if') h += '<span class="nm">IF</span><button class="nk im" title="Compare a number (Value) or words (Text)"></button><button class="nk op" title="How to compare"></button><input class="ni ik" type="number" step="any" title="Number to compare with"><input class="ni tx" type="text" maxlength="60" placeholder="text" title="Text to compare with">';
     else if (n.t === 'prop') h += '<button class="nk pp" title="The mode this sends. Wire its output into a property pin"></button>';
+    else if (n.t === 'ui') h += '<span class="nm">UI Button</span><button class="nk" title="Choose which button on the main board this watches"></button>';
     else if (n.t === 'key') h += '<span class="nm">Button Input</span><button class="nk" title="Choose which mapped button this watches"></button>';
     else if (n.t === 'counter') h += '<span class="nm">Counter</span><input class="ni" type="number" min="1" max="99" title="Runs what is wired in every Nth press"><small class="cc"></small>';
     else if (n.t === 'wait') h += '<span class="nm">Wait</span><input class="ni" type="number" min="0" max="3600" step="0.1" title="Seconds to wait"><small>sec</small><svg class="wring"><rect pathLength="100"/></svg>';
@@ -2199,7 +2262,7 @@
       const op = el.querySelector('.op');
       op.addEventListener('click', e => { e.stopPropagation(); if (n.im === 'text') pickList(op, TOPS.map(o => ({ id: o[0], sm: o[2], label: o[1] })), id => { n.it = id; save(); }); else pickList(op, OPS.map(o => ({ id: o[0], sm: o[0], label: o[1] })), id => { n.op = id; save(); }); });
     }
-    else if (nk) nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, auto.btns.map((b, i) => ({ id: b.id, sm: i + 1, label: b.name })), id => { n.btn = id; save(); }); });
+    else if (nk) nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, (n.t === 'ui' ? items.filter(o => o.type === 'button') : auto.btns).map((b, i) => ({ id: b.id, sm: i + 1, label: b.name })), id => { n.btn = id; save(); }); });
     if (n.t === 'mover') {
       el.querySelector('.mrot').addEventListener('click', e => { e.stopPropagation(); n.mvr = n.mvr ? 0 : 1; save(); drawWires(); });
       el.querySelector('.mvt').addEventListener('click', e => {             // click the pill to put the line there
@@ -2398,8 +2461,8 @@
         const it = get(n.cue);
         el.querySelector('.nm').textContent = it ? it.name : 'Choose a cue'; el.classList.toggle('dim', !it || !it.src);
         const av = el.querySelector('.av'), ap = el.querySelector('.ap'); if (document.activeElement !== av && !av.classList.contains('driven')) av.value = n.vol; if (document.activeElement !== ap && !ap.classList.contains('driven')) ap.value = n.pitch;
-      } else if (n.t === 'key') {
-        const nk = el.querySelector('.nk'), b = auto.btns.find(x => x.id === n.btn); nk.textContent = b ? b.name : 'link a button'; nk.classList.toggle('set', !!b);
+      } else if (n.t === 'key' || n.t === 'ui') {
+        const nk = el.querySelector('.nk'), b = n.t === 'ui' ? items.find(x => x.id === n.btn && x.type === 'button') : auto.btns.find(x => x.id === n.btn); nk.textContent = b ? b.name : 'link a button'; nk.classList.toggle('set', !!b);
       } else if (n.t === 'counter') { const ni = el.querySelector('.ni'); if (document.activeElement !== ni && !ni.classList.contains('driven')) ni.value = n.n; updCounter(n); }
       else if (n.t === 'wait') { const ni = el.querySelector('.ni'); if (document.activeElement !== ni && !ni.classList.contains('driven')) ni.value = n.sec; }
       else if (n.t === 'number' || n.t === 'mvset') { const ni = el.querySelector('.ni'); if (document.activeElement !== ni && !ni.classList.contains('driven')) ni.value = n.v; }
@@ -2933,7 +2996,7 @@
     if (n.t === 'number') return numV(n) !== 0;
     if (n.t === 'loop') return !!loops[id];
     if (n.t === 'value') return vcur(n) !== 0;
-    if (n.t === 'key') return !!n.btn && isHeld(n.btn);
+    if (n.t === 'key' || n.t === 'ui') return !!n.btn && (n.t === 'ui' ? ubHeld.has(n.btn) : isHeld(n.btn));
     if (n.t === 'counter') return (cnt[id] || 0) > 0;
     if (n.t === 'random') { const [lo, hi] = rRange(n); return (n.rv || 0) >= (lo + hi) / 2 && n.rv !== undefined; }
     if (n.t === 'split') return n.sc.some(c => pin(id, c[0], seen));
@@ -2945,6 +3008,7 @@
     const n = nodeById(id); if (!n) return '';
     if (n.t === 'print') return n.txt || '';
     if (n.t === 'key') { const b = auto.btns.find(x => x.id === n.btn); return b ? b.name : ''; }
+    if (n.t === 'ui') { const b = items.find(x => x.id === n.btn); return b ? b.name : ''; }
     if (n.t === 'audio') { const it = get(n.cue); return it ? it.name || '' : ''; }
     return fmtV(+numOf(id, new Set([id])) || 0);
   }
@@ -3060,6 +3124,13 @@
     }
     else if (n.t === 'matrix') { if (p === 0) mrun[to] = Array(16).fill(0); else if (p >= 2) { (n.pp = n.pp || {})[p] = burst(); matLight(n); } }
   }
+  function runUI(it) {
+    applyProps();
+    const st = { played: 0, stopped: 0, miss: 0, delayed: 0 }, srcs = auto.nodes.filter(n => n.t === 'ui' && n.btn === it.id);
+    if (!srcs.length) toast('Add a UI Button node linked to ' + it.name + ' to make it do something');
+    srcs.forEach(n => { flash(n.id); emit(n.id, new Set([n.id]), st); });
+    if (srcs.length && st.miss && !st.played && !st.stopped && !st.delayed) toast('That cue has no audio file yet');
+  }
   function runBtn(b) {
     applyProps();
     const st = { played: 0, stopped: 0, miss: 0, delayed: 0 }, srcs = auto.nodes.filter(n => n.t === 'key' && n.btn === b.id);
@@ -3127,6 +3198,7 @@
         const rows = mrun[n.id] || n.mx, sig = rows.join() + JSON.stringify(n.mcl || {}); if (el._sig !== sig) { el._sig = sig; el.querySelectorAll('.mc').forEach((c, i) => { c.classList.toggle('on', !!(rows[i >> 4] >> (i & 15) & 1)); c.style.setProperty('--lc', n.mcl && n.mcl[i] || '#ffffff'); }); }
       }
       else if (n.t === 'key') el.classList.toggle('live', !!n.btn && isHeld(n.btn));
+      else if (n.t === 'ui') el.classList.toggle('live', !!n.btn && ubHeld.has(n.btn));
     });
     if (moved) drawWires();
     lightRaf = requestAnimationFrame(lightTick);
@@ -3230,7 +3302,7 @@
   /* what's new: edit this list when something ships (newest first) */
   const CHANGES = [
     { id: '2026-11-08', date: '8 Nov 2026', title: 'Nodes, menus and speed', groups: [
-      ['New nodes', ['[[Mover Setter]]: a signal into the top pin makes the Mover jump straight to the pin number held in it (or wired into the bottom pin), instantly, in both pin modes. Its L and R pins must both go to the same Mover\'s left and right pins', '[[Mover]]: a pill with a moving line. Signals into its left / right pins slide the line, and only the input the line sits on gets through. Many-pin or single-pin mode (right-click it), turn it with the corner button, drag the corner to resize', '[[RGB]] node and [[LED Matrix]] (resizable, each LED keeps the colour it was lit with)', '[[Property Changer]], plus property pins on [[IF]], [[VALUE]] and [[LOOP]]', '[[IF]] has a new pin under Value / Text to choose what it checks, so it can read a [[VALUE]]', 'The count on [[LOOP]] is now a value pin along the bottom', '[[Splitter]] nodes pass numbers straight through']],
+      ['New nodes', ['Right-click any element on the main board (Audio, Images, Text, Button) for its menu: rename, files, keys, delete. Board Buttons can now be dragged too', 'A new [[UI Button]] node, at the top of the list, listens to a Button you place on the main board (+ menu). Click the board button, or press the key shown on its badge, and the node fires. Double-click the name to rename it', '[[Mover Setter]]: a signal into the top pin makes the Mover jump straight to the pin number held in it (or wired into the bottom pin), instantly, in both pin modes. Its L and R pins must both go to the same Mover\'s left and right pins', '[[Mover]]: a pill with a moving line. Signals into its left / right pins slide the line, and only the input the line sits on gets through. Many-pin or single-pin mode (right-click it), turn it with the corner button, drag the corner to resize', '[[RGB]] node and [[LED Matrix]] (resizable, each LED keeps the colour it was lit with)', '[[Property Changer]], plus property pins on [[IF]], [[VALUE]] and [[LOOP]]', '[[IF]] has a new pin under Value / Text to choose what it checks, so it can read a [[VALUE]]', 'The count on [[LOOP]] is now a value pin along the bottom', '[[Splitter]] nodes pass numbers straight through']],
       ['Editing', ['Everything for a node is on the bar above the selection: colour, caption, a Mover\'s pin mode, group, move, duplicate and delete. Right-click no longer opens a menu', 'Captions under nodes, and click a group\'s label to rename it', 'Colour pins by kind: inputs, outputs, values or properties, on any number of pins', 'Keyboard hints in the node editor, and no dotted ring on selected nodes', 'The [[Splitter]] editor is 30% bigger']],
       ['Fixes and speed', ['Signals redraw the wires once per frame instead of once per wire, so big graphs no longer slow down and LED numbers come out right', '[[LED Matrix]] only combines a row and a column fired in the same moment', 'Wires no longer flip shape while zooming', 'Cursors: random colours, shown only on the board you are on, with presence dots on the tabs', 'Phones and tablets now see a "open this on a computer" note instead of the board']]
     ] },
