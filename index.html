@@ -297,8 +297,7 @@
   .asbar button:hover { background: rgba(255,255,255,.15); } .asbar button.del:hover { background: #e5484d; } .asbar button.mv { cursor: grab; touch-action: none; }
   .asbar svg { width: 15px; height: 15px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
   .asbar .sw { width: 15px; height: 15px; border-radius: 50%; background: conic-gradient(#ff6b6b, #ffd36b, #7bed9f, #6bb8ff, #c58bff, #ff6b6b); flex: none; }
-  .anode.picked { outline: 2.5px dashed #e0a8f0; outline-offset: 5px; }
-  .anode.picked.ingrp { outline: none; }                         /* a grouped node is already ringed by its group box, so no second dotted line inside it */
+  .anode.picked { outline: none; }                               /* the dotted selection frame around the selection is the only outline */
   .asel { position: absolute; z-index: 6; pointer-events: none; border: 2px dashed #e0a8f0; background: rgba(224,168,240,.13); border-radius: 8px; opacity: 0; display: block;
     transition: left .42s var(--ease), top .42s var(--ease), width .42s var(--ease), height .42s var(--ease), border-radius .42s var(--ease), opacity .25s ease; }
   .asel.on { opacity: 1; } .asel.drawing, .asel.inst { transition: none; } .asel.fit { border-radius: 18px; background: rgba(224,168,240,.07); }
