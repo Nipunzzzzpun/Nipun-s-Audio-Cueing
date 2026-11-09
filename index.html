@@ -378,8 +378,8 @@
   .dock.auto.open.full { width: calc(100vw - 40px); height: calc(100vh - 40px); }
   .dock.auto .awrap { flex: none; width: 640px; max-width: 100%; transition: width .7s var(--ease); }
   .dock.auto.full .awrap { width: calc(100vw - 532px); max-width: none; }
-  .stopall { position: absolute; left: 10px; bottom: 10px; z-index: 6; height: 26px; padding: 0 12px; border: 0; border-radius: 13px; background: rgba(0,0,0,.5); color: #ff6b6b; font: 700 11px 'Montserrat', sans-serif; cursor: pointer; transition: background .2s, transform .2s var(--spring); }
-  .stopall:hover { background: rgba(0,0,0,.72); } .stopall:active { transform: scale(.94); }
+  .stopall { position: absolute; left: 10px; bottom: 10px; z-index: 6; height: 26px; padding: 0 12px; border: 1.5px solid rgba(255,107,107,.38); border-radius: 13px; background: rgba(0,0,0,.5); color: #ff6b6b; font: 700 11px 'Montserrat', sans-serif; cursor: pointer; transition: background .2s, transform .2s var(--spring); }
+  .stopall:hover { background: rgba(0,0,0,.72); border-color: rgba(255,107,107,.6); } .stopall:active { transform: scale(.94); }
   .azoom .hb svg { width: 21px; height: 21px; fill: #fff; stroke: none; }
   .azoom .hb.redo svg { transform: scaleX(-1); }
   .azoom .hb:disabled { opacity: .3; cursor: default; pointer-events: none; }
