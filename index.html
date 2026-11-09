@@ -346,7 +346,7 @@
   .anode .port:hover { transform: scale(1.35); }
   .agrp { position: absolute; z-index: 0; pointer-events: none; border: 2px dashed rgba(224,168,240,.5); background: rgba(224,168,240,.06); border-radius: 24px; }
   .agrp small { position: absolute; left: 18px; top: -9px; padding: 0 8px; border-radius: 8px; background: #4b4b4b; color: rgba(224,168,240,.95); font: 600 10px 'Montserrat', sans-serif; letter-spacing: .06em; text-transform: uppercase; }
-  .asbar { position: absolute; z-index: 7; display: none; gap: 2px; padding: 4px; border-radius: 16px; background: rgba(12,12,14,.94); border: 1.5px solid rgba(255,255,255,.16); box-shadow: 0 8px 24px rgba(0,0,0,.35); animation: sbIn .25s var(--spring) both; }
+  .asbar { position: absolute; z-index: 7; display: none; flex-wrap: wrap; justify-content: center; gap: 2px; padding: 4px; border-radius: 16px; background: rgba(12,12,14,.94); border: 1.5px solid rgba(255,255,255,.16); box-shadow: 0 8px 24px rgba(0,0,0,.35); animation: sbIn .25s var(--spring) both; }
   @keyframes sbIn { from { opacity: 0; transform: translateY(6px) scale(.94); } }
   .asbar button { height: 30px; padding: 0 12px 0 9px; border: 0; border-radius: 12px; background: none; color: #fff; font: 600 12px 'Montserrat', sans-serif; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; transition: background .15s; }
   .asbar button.mtg.lit { background: rgba(255,255,255,.18); }
@@ -2282,7 +2282,7 @@
   const rowY = i => RY0 + i * RPITCH;
   const RGBPIN = ['#ff5a5a', '#c4ff6a', '#5a78ff'], inDef = (n, p) => n && n.t === 'rgb' ? RGBPIN[p] : isPropPin(n, p) ? PROPC : isValIn(n, p) ? VALC : '';
   const isValSrc = n => n && (n.t === 'number' || n.t === 'value'), isValIn = (n, p) => n && VP[n.t] !== undefined && p >= VP[n.t];     // value pins default to cornflower blue
-  const pinColor = (n, k) => (n && n.pc && n.pc[k]) || (k === 'o' ? (n && n.t === 'prop' ? PROPC : isValSrc(n) ? VALC : PURPLE) : k === 'o1' ? (n && (n.t === 'split' || n.t === 'mvset') ? PURPLE : STOPC) : /^o\d+$/.test(k) ? PURPLE : DARK);
+  const pinColor = (n, k) => (n && n.pc && n.pc[k]) || (k === 'o' ? (n && n.t === 'prop' ? PROPC : isValSrc(n) ? VALC : PURPLE) : k === 'o1' ? (n && (n.t === 'split' || n.t === 'mvset' || n.t === 'mover') ? PURPLE : STOPC) : /^o\d+$/.test(k) ? PURPLE : DARK);
   function autoDropCue(id) {
     const gone = auto.nodes.filter(n => n.t === 'audio' && n.cue === id).map(n => n.id);
     if (!gone.length) return;
@@ -2351,6 +2351,7 @@
   /* Mover: mvw = pins, mvk = where the line starts, mvr = 1 when turned on its side */
   const MVH = 32, MVE = 26, MVP = 20, mvcur = {}; let mvBusy = false;
   const mvCur = n => Math.max(0, Math.min(n.mvw - 1, mvcur[n.id] === undefined ? n.mvk | 0 : mvcur[n.id]));
+  let dragEnd = 0;
   function updMover(n) {
     const el = nodeEls[n.id], ln = el && el.querySelector('.mvl'); if (!ln) return; const c = MVE + mvCur(n) * MVP + 7, vert = !!n.mvr, W = el.offsetWidth, H = el.offsetHeight;
     if (n.mvs) { const d = vert ? 'M0 ' + H / 2 + 'L' + W / 2 + ' ' + H / 2 + 'L' + W / 2 + ' ' + c + 'L' + W + ' ' + c : 'M' + W / 2 + ' 0L' + W / 2 + ' ' + H / 2 + 'L' + c + ' ' + H / 2 + 'L' + c + ' ' + H; el.querySelector('.mvs path').setAttribute('d', d); return; }
@@ -2430,6 +2431,7 @@
     else if (nk) nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, (n.t === 'ui' ? items.filter(o => o.type === 'button') : auto.btns).map((b, i) => ({ id: b.id, sm: i + 1, label: b.name })), id => { n.btn = id; save(); }); });
     if (n.t === 'mover') {
       el.querySelector('.mvt').addEventListener('click', e => {             // click the pill to put the line there
+        if (performance.now() - dragEnd < 400) return;                    // letting go after dragging the node is not a click on the pill
         const r = el.getBoundingClientRect(), c = ((n.mvr ? e.clientY - r.top : e.clientX - r.left) / v.z - MVE) / MVP, k = Math.max(0, Math.min(n.mvw - 1, Math.floor(c)));
         if (e.target.closest('.ip, .port')) return; n.mvk = k; mvcur[n.id] = k; updMover(n); save();
       });
@@ -2734,7 +2736,7 @@
   const asb = document.createElement('div'); asb.className = 'asbar'; acanvas.appendChild(asb);
   asb.innerHTML = '<button class="col" title="Change pin colours: inputs, outputs, values or properties"><span class="sw"></span>Colour</button>'
     + '<button class="cap" title="Add or edit a caption under the node (clear the text to remove it)"><svg viewBox="0 0 24 24"><path d="M4 8h16M4 12h16M4 16h9"/></svg><span>Caption</span></button>'
-    + '<button class="rot" title="Turn it to the other side of the matrix"><svg viewBox="0 0 24 24" style="transform:scaleX(-1)"><path d="M19.75,12.05q-0.3,0-0.59-0.21q-0.29-0.21-0.36-0.54q-0.13-0.47-0.31-0.94T18.05,9.48Q17.88,9.2 17.93,8.86T18.2,8.3Q18.58,7.95 19.06,8T19.8,8.48q0.32,0.55 0.57,1.13q0.25,0.57 0.4,1.2q0.13,0.5-0.19,0.88t-0.84,0.38Zm-6.7,8.7q0-0.3 0.21-0.59T13.8,19.8q0.47-0.13 0.94-0.31t0.89-0.44q0.28-0.18 0.61-0.13T16.8,19.2q0.35,0.38 0.3,0.86T16.63,20.8q-0.57,0.32-1.15,0.56T14.3,21.78q-0.5,0.13-0.88-0.17t-0.38-0.85ZM18.2,17.8q-0.22-0.2-0.27-0.55t0.13-0.63q0.25-0.43 0.44-0.89q0.19-0.46 0.31-0.94q0.07-0.32 0.35-0.54t0.6-0.21q0.55,0 0.85,0.38t0.18,0.88q-0.18,0.6-0.41,1.18T19.8,17.63q-0.25,0.43-0.74,0.48T18.2,17.8ZM9.83,21.75q-2.98-0.8-4.88-3.2t-1.9-5.5q0-3.75 2.63-6.37t6.38-2.63H12.2L11.33,3.17q-0.28-0.27-0.28-0.7t0.3-0.72q0.27-0.28 0.7-0.28t0.72,0.28l2.58,2.6Q15.5,4.5 15.56,4.67t0.06,0.38T15.56,5.43T15.35,5.75l-2.6,2.6q-0.27,0.28-0.7,0.28t-0.7-0.28t-0.28-0.7t0.28-0.7l0.9-0.9h-0.2q-2.93,0-4.96,2.04q-2.04,2.04-2.04,4.96q0,2.43 1.47,4.29T10.3,19.8q0.32,0.07 0.54,0.35q0.21,0.28 0.21,0.6q0,0.52-0.36,0.82T9.83,21.75Z"/></svg><span>Rotate</span></button>'
+    + '<button class="rot" title="Turn it to the other side of the matrix"><svg viewBox="0 0 24 24" style="transform:scaleX(-1);fill:#fff;stroke:none"><path d="M19.75,12.05q-0.3,0-0.59-0.21q-0.29-0.21-0.36-0.54q-0.13-0.47-0.31-0.94T18.05,9.48Q17.88,9.2 17.93,8.86T18.2,8.3Q18.58,7.95 19.06,8T19.8,8.48q0.32,0.55 0.57,1.13q0.25,0.57 0.4,1.2q0.13,0.5-0.19,0.88t-0.84,0.38Zm-6.7,8.7q0-0.3 0.21-0.59T13.8,19.8q0.47-0.13 0.94-0.31t0.89-0.44q0.28-0.18 0.61-0.13T16.8,19.2q0.35,0.38 0.3,0.86T16.63,20.8q-0.57,0.32-1.15,0.56T14.3,21.78q-0.5,0.13-0.88-0.17t-0.38-0.85ZM18.2,17.8q-0.22-0.2-0.27-0.55t0.13-0.63q0.25-0.43 0.44-0.89q0.19-0.46 0.31-0.94q0.07-0.32 0.35-0.54t0.6-0.21q0.55,0 0.85,0.38t0.18,0.88q-0.18,0.6-0.41,1.18T19.8,17.63q-0.25,0.43-0.74,0.48T18.2,17.8ZM9.83,21.75q-2.98-0.8-4.88-3.2t-1.9-5.5q0-3.75 2.63-6.37t6.38-2.63H12.2L11.33,3.17q-0.28-0.27-0.28-0.7t0.3-0.72q0.27-0.28 0.7-0.28t0.72,0.28l2.58,2.6Q15.5,4.5 15.56,4.67t0.06,0.38T15.56,5.43T15.35,5.75l-2.6,2.6q-0.27,0.28-0.7,0.28t-0.7-0.28t-0.28-0.7t0.28-0.7l0.9-0.9h-0.2q-2.93,0-4.96,2.04q-2.04,2.04-2.04,4.96q0,2.43 1.47,4.29T10.3,19.8q0.32,0.07 0.54,0.35q0.21,0.28 0.21,0.6q0,0.52-0.36,0.82T9.83,21.75Z"/></svg><span>Rotate</span></button>'
     + '<button class="mtg" title="Toggle Mode: a signal at an LED that is already on turns it off"><svg viewBox="0 0 24 24" style="fill:#fff;stroke:none"><path d="M15.54,15.54Q17,14.08 17,12q0-2.08-1.46-3.54T12,7Q9.93,7 8.46,8.46T7,12t1.46,3.54T12,17t3.54-1.46ZM12,22q-2.07,0-3.9-0.79q-1.82-0.79-3.17-2.14Q3.58,17.73 2.79,15.9T2,12Q2,9.92 2.79,8.1Q3.58,6.27 4.93,4.93Q6.28,3.57 8.1,2.79Q9.93,2 12,2t3.9,0.79t3.17,2.14q1.35,1.35 2.14,3.17Q22,9.92 22,12t-0.79,3.9t-2.14,3.17q-1.35,1.35-3.17,2.14T12,22Zm0-2q3.35,0 5.68-2.32T20,12T17.68,6.32T12,4T6.33,6.32T4,12t2.33,5.68T12,20Z"/></svg><span>Toggle Mode</span></button>'
     + '<button class="mvm" title="Many input pins, or one pin that the line points at"><svg viewBox="0 0 24 24"><path d="M12 4v8M6 12h12M6 12v8M18 12v8"/></svg><span>Single-Pin Mode</span></button>'
     + '<button class="grp" title="Group the selected nodes so they move together"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4" stroke-dasharray="3 3.2"/><rect x="8" y="8" width="8" height="8" rx="2"/></svg><span>Group</span></button>'
@@ -2769,12 +2771,12 @@
     if (instant) { selBox.classList.add('inst'); requestAnimationFrame(() => selBox.classList.remove('inst')); }
     Object.assign(selBox.style, { left: x0 - 12 + 'px', top: y0 - 12 + 'px', width: x1 - x0 + 24 + 'px', height: y1 - y0 + 24 + 'px' });
     const grpBtn = asb.querySelector('.grp'), un = isOneGroup(ns);
-    const rotBtn = asb.querySelector('.rot'); rotBtn.style.display = ns.length === 1 && ns[0].t === 'mover' ? '' : 'none';
-    const tgBtn = asb.querySelector('.mtg'); tgBtn.style.display = ns.length === 1 && ns[0].t === 'matrix' ? '' : 'none'; if (ns.length === 1) { tgBtn.querySelector('path').setAttribute('d', ns[0].mtg ? TG_ON : TG_OFF); tgBtn.classList.toggle('lit', !!ns[0].mtg); }
-    const mvBtn = asb.querySelector('.mvm'); mvBtn.style.display = ns.length === 1 && ns[0].t === 'mover' ? '' : 'none'; if (ns.length === 1) mvBtn.querySelector('span').textContent = ns[0].mvs ? 'Multi-Pin Mode' : 'Single-Pin Mode';
+    const rotBtn = asb.querySelector('.rot'); const movs = ns.filter(n => n.t === 'mover'), mats = ns.filter(n => n.t === 'matrix'); rotBtn.style.display = movs.length ? '' : 'none';
+    const tgBtn = asb.querySelector('.mtg'); tgBtn.style.display = mats.length ? '' : 'none'; if (mats.length) { tgBtn.querySelector('path').setAttribute('d', mats[0].mtg ? TG_ON : TG_OFF); tgBtn.classList.toggle('lit', !!mats[0].mtg); }
+    const mvBtn = asb.querySelector('.mvm'); mvBtn.style.display = movs.length ? '' : 'none'; if (movs.length) mvBtn.querySelector('span').textContent = movs[0].mvs ? 'Multi-Pin Mode' : 'Single-Pin Mode';
     const capBtn = asb.querySelector('.cap'); capBtn.style.display = ns.length === 1 ? '' : 'none'; capBtn.querySelector('span').textContent = ns.length === 1 && ns[0].cap ? 'Edit caption' : 'Add caption';
     grpBtn.style.display = ns.length > 1 || ns[0].g ? '' : 'none'; grpBtn.querySelector('span').textContent = un ? 'Ungroup' : 'Group';
-    asb.style.display = 'flex'; const w = asb.offsetWidth, h = asb.offsetHeight, W = acanvas.clientWidth, H = acanvas.clientHeight;
+    asb.style.maxWidth = Math.max(160, acanvas.clientWidth - 12) + 'px'; asb.style.display = 'flex'; const w = asb.offsetWidth, h = asb.offsetHeight, W = acanvas.clientWidth, H = acanvas.clientHeight;
     let top = y0 - h - 26; if (top < 6) top = Math.min(H - h - 6, y1 + 26);
     asb.style.left = Math.max(6, Math.min(W - w - 6, (x0 + x1) / 2 - w / 2)) + 'px'; asb.style.top = Math.max(6, top) + 'px';
   }
@@ -2808,9 +2810,10 @@
     selSet.clear(); copies.forEach(c => selSet.add(c.id)); save(); syncNodes();
   }
   asb.querySelector('.dup').addEventListener('click', dupSel);
-  asb.querySelector('.rot').addEventListener('click', e => { e.stopPropagation(); const ns = selNodes(), n = ns[0]; if (ns.length !== 1 || n.t !== 'mover') return; n.mvr = n.mvr ? 0 : 1; save(); drawWires(); placeBar(); });
-  asb.querySelector('.mtg').addEventListener('click', e => { e.stopPropagation(); const ns = selNodes(), n = ns[0]; if (ns.length !== 1 || n.t !== 'matrix') return; n.mtg = n.mtg ? 0 : 1; save(); placeBar(); });
-  asb.querySelector('.mvm').addEventListener('click', e => { e.stopPropagation(); const ns = selNodes(), n = ns[0]; if (ns.length !== 1 || n.t !== 'mover') return; n.mvs = n.mvs ? 0 : 1; if (n.mvs) auto.links = auto.links.filter(l => !(l[1] === n.id && l[2] > 0 && l[2] < 16)); save(); drawWires(); placeBar(); });
+  const selOf = t => selNodes().filter(n => n.t === t);
+  asb.querySelector('.mtg').addEventListener('click', e => { e.stopPropagation(); const ms = selOf('matrix'); if (!ms.length) return; const to = ms[0].mtg ? 0 : 1; ms.forEach(n => { n.mtg = to; }); save(); placeBar(); });
+  asb.querySelector('.rot').addEventListener('click', e => { e.stopPropagation(); const ms = selOf('mover'); if (!ms.length) return; const to = ms[0].mvr ? 0 : 1; ms.forEach(n => { n.mvr = to; }); save(); drawWires(); placeBar(); });
+  asb.querySelector('.mvm').addEventListener('click', e => { e.stopPropagation(); const ms = selOf('mover'); if (!ms.length) return; const to = ms[0].mvs ? 0 : 1; ms.forEach(n => { n.mvs = to; if (to) auto.links = auto.links.filter(l => !(l[1] === n.id && l[2] > 0 && l[2] < 16)); }); save(); drawWires(); placeBar(); });
   asb.querySelector('.cap').addEventListener('click', e => { e.stopPropagation(); const ns = selNodes(); if (ns.length === 1 && nodeEls[ns[0].id]) editCap(ns[0], nodeEls[ns[0].id]); });
   addEventListener('keydown', e => {
     if (!autoOpen || !selSet.size || !(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey || e.key.toLowerCase() !== 'd') return;
@@ -2852,10 +2855,10 @@
   const selBox = document.createElement('div'); selBox.className = 'asel'; acanvas.appendChild(selBox);
   const HOLD_MS = 450; let lastAlt = false; addEventListener('keydown', e => { if (e.key === 'Alt') lastAlt = true; }, true); addEventListener('keyup', e => { if (e.key === 'Alt') lastAlt = false; }, true);
   const VEC = { l: [-1, 0], r: [1, 0], t: [0, -1], b: [0, 1] };
-  const wirePath = (x1, y1, x2, y2, dir, sdir) => {                // dir / sdir: the side of the pin the wire leaves through (l r t b)
-    const z = v.z, k = Math.max(50 * z, Math.abs(x2 - x1) * .5), kk = Math.max(46 * z, Math.abs(y2 - y1) * .5), sv = VEC[sdir] || VEC.r, ev = VEC[dir] || VEC.l;
+  const wirePath = (x1, y1, x2, y2, dir, sdir, ea, eb) => {        // dir / sdir: the side of the pin the wire leaves through (l r t b); ea / eb: lagging ends the shape follows
+    const z = v.z, e1 = ea || [x1, y1], e2 = eb || [x2, y2], k = Math.max(50 * z, Math.abs(e2[0] - e1[0]) * .5), kk = Math.max(46 * z, Math.abs(e2[1] - e1[1]) * .5), sv = VEC[sdir] || VEC.r, ev = VEC[dir] || VEC.l;
     const len = q => q[0] ? k : kk;
-    return 'M' + x1 + ' ' + y1 + ' C' + (x1 + sv[0] * len(sv)) + ' ' + (y1 + sv[1] * len(sv)) + ',' + (x2 + ev[0] * len(ev)) + ' ' + (y2 + ev[1] * len(ev)) + ',' + x2 + ' ' + y2;
+    return 'M' + x1 + ' ' + y1 + ' C' + (e1[0] + sv[0] * len(sv)) + ' ' + (e1[1] + sv[1] * len(sv)) + ',' + (e2[0] + ev[0] * len(ev)) + ' ' + (e2[1] + ev[1] * len(ev)) + ',' + x2 + ' ' + y2;
   };
   const outPos = (id, fp) => { const el = nodeEls[id], pt = el && el.querySelectorAll('.port')[fp || 0]; return pt ? [v.x + (parseFloat(el.style.left) + pt.offsetLeft + pt.offsetWidth / 2) * v.z, v.y + (parseFloat(el.style.top) + pt.offsetTop + pt.offsetHeight / 2) * v.z, pt.dataset.s || (nodeById(id) && nodeById(id).t === 'prop' ? 't' : nodeById(id) && nodeById(id).t === 'mvset' && !fp ? 'l' : 'r')] : null; };
   function inPos(to, p, W) {
@@ -2949,15 +2952,23 @@
   }
   /* a wire switching between its loose curve and a detour glides from one to the other (a blend of the two shapes) instead of popping */
   const wmix = new Map(), wmixNext = new Map(), wlastR = new Map(), NPT = 48;
-  function plainWorld(a, b) {
-    const z = v.z, aw = [(a[0] - v.x) / z, (a[1] - v.y) / z], bw = [(b[0] - v.x) / z, (b[1] - v.y) / z];
-    const k = Math.max(50, Math.abs(bw[0] - aw[0]) * .5), kk = Math.max(46, Math.abs(bw[1] - aw[1]) * .5), sv = VEC[a[2]] || VEC.r, ev = VEC[b[2]] || VEC.l, ln = q => q[0] ? k : kk;
-    const c1 = [aw[0] + sv[0] * ln(sv), aw[1] + sv[1] * ln(sv)], c2 = [bw[0] + ev[0] * ln(ev), bw[1] + ev[1] * ln(ev)], P = [];
+  function plainWorld(a, b, ea, eb) {                              // ea / eb: the lagging ends the curve's shape follows (the wire itself still starts and ends exactly on its pins)
+    ea = ea || a; eb = eb || b;
+    const z = v.z, aw = [(a[0] - v.x) / z, (a[1] - v.y) / z], bw = [(b[0] - v.x) / z, (b[1] - v.y) / z], ew = [(ea[0] - v.x) / z, (ea[1] - v.y) / z], fw = [(eb[0] - v.x) / z, (eb[1] - v.y) / z];
+    const k = Math.max(50, Math.abs(fw[0] - ew[0]) * .5), kk = Math.max(46, Math.abs(fw[1] - ew[1]) * .5), sv = VEC[a[2]] || VEC.r, ev = VEC[b[2]] || VEC.l, ln = q => q[0] ? k : kk;
+    const c1 = [ew[0] + sv[0] * ln(sv), ew[1] + sv[1] * ln(sv)], c2 = [fw[0] + ev[0] * ln(ev), fw[1] + ev[1] * ln(ev)], P = [];
     for (let i = 0; i <= 96; i++) { const t = i / 96, u = 1 - t; P.push([u * u * u * aw[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * bw[0], u * u * u * aw[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * bw[1]]); }
     return P;
   }
+  const wep = new Map(), wepNext = new Map();
+  function easeEnds(a, b, key) {                                 // a plain wire's ends glide after the pins (in board space, so panning and zooming never lag), like a routed wire does
+    const z = v.z, wa = [(a[0] - v.x) / z, (a[1] - v.y) / z], wb = [(b[0] - v.x) / z, (b[1] - v.y) / z], st = wep.get(key) || { a: wa.slice(), b: wb.slice() };
+    [[st.a, wa], [st.b, wb]].forEach(([c, t]) => { for (let i = 0; i < 2; i++) { const dd = t[i] - c[i]; if (Math.abs(dd) > .3) { c[i] += dd * wEase; wBusy = true; } else c[i] = t[i]; } });
+    wepNext.set(key, st);
+    return [[v.x + st.a[0] * z, v.y + st.a[1] * z, a[2]], [v.x + st.b[0] * z, v.y + st.b[1] * z, b[2]]];
+  }
   function routeWire(a, b, rects, key) {
-    const plain = wirePath(a[0], a[1], b[0], b[1], b[2], a[2]), R = routeCore(a, b, rects, key);
+    const R = routeCore(a, b, rects, key), [ea, eb] = easeEnds(a, b, key), plain = wirePath(a[0], a[1], b[0], b[1], b[2], a[2], ea, eb);
     let m = wmix.get(key) || 0; const target = R ? 1 : 0;
     if (R) wlastR.set(key, R.P);
     if (m !== target) { m += (target - m) * wEase * .4; if (Math.abs(target - m) < .02) m = target; else wBusy = true; }
@@ -2965,7 +2976,7 @@
     if (m <= 0) { wlastR.delete(key); return plain; }
     if (m >= 1 && R) return R.d;
     const rp = R ? R.P : wlastR.get(key); if (!rp) return plain;
-    const A = resample(plainWorld(a, b), NPT), B = resample(rp, NPT), z = v.z;
+    const A = resample(plainWorld(a, b, ea, eb), NPT), B = resample(rp, NPT), z = v.z;
     return A.map((p, i) => (i ? 'L' : 'M') + (v.x + (p[0] + (B[i][0] - p[0]) * m) * z) + ' ' + (v.y + (p[1] + (B[i][1] - p[1]) * m) * z)).join('');
   }
   function drawWires() {
@@ -2980,6 +2991,7 @@
       s += '<g class="wg' + (badLink(l) ? ' bad' : '') + ((lglow.get(l[0] + l[1] + l[2]) || 0) > nowT ? ' on' : '') + '" data-n="' + n + '" style="--wc:' + wireFill(l, n, a, b, (x) => { defs += x; }) + '"><path class="hit" d="' + d + '"/><path class="vis" d="' + d + '"/></g>';
     });
     if (wd) { const a = outPos(wd.id, wd.fp); if (a) s += '<path class="tmp" style="--wc:' + pinColor(nodeById(wd.id), outKey(wd.fp)) + '" d="' + wirePath(a[0], a[1], wd.cx, wd.cy, wd.snapB ? wd.snapB[2] : undefined, a[2]) + '"/>'; }
+    wep.clear(); wepNext.forEach((x, k) => wep.set(k, x)); wepNext.clear();
     wst = wstNext; wmix.clear(); wmixNext.forEach((x, k) => wmix.set(k, x)); wmixNext.clear(); if (wBusy && !wKick) wKick = requestAnimationFrame(() => { wKick = 0; drawWires(); });
     awires.innerHTML = '<defs>' + defs + '</defs>' + s;
     awires.querySelectorAll('.wg.bad').forEach(g => {          // a wire into a pin that is switched off: broken line with an × in the gap
@@ -3101,7 +3113,7 @@
     }
     if (nd) {
       clearTimeout(nd.hold); const d = nd; nd = null; d.el.style.cursor = '';
-      if (d.moved) save();
+      if (d.moved) { dragEnd = performance.now(); save(); }
       else if (d.ip) openPinPicker(d.n, d.ip.dataset.p, d.ip);
       else if (d.onName) pickCue(d.el, id => { d.n.cue = id; save(); });
     }
