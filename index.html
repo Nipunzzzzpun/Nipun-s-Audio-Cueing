@@ -721,6 +721,18 @@
   .dialog .row button { height: 40px; padding: 0 18px; border-radius: 20px; border: 0; cursor: pointer; font-weight: 600; background: #eee; }
   .dialog .row .go { background: #000; color: #fff; }
 
+  /* dark mode for the dialogs */
+  .dialog, .dialog h3, .dialog p, .dialog .lbl, .dialog textarea, .dialog .row button, .dialog .presets button, .dialog.cl .tg { transition: background-color .7s ease, color .7s ease, border-color .7s ease; }
+  body.dark .dialog { background: #2b2b2e; color: #f1f1f3; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+  body.dark .dialog p, body.dark .dialog .lbl b { color: #a6a6ad; }
+  body.dark .dialog textarea { background: #1f1f21; color: #eee; border-color: #48484d; } body.dark .dialog textarea:focus { border-color: #fff; }
+  body.dark .dialog input[type=text] { background: #1f1f21; color: #eee; border-color: #48484d; } body.dark .dialog input[type=text]:focus { border-color: #fff; }
+  body.dark .dialog .swatch { border-color: #2b2b2e; }
+  body.dark .dialog input[type=range] { accent-color: #fff; } body.dark .dialog .chk input { accent-color: #fff; }
+  body.dark .dialog .row button, body.dark .dialog .presets button { background: #444448; color: #f1f1f3; }
+  body.dark .dialog .presets button:hover { background: #55555a; }
+  body.dark .dialog .row .go, body.dark .dialog .presets button.on { background: #fff; color: #111; }
+  body.dark .dialog.cl .tg { background: #444448; color: #f1f1f3; }
   .toast { position: fixed; left: 50%; bottom: 28px; z-index: 300; transform: translate(-50%, 20px); padding: 10px 18px; border-radius: 20px;
     background: #000; color: #fff; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .35s var(--ease); }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
@@ -1268,14 +1280,19 @@
   /* ---------- board view: pan + zoom, same feel as the node editor ---------- */
   let bv = { x: 0, y: 0, z: 1 }, bvt = { x: 0, y: 0, z: 1 }, bRaf = 0, bT = 0, bpn = null;
   function putCur(el) {
-    if (el._wx === undefined) return; let x, y, show = true;
-    { const t = tabs.get(el._uid); if (t && t.tab !== 'main') show = false; }       // cursors only show while that person is on the main board
+    if (el._wx === undefined) return; let x, y, show = true, z = 2000;
+    const t = tabs.get(el._uid), th = el._a ? 'auto' : t ? t.tab : 'main';          // where that person is: the main board, or one of the opened pages
+    let mine = 'main'; try { mine = myTab(); } catch (e) {}
+    if (th === mine) { }                                              // we're on the same page: their cursor shows on it, in front
+    else if (th === 'main') z = 40;                                   // they're on the board while I have a page open: their cursor slips behind my page
+    else show = false;                                                // they have a page open that I don't: nothing to see
     if (!show) { }
     else if (el._a) {                                                  // this person is inside the node editor: their position is in the editor's own board
       if (typeof autoOpen === 'undefined' || !autoOpen) show = false;
       else { const r = acanvas.getBoundingClientRect(), px = r.left + v.x + el._wx * v.z, py = r.top + v.y + el._wy * v.z; show = px >= r.left && px <= r.right && py >= r.top && py <= r.bottom; x = px + 'px'; y = py + 'px'; }
     } else { x = el._wx * bv.z + bv.x + 'px'; y = el._wy * bv.z + bv.y + 'px'; }
-    el.style.display = show ? '' : 'none'; if (el._ar) el._ar.style.display = show ? '' : 'none'; if (!show) return; el.style.left = x; el.style.top = y; if (el._ar) { el._ar.style.left = x; el._ar.style.top = y; } }
+    el.style.display = show ? '' : 'none'; if (el._ar) el._ar.style.display = show ? '' : 'none'; if (!show) return;
+    el.style.zIndex = z; if (el._ar) el._ar.style.zIndex = z - 1; el.style.left = x; el.style.top = y; if (el._ar) { el._ar.style.left = x; el._ar.style.top = y; } }
   function applyBoard() {
     world.style.transform = 'translate(' + bv.x + 'px,' + bv.y + 'px) scale(' + bv.z + ')';
     const g = GRID * bv.z; document.body.style.backgroundSize = g + 'px ' + g + 'px'; document.body.style.backgroundPosition = (bv.x - g / 2) + 'px ' + (bv.y - g / 2) + 'px';
@@ -3448,8 +3465,8 @@
   hist.cur = autoJSON();
   /* what's new: edit this list when something ships (newest first) */
   const CHANGES = [
-    { id: '2026-11-08', date: '8 Nov 2026', title: 'Nodes, menus and speed', groups: [
-      ['New nodes', ['A moon / sun button in the top-right corner switches the board between light and dark, and remembers your choice', 'The shortcut hints light up the keys you are holding, and fade the shortcuts that do not include them', 'Board Buttons got smaller, with an optional icon square: pick any Material icon, change the square\'s colour (the icon turns black or white by itself), or remove the square and colour the icon directly. Choosing a key is now a quiet fade instead of a pulse', 'Right-click any element on the main board (Audio, Images, Text, Button) for its menu: rename, files, keys, delete. Board Buttons can now be dragged too', 'A new [[UI Button]] node, at the top of the list, listens to a Button you place on the main board (+ menu). Click the board button, or press the key shown on its badge, and the node fires. Double-click the name to rename it', '[[Mover Setter]]: a signal into the top pin makes the Mover jump straight to the pin number held in it (or wired into the bottom pin), instantly, in both pin modes. Its L and R pins must both go to the same Mover\'s left and right pins', '[[Mover]]: a pill with a moving line. Signals into its left / right pins slide the line, and only the input the line sits on gets through. Many-pin or single-pin mode (right-click it), turn it with the corner button, drag the corner to resize', '[[RGB]] node and [[LED Matrix]] (resizable, each LED keeps the colour it was lit with)', '[[Property Changer]], plus property pins on [[IF]], [[VALUE]] and [[LOOP]]', '[[IF]] has a new pin under Value / Text to choose what it checks, so it can read a [[VALUE]]', 'The count on [[LOOP]] is now a value pin along the bottom', '[[Splitter]] nodes pass numbers straight through']],
+    { id: '2026-11-09', date: '9 Nov 2026', title: 'Nodes, menus and speed', groups: [
+      ['New nodes', ['A sun / moon button in the bottom-right corner switches the board between light and dark with a smooth fade (the sun curls into the moon), and remembers your choice. The reset-view button is glass too', 'The shortcut hints light up the keys you are holding, and fade the shortcuts that do not include them', 'Board Buttons got smaller, with an optional icon square: pick any Material icon, change the square\'s colour (the icon turns black or white by itself), or remove the square and colour the icon directly. Choosing a key is now a quiet fade instead of a pulse', 'Right-click any element on the main board (Audio, Images, Text, Button) for its menu: rename, files, keys, delete. Board Buttons can now be dragged too', 'A new [[UI Button]] node, at the top of the list, listens to a Button you place on the main board (+ menu). Click the board button, or press the key shown on its badge, and the node fires. Double-click the name to rename it', '[[Mover Setter]]: a signal into the top pin makes the Mover jump straight to the pin number held in it (or wired into the bottom pin), instantly, in both pin modes. Its L and R pins must both go to the same Mover\'s left and right pins', '[[Mover]]: a pill with a moving line. Signals into its left / right pins slide the line, and only the input the line sits on gets through. Many-pin or single-pin mode (right-click it), turn it with the corner button, drag the corner to resize', '[[RGB]] node and [[LED Matrix]] (resizable, each LED keeps the colour it was lit with)', '[[Property Changer]], plus property pins on [[IF]], [[VALUE]] and [[LOOP]]', '[[IF]] has a new pin under Value / Text to choose what it checks, so it can read a [[VALUE]]', 'The count on [[LOOP]] is now a value pin along the bottom', '[[Splitter]] nodes pass numbers straight through']],
       ['Editing', ['[[LED Matrix]] has a Toggle Mode button on its bar: a signal at an LED that is already on turns it off', 'Everything for a node is on the bar above the selection: colour, caption, a Mover\'s pin mode, group, move, duplicate and delete. Right-click no longer opens a menu', 'Captions under nodes, and click a group\'s label to rename it', 'Colour pins by kind: inputs, outputs, values or properties, on any number of pins', 'Keyboard hints in the node editor, and no dotted ring on selected nodes', 'The [[Splitter]] editor is 30% bigger']],
       ['Fixes and speed', ['Signals redraw the wires once per frame instead of once per wire, so big graphs no longer slow down and LED numbers come out right', '[[LED Matrix]] only combines a row and a column fired in the same moment', 'Wires no longer flip shape while zooming', 'Cursors: random colours, shown only on the board you are on, with presence dots on the tabs', 'Phones and tablets now see a "open this on a computer" note instead of the board']]
     ] },
@@ -3461,7 +3478,7 @@
   const clOv = $('#clOverlay'), wnDot = $('#wdot'), CL_NEW = CHANGES[0].id;
   const clSeen = () => { try { return localStorage.getItem('cb_seen') || ''; } catch (e) { return ''; } };
   wnDot.classList.toggle('on', clSeen() !== CL_NEW);
-  $('#clList').innerHTML = CHANGES.map(c => '<h4>' + c.title + '<small>' + c.date + '</small></h4>' + c.groups.map(([h, li]) => '<h5>' + h + '</h5><ul>' + li.map(x => '<li>' + x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\[\[(.+?)\]\]/g, '<span class="tg">$1</span>') + '</li>').join('') + '</ul>').join('')).join('');
+  $('#clList').innerHTML = CHANGES.map((c, ci) => '<h4>' + c.title + '<small>' + c.date + (ci === 0 ? ' (latest)' : '') + '</small></h4>' + c.groups.map(([h, li]) => '<h5>' + h + '</h5><ul>' + li.map(x => '<li>' + x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\[\[(.+?)\]\]/g, '<span class="tg">$1</span>') + '</li>').join('') + '</ul>').join('')).join('');
   const closeCl = () => clOv.classList.remove('show');
   $('#wn').addEventListener('click', () => { clOv.classList.add('show'); wnDot.classList.remove('on'); try { localStorage.setItem('cb_seen', CL_NEW); } catch (e) { /* fine */ } });
   $('#clDone').addEventListener('click', closeCl); clOv.addEventListener('pointerdown', e => { if (e.target === clOv) closeCl(); });
