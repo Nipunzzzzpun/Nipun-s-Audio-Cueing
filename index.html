@@ -440,6 +440,7 @@
   .anode.tall { height: 58px; padding-left: 38px; }
   .anode.tall .ip[data-p="0"] { top: 17px; } .anode.tall .ip[data-p="1"] { top: 41px; }
   .anode.t-counter, .anode.t-random, .anode.t-light { padding-left: 24px; }
+  .anode.t-counter .ip[data-p="1"] { left: 50%; top: 0; margin: -8px 0 0 -8px; }
   .anode .ni { width: 44px; height: 22px; border: 0; border-radius: 11px; background: rgba(255,255,255,.16); color: #fff; text-align: center; font: 600 12px 'Montserrat', sans-serif; outline: none; -moz-appearance: textfield; padding: 0; }
   .anode .ni::-webkit-inner-spin-button, .anode .ni::-webkit-outer-spin-button { display: none; }
   .anode.t-rgb { height: auto; padding: 10px 38px 10px 40px; border-radius: 26px; }
@@ -484,7 +485,7 @@
   .anode.t-prop .nk { color: #fff; }
   .anode.t-prop .nk i { font-style: normal; opacity: .5; font-size: 14px; min-width: 12px; text-align: center; }
   .anode.t-prop .port { right: auto; left: 50%; top: 0; margin: -8px 0 0 -8px; }
-  .anode.t-counter .ip[data-p="1"], .anode.t-wait .ip[data-p="1"], .anode.t-if .ip[data-p="1"], .anode.t-number .ip[data-p="1"], .anode.t-random .ip[data-p="1"], .anode.t-random .ip[data-p="2"], .anode.t-loop .ip[data-p="2"], .anode.t-loop .ip[data-p="3"] { top: 100%; margin: -8px 0 0 -8px; }
+  .anode.t-counter .ip[data-p="2"], .anode.t-wait .ip[data-p="1"], .anode.t-if .ip[data-p="1"], .anode.t-number .ip[data-p="1"], .anode.t-random .ip[data-p="1"], .anode.t-random .ip[data-p="2"], .anode.t-loop .ip[data-p="2"], .anode.t-loop .ip[data-p="3"] { top: 100%; margin: -8px 0 0 -8px; }
   .anode.t-random .ni { width: 56px; }
   .anode.t-random .cc { color: #fff; font-weight: 600; font-size: 12px; }
   .anode.t-print .ip[data-p="1"] { top: 100%; margin: -8px 0 0 -8px; }
@@ -2123,7 +2124,7 @@
   const autoDock = $('#autoDock'), acanvas = $('#acanvas'), aworld = $('#aworld'), awires = $('#awires'), amaps = $('#amaps'), mlist = $('#mlist'), minner = $('#minner'), azp = $('#azp'), autoin = autoDock.querySelector('.autoin');
   const RY0 = 24, RPITCH = 46, GAPX = 0, MAXB = 200, PURPLE = '#e0a8f0', VALC = 'cornflowerblue', STOPC = '#ff9a9a', DARK = '#3d3d3d';
   const SPEC = {
-    audio: { ins: 4, out: true, multi: true }, value: { ins: 5, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, ui: { ins: 0, out: true }, counter: { ins: 2, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
+    audio: { ins: 4, out: true, multi: true }, value: { ins: 5, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, ui: { ins: 0, out: true }, counter: { ins: 3, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
     and: { ins: 2, out: true, multi: true, gate: true }, or: { ins: 2, out: true, multi: true, gate: true }, nor: { ins: 2, out: true, multi: true, gate: true },
     xor: { ins: 2, out: true, multi: true, gate: true }, xand: { ins: 2, out: true, multi: true, gate: true },
     if: { ins: 5, out: true, multi: true }, prop: { ins: 1, out: true, multi: true }, loop: { ins: 5, out: true, outs: 2, multi: true }, random: { ins: 3, out: true, multi: true }, print: { ins: 2, out: true, multi: true }, light: { ins: 1, out: false, multi: true }, rgb: { ins: 3, out: true, multi: true }, matrix: { ins: 34, out: false, multi: true }, mover: { ins: 18, out: true, outs: 16, multi: true }, mvset: { ins: 2, out: true, outs: 2, multi: true }, split: { ins: 1, out: true, outs: 1, multi: true }
@@ -2163,7 +2164,7 @@
     });
     sp.w = W; sp.h = H; return sp;
   }
-  const VP = { mvset: 1, audio: 2, value: 2, loop: 2, counter: 1, wait: 1, if: 1, number: 1, random: 1, print: 1 };      // first input pin of each node that carries a value (not a signal)
+  const VP = { mvset: 1, audio: 2, value: 2, loop: 2, counter: 2, wait: 1, if: 1, number: 1, random: 1, print: 1 };      // first input pin of each node that carries a value (not a signal)
   const OPS = [['<', 'less than'], ['>', 'greater than'], ['=', 'equal to'], ['≤', 'at most'], ['≥', 'at least'], ['≠', 'not equal to']];
   const CMP = { '<': (a, b) => a < b, '>': (a, b) => a > b, '=': (a, b) => a === b, '≤': (a, b) => a <= b, '≥': (a, b) => a >= b, '≠': (a, b) => a !== b };
   const TOPS = [['is', 'Is', '='], ['isnt', 'Isn’t', '≠'], ['has', 'Contains', '∋']];
@@ -2217,7 +2218,7 @@
   let vdepth = 0;
   const liveIn = (n, p, own) => { const l = inputsL(n.id, p)[0]; if (!l || vdepth > 6) return own; vdepth++; try { const x = +numOf(l[0], new Set([n.id]), l[3]); return isFinite(x) ? x : own; } finally { vdepth--; } };
   const vby = n => liveIn(n, 2, n.vx), vstart = n => liveIn(n, 3, n.vs);        // 'by' and 'start' can be driven by wires into the bottom pins
-  const cN = n => Math.max(1, Math.min(99, Math.round(liveIn(n, 1, n.n)) || 1));
+  const cN = n => Math.max(1, Math.min(99, Math.round(liveIn(n, 2, n.n)) || 1));
   const wSec = n => Math.max(0, Math.min(3600, liveIn(n, 1, n.sec)));
   const mvV = n => liveIn(n, 1, n.v);
   const ifK = n => liveIn(n, 1, n.k), numV = n => liveIn(n, 1, n.v);
@@ -2238,7 +2239,7 @@
   const idOk = x => typeof x === 'string' && /^[a-z0-9]{3,16}$/.test(x);
   const HEX = /^#[0-9a-f]{6}$/i;
   const mkBtn = n => ({ id: uid(), name: 'Mapped Button ' + n, key: '' });
-  const defaultAuto = () => ({ btns: [], nodes: [], links: [], gn: {}, ifm: 1 });
+  const defaultAuto = () => ({ btns: [], nodes: [], links: [], gn: {}, ifm: 1, ctm: 1 });
   let auto = defaultAuto(), autoOpen = false, binding = null;
   const num = (x, lim) => Math.max(-lim, Math.min(lim, +x));
   function loadAuto(a) {
@@ -2269,7 +2270,8 @@
     }
     if (a && a.gn && typeof a.gn === 'object') Object.entries(a.gn).slice(0, 80).forEach(([k, nm]) => { if (/^g[a-z0-9]{1,15}$/.test(k) && typeof nm === 'string' && nm.trim()) out.gn[k] = nm.trim().slice(0, 30); });      // group names
     if (!(a && a.ifm)) out.links.forEach(l => { const t = out.nodes.find(n => n.id === l[1]), f = out.nodes.find(n => n.id === l[0]); if (t && t.t === 'if' && l[2] === 3 && f && f.t !== 'prop') l[2] = 4; });      // older saves: the IF "what to check" wire moved from pin 3 to pin 4 (pin 3 is now the Value / Text property pin)
-    out.ifm = 1;
+    if (!(a && a.ctm)) { out.links.forEach(l => { const t = out.nodes.find(n => n.id === l[1]); if (t && t.t === 'counter' && l[2] === 1) l[2] = 2; }); out.nodes.forEach(n => { if (n.t === 'counter' && n.pc && n.pc['1']) { n.pc['2'] = n.pc['1']; delete n.pc['1']; } }); }      // older saves: the Counter's count wire moved from pin 1 to pin 2 (pin 1 is now Reset)
+    out.ifm = 1; out.ctm = 1;
     out.links = out.links.filter(l => { const t = out.nodes.find(n => n.id === l[1]); return !(t && t.t === 'print' && l[2] === 1); });      // Print's value pin isn't available yet
     auto = out;
   }
@@ -2280,7 +2282,7 @@
   const norm = k => k.length === 1 ? k.toLowerCase() : k;
   const keyLabel = k => !k ? 'key' : k.length === 1 ? k.toUpperCase() : ({ ' ': 'Space', ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→', Control: 'Ctrl' }[k] || k);
   const rowY = i => RY0 + i * RPITCH;
-  const RGBPIN = ['#ff5a5a', '#c4ff6a', '#5a78ff'], inDef = (n, p) => n && n.t === 'rgb' ? RGBPIN[p] : isPropPin(n, p) ? PROPC : isValIn(n, p) ? VALC : '';
+  const RGBPIN = ['#ff5a5a', '#c4ff6a', '#5a78ff'], inDef = (n, p) => n && n.t === 'rgb' ? RGBPIN[p] : n && n.t === 'counter' && p === 1 ? '#ff7b7b' : isPropPin(n, p) ? PROPC : isValIn(n, p) ? VALC : '';
   const isValSrc = n => n && (n.t === 'number' || n.t === 'value'), isValIn = (n, p) => n && VP[n.t] !== undefined && p >= VP[n.t];     // value pins default to cornflower blue
   const pinColor = (n, k) => (n && n.pc && n.pc[k]) || (k === 'o' ? (n && n.t === 'prop' ? PROPC : isValSrc(n) ? VALC : PURPLE) : k === 'o1' ? (n && (n.t === 'split' || n.t === 'mvset' || n.t === 'mover') ? PURPLE : STOPC) : /^o\d+$/.test(k) ? PURPLE : DARK);
   function autoDropCue(id) {
@@ -2393,7 +2395,7 @@
   function buildNodeEl(n) {
     const sp = SPEC[n.t], el = document.createElement('div'); el.className = 'anode t-' + n.t + (n.t === 'audio' || n.t === 'value' || n.t === 'loop' ? ' big' : sp.gate ? ' tall' : ''); el.dataset.id = n.id;
     let h = '';
-    if (n.t !== 'split' && n.t !== 'matrix') for (let i = 0; i < sp.ins; i++) h += '<i class="ip" data-p="' + i + '"></i>';
+    if (n.t !== 'split' && n.t !== 'matrix') for (let i = 0; i < sp.ins; i++) h += '<i class="ip" data-p="' + i + '"' + (n.t === 'counter' && i === 1 ? ' title="Reset: sets the count back to 0"' : '') + '></i>';
     if (n.t === 'audio') h += '<span class="il l0">play</span><span class="il l1">stop</span><span class="ol">done</span>';
     if (n.t === 'loop') h += '<span class="il l0">start</span><span class="il l1">break</span><span class="ol o0">each</span><span class="ol o1">done</span>';
     if (n.t === 'value') h += '<span class="il l0">run</span><span class="il l1">clear</span>';
@@ -2863,7 +2865,7 @@
   const outPos = (id, fp) => { const el = nodeEls[id], pt = el && el.querySelectorAll('.port')[fp || 0]; return pt ? [v.x + (parseFloat(el.style.left) + pt.offsetLeft + pt.offsetWidth / 2) * v.z, v.y + (parseFloat(el.style.top) + pt.offsetTop + pt.offsetHeight / 2) * v.z, pt.dataset.s || (nodeById(id) && nodeById(id).t === 'prop' ? 't' : nodeById(id) && nodeById(id).t === 'mvset' && !fp ? 'l' : 'r')] : null; };
   function inPos(to, p, W) {
     const el = nodeEls[to], ip = el && el.querySelector('.ip[data-p="' + p + '"]'); if (!ip) return null;
-    const nn = nodeById(to), dir = !nn ? 'l' : nn.t === 'split' ? (ip.dataset.s || 'l') : nn.t === 'matrix' ? (p < 2 ? 'b' : p < 18 ? 't' : 'l') : (nn.t === 'if' && p === 4) || (nn.t === 'mvset' && p === 0) ? 't' : nn.t === 'mover' ? (p === 16 ? (nn.mvr ? 't' : 'l') : p === 17 ? (nn.mvr ? 'b' : 'r') : nn.mvr ? 'l' : 't') : nn.t === 'loop' ? (p >= 2 ? 'b' : 'l') : VP[nn.t] !== undefined && p >= VP[nn.t] ? 'b' : 'l';
+    const nn = nodeById(to), dir = !nn ? 'l' : nn.t === 'split' ? (ip.dataset.s || 'l') : nn.t === 'matrix' ? (p < 2 ? 'b' : p < 18 ? 't' : 'l') : (nn.t === 'if' && p === 4) || (nn.t === 'mvset' && p === 0) || (nn.t === 'counter' && p === 1) ? 't' : nn.t === 'mover' ? (p === 16 ? (nn.mvr ? 't' : 'l') : p === 17 ? (nn.mvr ? 'b' : 'r') : nn.mvr ? 'l' : 't') : nn.t === 'loop' ? (p >= 2 ? 'b' : 'l') : VP[nn.t] !== undefined && p >= VP[nn.t] ? 'b' : 'l';
     return [v.x + (parseFloat(el.style.left) + ip.offsetLeft + ip.offsetWidth / 2) * v.z, v.y + (parseFloat(el.style.top) + ip.offsetTop + ip.offsetHeight / 2) * v.z, dir];
   }
   /* dynamic wires: a wire runs as its normal loose curve, but if that curve would cross a node it is re-routed around the nodes in the way.
@@ -3283,7 +3285,7 @@
       }
       const t = setTimeout(() => { n.pend = Math.max(0, (n.pend || 1) - 1); const e2 = nodeEls[to]; if (e2 && !n.pend) e2.classList.remove('waiting'); emit(to, seen, { played: 0, stopped: 0, miss: 0, delayed: 0 }); }, wSec(n) * 1000);
       (waits[to] = waits[to] || []).push(t);
-    } else if (n.t === 'counter') { cnt[to] = (cnt[to] || 0) + 1; if (cnt[to] >= cN(n)) { cnt[to] = 0; updCounter(n); emit(to, seen, st); } else updCounter(n); }
+    } else if (n.t === 'counter') { if (p === 1) { cnt[to] = 0; updCounter(n); return; } cnt[to] = (cnt[to] || 0) + 1; if (cnt[to] >= cN(n)) { cnt[to] = 0; updCounter(n); emit(to, seen, st); } else updCounter(n); }
     else if (n.t === 'loop') {
       if (p === 1) { endLoop(to); return; }                                                     // break
       if (loops[to]) clearTimeout(loops[to].t); loops[to] = { i: 0, t: 0 }; loopStep(to);        // start (or restart)
@@ -3333,7 +3335,7 @@
     if (srcs.length && st.miss && !st.played && !st.stopped && !st.delayed) toast('That cue has no audio file yet');
     const row = minner.querySelector('.mrow[data-id="' + b.id + '"]'); if (row) { row.classList.remove('ran'); void row.offsetWidth; row.classList.add('ran'); }
   }
-  const VPIN = { loop: [[2, '.lc', n => loopTotal(n)], [3, '.lt', lEvery]], counter: [[1, '.ni', cN]], wait: [[1, '.ni', wSec]], if: [[1, n => n.im === 'text' ? '.tx' : '.ik', n => n.im === 'text' ? null : ifK(n)], [4, '.nm', null]], number: [[1, '.ni', numV]], mvset: [[1, '.ni', n => mvV(n)]], print: [[1, '.pt', null]], random: [[1, '.rmin', n => rRange(n)[0]], [2, '.rmax', n => rRange(n)[1]]] };
+  const VPIN = { loop: [[2, '.lc', n => loopTotal(n)], [3, '.lt', lEvery]], counter: [[2, '.ni', cN]], wait: [[1, '.ni', wSec]], if: [[1, n => n.im === 'text' ? '.tx' : '.ik', n => n.im === 'text' ? null : ifK(n)], [4, '.nm', null]], number: [[1, '.ni', numV]], mvset: [[1, '.ni', n => mvV(n)]], print: [[1, '.pt', null]], random: [[1, '.rmin', n => rRange(n)[0]], [2, '.rmax', n => rRange(n)[1]]] };
   const rgbVal = n => [0, 1, 2].map(i => { const l = inputsL(n.id, i)[0]; return Math.max(0, Math.min(255, Math.round(l ? +numOf(l[0], new Set([n.id]), l[3]) || 0 : n['c' + 'rgb'[i]] || 0))); });
   let lightRaf = 0;
   function lightTick() {
@@ -3420,7 +3422,7 @@
 
   /* undo / redo for the node editor (keeps the last HIST_MAX changes) */
   const HIST_MAX = 200, hist = { u: [], r: [], cur: '' };
-  const autoJSON = () => JSON.stringify({ btns: auto.btns, nodes: auto.nodes.map(({ pend, rv, lit, ...n }) => n), links: auto.links, gn: auto.gn, ifm: 1 });
+  const autoJSON = () => JSON.stringify({ btns: auto.btns, nodes: auto.nodes.map(({ pend, rv, lit, ...n }) => n), links: auto.links, gn: auto.gn, ifm: 1, ctm: 1 });
   function updHist() { $('#aundo').disabled = !hist.u.length; $('#aredo').disabled = !hist.r.length; }
   function autoHist() {
     const j = autoJSON(); if (j === hist.cur) return;
@@ -3496,7 +3498,7 @@
   /* what's new: edit this list when something ships (newest first) */
   const CHANGES = [
     { id: '2026-11-09', date: '9 Nov 2026', title: 'Polish and Toggle Mode', groups: [
-      ['New', ['[[LED Matrix]] Toggle Mode (on its bar): a signal at an LED that is already on turns it off. It fires once per signal, so one signal can\'t flip an LED on and straight back off', 'The Mover\'s rotate button moved from the node to the bar above the selection']],
+      ['New', ['[[Counter]] has a Reset pin on top: a signal into it sets the count back to 0. Old saves keep working, a wire into the count pin moves to its new place at the bottom', '[[LED Matrix]] Toggle Mode (on its bar): a signal at an LED that is already on turns it off. It fires once per signal, so one signal can\'t flip an LED on and straight back off', 'The Mover\'s rotate button moved from the node to the bar above the selection']],
       ['Look and feel', ['The sun / moon button moved to the bottom-right and animates: the sun sucks in its rays and curls into the moon, and back the other way, always turning clockwise', 'Switching theme fades the whole board, the dotted grid and every panel instead of snapping', 'The reset-view button is a glass button with a white icon, in light and dark', 'Dialogs (What\'s new, Edit length, sharing, naming) follow the dark theme', 'The theme button sits behind everything else, so it never covers the node editor or menus', 'The icon picker no longer clips the corner of the "None" tile and the tile edges', 'The [[Mover]] pin-mode button now reads "Single-Pin Mode" / "Multi-Pin Mode"']],
       ['Live sharing', ['Cursors follow the page each person has open: if I open a page, people on the board go behind it; if we both have the same page open I see their cursor on it; if they have a page open and I don\'t, I can\'t see it']],
       ['Changelog', ['This list now covers every change so far, and the newest entry is marked (latest)']]
