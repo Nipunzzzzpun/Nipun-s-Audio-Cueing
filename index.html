@@ -40,16 +40,16 @@
   }
   body.dark { background-color: #333; --dot: #4a4a4d; }
   body.fading, body.fading *:not(.theme):not(.theme *):not(.recenter) { transition: background-color .7s ease, color .7s ease, border-color .7s ease, --dot .7s ease, fill .7s ease, box-shadow .7s ease !important; }
-  .theme { position: fixed; bottom: 116px; right: 16px; z-index: 100; width: 40px; height: 40px; padding: 0; border-radius: 20px; background: var(--glass); background-clip: padding-box; border: 2px solid var(--glass-border); -webkit-backdrop-filter: blur(6px) saturate(1.4); backdrop-filter: blur(6px) saturate(1.4); cursor: pointer; display: grid; place-items: center; transition: transform .3s var(--spring), background .2s; }
+  .theme { position: fixed; bottom: 116px; right: 16px; z-index: 1; width: 40px; height: 40px; padding: 0; border-radius: 20px; background: var(--glass); background-clip: padding-box; border: 2px solid var(--glass-border); -webkit-backdrop-filter: blur(6px) saturate(1.4); backdrop-filter: blur(6px) saturate(1.4); cursor: pointer; display: grid; place-items: center; transition: transform .3s var(--spring), background .2s; }
   .theme:hover { transform: scale(1.08); } .theme:active { transform: scale(.92); }
   .theme svg { width: 24px; height: 24px; fill: #fff; stroke: #fff; overflow: visible; }
   .theme .tgd { stroke: none; transform: scale(.556); transform-origin: 12px 12px; }
   .theme .tgc { transform: translate(24px,-24px); transform-origin: 12px 12px; }
   .theme .tgr { transform-origin: 12px 12px; }
   .theme .tgr line { stroke-width: 2; stroke-linecap: round; }
-  .theme .tgs { transform-origin: 12px 12px; transform: rotate(90deg); }
+  .theme .tgs { transform-origin: 12px 12px; transform: rotate(var(--r, 180deg)); }
   .theme.moon .tgd { transform: scale(1); } .theme.moon .tgc { transform: translate(5px,-5px); }
-  .theme.moon .tgr { transform: rotate(90deg) scale(.15); opacity: 0; } .theme.moon .tgs { transform: rotate(0deg); }
+  .theme.moon .tgr { transform: scale(.15); opacity: 0; }
   .theme.rdy .tgd, .theme.rdy .tgc { transition: transform .75s cubic-bezier(.65,0,.25,1); }
   .theme.rdy .tgr { transition: transform .6s cubic-bezier(.65,0,.25,1), opacity .5s ease; }
   .theme.rdy .tgs { transition: transform .9s cubic-bezier(.65,0,.25,1); }
@@ -923,7 +923,7 @@
   function applyTheme(on, save1) {
     if (document.body.classList.contains('dark') !== on && document.getElementById('theme') && document.getElementById('theme').classList.contains('rdy')) { document.body.classList.add('fading'); clearTimeout(applyTheme.t); applyTheme.t = setTimeout(() => document.body.classList.remove('fading'), 800); }
     darkOn = on; document.body.classList.toggle('dark', on);
-    const tb = document.getElementById('theme'); if (tb) { if (!tb.firstChild) tb.innerHTML = THEME_SVG; tb.classList.toggle('moon', on); if (!tb.classList.contains('rdy')) requestAnimationFrame(() => requestAnimationFrame(() => tb.classList.add('rdy'))); tb.title = on ? 'Switch to light mode' : 'Switch to dark mode'; }
+    const tb = document.getElementById('theme'); if (tb) { if (!tb.firstChild) tb.innerHTML = THEME_SVG; if (tb.classList.contains('moon') !== on || tb._r === undefined) { const base = tb._r === undefined ? (on ? 0 : 180) : (() => { let t = on ? 0 : 180; while (t < tb._r + 100) t += 360; return t; })(); tb._r = base; tb.style.setProperty('--r', base + 'deg'); } tb.classList.toggle('moon', on); if (!tb.classList.contains('rdy')) requestAnimationFrame(() => requestAnimationFrame(() => tb.classList.add('rdy'))); tb.title = on ? 'Switch to light mode' : 'Switch to dark mode'; }
     if (save1) { try { localStorage.setItem('cueTheme', on ? 'dark' : 'light'); } catch (e) {} }
     if (typeof items !== 'undefined') items.forEach(i => { if (i.type === 'text' && els[i.id]) styleText(i, els[i.id]); });
   }
