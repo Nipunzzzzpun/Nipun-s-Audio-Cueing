@@ -41,6 +41,19 @@
   body.dark { background-color: #333; --dot: #4a4a4d; }
   body.fading, body.fading *:not(.theme):not(.theme *):not(.recenter) { transition: background-color .7s ease, color .7s ease, border-color .7s ease, --dot .7s ease, fill .7s ease, box-shadow .7s ease !important; }
   .theme { position: fixed; bottom: 116px; right: 16px; z-index: 1; width: 40px; height: 40px; padding: 0; border-radius: 20px; background: var(--glass); background-clip: padding-box; border: 2px solid var(--glass-border); -webkit-backdrop-filter: blur(6px) saturate(1.4); backdrop-filter: blur(6px) saturate(1.4); cursor: pointer; display: grid; place-items: center; transition: transform .3s var(--spring), background .2s; }
+  .theme.fxbtn, .theme.blurbtn { width: 36px; height: 36px; border-radius: 18px; right: 18px; } .theme.fxbtn svg, .theme.blurbtn svg { width: 21.6px; height: 21.6px; }
+  .theme.fxbtn { bottom: 166px; z-index: 2; } .theme.fxbtn svg { fill: #fff; stroke: #fff; stroke-width: 2.6px; stroke-linejoin: round; transition: transform .45s var(--spring); transform: rotate(180deg); }
+  .theme.fxbtn.open svg { transform: rotate(0deg); }
+  .fxdot { position: absolute; right: 1px; top: 1px; min-width: 9px; height: 9px; padding: 0; box-sizing: border-box; border-radius: 5px; background: #4fc983; opacity: .85; transform: scale(0); transition: transform .3s var(--spring), min-width .3s var(--spring), height .3s var(--spring), padding .3s var(--spring); font: 700 9px/14px system-ui, sans-serif; color: #fff; text-align: center; overflow: hidden; white-space: nowrap; pointer-events: none; }
+  .fxdot.show { transform: scale(1); }
+  .fxdot.pill { min-width: 21px; height: 14px; padding: 0 4px; right: -3px; top: -3px; }
+  .theme.blurbtn { bottom: 214px; z-index: 0; opacity: 0; transform: translateY(48px) scale(.6); pointer-events: none; transition: transform .4s cubic-bezier(.5,0,.3,1), opacity .25s ease .1s, background .2s; }
+  .theme.blurbtn.shown { opacity: 1; transform: none; pointer-events: auto; transition: transform .45s var(--spring), opacity .3s ease, background .2s; }
+  .theme.blurbtn.shown:hover { transform: scale(1.08); } .theme.blurbtn.shown:active { transform: scale(.92); }
+  .theme.blurbtn svg { fill: #fff; stroke: none; }
+  .theme.blurbtn svg { overflow: visible; } .blurbtn .tr1, .blurbtn .tr2 { transform-box: fill-box; transform-origin: center; }
+  .blurbtn.on .tr1 { animation: mbstream 0.9s linear infinite; } .blurbtn.on .tr2 { animation: mbstream 0.9s linear infinite -0.45s; }
+  @keyframes mbstream { 0% { transform: translateX(5px) scaleX(.5); opacity: 0; } 25% { opacity: 1; } 70% { opacity: .9; transform: translateX(-2px) scaleX(1.5); } 100% { transform: translateX(-7px) scaleX(2); opacity: 0; } }
   .theme:hover { transform: scale(1.08); } .theme:active { transform: scale(.92); }
   .theme svg { width: 24px; height: 24px; fill: #fff; stroke: #fff; overflow: visible; }
   .theme .tgd { stroke: none; transform: scale(.556); transform-origin: 12px 12px; }
@@ -875,6 +888,8 @@
 <a class="gh" id="gh" href="https://github.com/" target="_blank" rel="noopener" title="View the source on GitHub"><svg viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg>GitHub</a>
 
 <button class="theme" id="theme" aria-label="Switch between light and dark"></button>
+<button class="theme fxbtn" id="fxBtn" aria-label="Effects" aria-expanded="false" title="Effects"><svg viewBox="0 0 24 24"><path d="M12 9l5 6H7z"/></svg><span class="fxdot" id="fxDot"></span></button>
+<button class="theme blurbtn fxitem" id="blurBtn" aria-label="Motion blur" aria-pressed="false" title="Motion blur: things blur as they move"><svg viewBox="0 0 24 24"><path d="M8,17q-0.42,0-0.71-0.29Q7,16.43 7,16t0.29-0.71T8,15h5q-0.35-0.43-0.56-0.93T12.1,13H10q-0.42,0-0.71-0.29Q9,12.43 9,12t0.29-0.71Q9.58,11 10,11h2.1q0.13-0.58 0.34-1.08T13,9H4Q3.58,9 3.29,8.71T3,8Q3,7.57 3.29,7.29T4,7H17q2.07,0 3.54,1.46T22,12t-1.46,3.54T17,17H8Zm9-2q1.25,0 2.13-0.88T20,12T19.13,9.88T17,9T14.88,9.88T14,12t0.88,2.13T17,15Z"/><path class="tr1" d="M3,13q-0.42,0-0.71-0.29Q2,12.43 2,12t0.29-0.71T3,11H7q0.43,0 0.71,0.29T8,12T7.71,12.71T7,13H3Z"/><path class="tr2" d="M4,17q-0.42,0-0.71-0.29Q3,16.43 3,16t0.29-0.71T4,15H5q0.43,0 0.71,0.29T6,16T5.71,16.71T5,17H4Z"/></svg></button>
 <button class="recenter" id="recenter" title="Reset the view to the centre" aria-label="Reset the view"></button>
 
 <div class="save">
@@ -959,6 +974,63 @@
     if (save1) { try { localStorage.setItem('cueTheme', on ? 'dark' : 'light'); } catch (e) {} }
     if (typeof items !== 'undefined') items.forEach(i => { if (i.type === 'text' && els[i.id]) styleText(i, els[i.id]); });
   }
+  /* motion blur: things blur in the direction they move (a button toggles it) */
+  const motionBlur = (() => {
+    const STRENGTH = .6, MAX_BLUR = 25, SMOOTH = .5, MIN_V = .4, MAX_EL = 3000, NS = 'http://www.w3.org/2000/svg', SKIP = new Set(['SCRIPT', 'STYLE', 'LINK', 'META', 'HEAD', 'TITLE', 'NOSCRIPT', 'BR', 'SVG', 'DEFS', 'PATH']);
+    let svg = null, defs = null, prev, vel, fx, active, id = 0, raf = 0, running = false;
+    function attach(el) {
+      const f = document.createElementNS(NS, 'filter'), fid = 'mb' + (id++); f.setAttribute('id', fid);
+      f.setAttribute('x', '-30%'); f.setAttribute('y', '-30%'); f.setAttribute('width', '160%'); f.setAttribute('height', '160%'); f.setAttribute('color-interpolation-filters', 'sRGB');
+      const b = document.createElementNS(NS, 'feGaussianBlur'); b.setAttribute('stdDeviation', '0 0'); f.appendChild(b); defs.appendChild(f);
+      const orig = el.style.filter; el.style.filter = (orig ? orig + ' ' : '') + 'url(#' + fid + ')';
+      const d = { f, b, orig, idle: 0 }; fx.set(el, d); active.add(el); return d;
+    }
+    function release(el) { const d = fx.get(el); if (!d) return; el.style.filter = d.orig || ''; d.f.remove(); fx.delete(el); active.delete(el); }
+    function tick() {
+      if (!running) return;
+      const vh = innerHeight, vw = innerWidth, els = document.body.querySelectorAll('*'), n = Math.min(els.length, MAX_EL), rects = new Array(n);
+      for (let i = 0; i < n; i++) {
+        const el = els[i];
+        if (SKIP.has(el.tagName.toUpperCase()) || (el instanceof SVGElement && el.ownerSVGElement) || el.id === 'blurBtn' || el.id === 'fxBtn') { rects[i] = null; continue; }
+        const r = el.getBoundingClientRect();
+        rects[i] = (r.width && r.height && r.bottom > -200 && r.top < vh + 200 && r.right > -200 && r.left < vw + 200) ? r : null;
+      }
+      const work = [];
+      for (let i = 0; i < n; i++) {
+        const el = els[i], r = rects[i]; if (!r) continue;
+        const p = prev.get(el); prev.set(el, { x: r.left, y: r.top });
+        if (!p) { vel.set(el, { x: 0, y: 0 }); continue; }
+        const old = vel.get(el) || { x: 0, y: 0 }, v = { x: old.x + (r.left - p.x - old.x) * SMOOTH, y: old.y + (r.top - p.y - old.y) * SMOOTH };
+        vel.set(el, v);
+        const pv = (el.parentElement && vel.get(el.parentElement)) || { x: 0, y: 0 };      // relative to the parent, so nested things blur on their own
+        work.push([el, Math.abs(v.x - pv.x), Math.abs(v.y - pv.y)]);
+      }
+      for (const [el, rx, ry] of work) {
+        const moving = rx > MIN_V || ry > MIN_V; let d = fx.get(el);
+        if (moving) { if (!d) d = attach(el); d.idle = 0; d.b.setAttribute('stdDeviation', Math.min(MAX_BLUR, rx * STRENGTH).toFixed(2) + ' ' + Math.min(MAX_BLUR, ry * STRENGTH).toFixed(2)); }
+        else if (d && ++d.idle > 6) release(el);
+      }
+      raf = requestAnimationFrame(tick);
+    }
+    return on => {
+      if (on === running) return;
+      if (on) {
+        svg = document.createElementNS(NS, 'svg'); svg.setAttribute('width', '0'); svg.setAttribute('height', '0'); svg.style.cssText = 'position:absolute;pointer-events:none;'; defs = document.createElementNS(NS, 'defs'); svg.appendChild(defs); document.documentElement.appendChild(svg);
+        prev = new WeakMap(); vel = new WeakMap(); fx = new WeakMap(); active = new Set(); running = true;
+        raf = requestAnimationFrame(tick);
+      } else { running = false; cancelAnimationFrame(raf); [...active].forEach(release); if (svg) svg.remove(); svg = null; }
+    };
+  })();
+  (() => {
+    const fxb = document.getElementById('fxBtn'), fxd = document.getElementById('fxDot'), items = [...document.querySelectorAll('.fxitem')];
+    const fxSync = () => { const n = items.filter(b => b.classList.contains('on')).length; fxd.classList.toggle('show', n > 0); fxd.classList.toggle('pill', n > 1); fxd.textContent = n > 1 ? '+' + n : ''; };
+    fxb.addEventListener('click', () => { const o = !fxb.classList.contains('open'); fxb.classList.toggle('open', o); fxb.setAttribute('aria-expanded', o); items.forEach((b, i) => setTimeout(() => b.classList.toggle('shown', o), o ? i * 60 : 0)); });
+    items.forEach(b => new MutationObserver(fxSync).observe(b, { attributes: true, attributeFilter: ['class'] }));
+    const btn = document.getElementById('blurBtn'); let on = false;
+    const set = (v, keep) => { on = v; btn.classList.toggle('on', on); btn.setAttribute('aria-pressed', on); btn.title = on ? 'Motion blur: on' : 'Motion blur: things blur as they move'; motionBlur(on); if (keep) { try { localStorage.setItem('cueBlur', on ? '1' : '0'); } catch (e) {} } };
+    btn.addEventListener('click', () => set(!on, true));
+    try { if (localStorage.getItem('cueBlur') === '1') set(true); } catch (e) {}
+  })();
   let items = [], els = {}, players = {}, selId = null, placing = null, editingId = null, pickFor = null, ro;
   const GRID = 20;                                   // keep in sync with --grid in the CSS
   const snap = v => Math.round(v / GRID) * GRID;
@@ -3528,7 +3600,7 @@
   const CHANGES = [
     { id: '2026-11-09', date: '9 Nov 2026', title: 'Polish and Toggle Mode', groups: [
       ['New', ['[[Audio]] has a red Restart pin (rewinds the sound to the beginning and stops it) and its Stop pin is now Pause: it holds the sound where it is, and Play carries on from there. Volume and pitch pins moved down one, old saves are updated for you', '[[LOOP]]: a signal into Break stops the loop without sending anything out of Done (Done only fires when the loop finishes)', 'Loops: a wire may now lead back to a node it already passed (even to its own input), and the signal goes round again a moment later, so loops keep running', 'A small red Stop everything button at the bottom-left of the node editor stops every sound, wait and loop at once', '[[Counter]] has a Reset pin on top: a signal into it sets the count back to 0. Old saves keep working, a wire into the count pin moves to its new place at the bottom', '[[LED Matrix]] Toggle Mode (on its bar): a signal at an LED that is already on turns it off. It fires once per signal, so one signal can\'t flip an LED on and straight back off', 'The Mover\'s rotate button moved from the node to the bar above the selection']],
-      ['Look and feel', ['The sun / moon button moved to the bottom-right and animates: the sun sucks in its rays and curls into the moon, and back the other way, always turning clockwise', 'Switching theme fades the whole board, the dotted grid and every panel instead of snapping', 'The reset-view button is a glass button with a white icon, in light and dark', 'Dialogs (What\'s new, Edit length, sharing, naming) follow the dark theme', 'The theme button sits behind everything else, so it never covers the node editor or menus', 'The icon picker no longer clips the corner of the "None" tile and the tile edges', 'The [[Mover]] pin-mode button now reads "Single-Pin Mode" / "Multi-Pin Mode"']],
+      ['Look and feel', ['A motion blur button above the sun / moon: things blur in the direction they move. A green dot shows when it is on, and it remembers your choice', 'The sun / moon button moved to the bottom-right and animates: the sun sucks in its rays and curls into the moon, and back the other way, always turning clockwise', 'Switching theme fades the whole board, the dotted grid and every panel instead of snapping', 'The reset-view button is a glass button with a white icon, in light and dark', 'Dialogs (What\'s new, Edit length, sharing, naming) follow the dark theme', 'The theme button sits behind everything else, so it never covers the node editor or menus', 'The icon picker no longer clips the corner of the "None" tile and the tile edges', 'The [[Mover]] pin-mode button now reads "Single-Pin Mode" / "Multi-Pin Mode"']],
       ['Live sharing', ['Cursors follow the page each person has open: if I open a page, people on the board go behind it; if we both have the same page open I see their cursor on it; if they have a page open and I don\'t, I can\'t see it']],
       ['Changelog', ['This list now covers every change so far, and the newest entry is marked (latest)']]
     ] },
