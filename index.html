@@ -378,6 +378,8 @@
   .dock.auto.open.full { width: calc(100vw - 40px); height: calc(100vh - 40px); }
   .dock.auto .awrap { flex: none; width: 640px; max-width: 100%; transition: width .7s var(--ease); }
   .dock.auto.full .awrap { width: calc(100vw - 532px); max-width: none; }
+  .stopall { position: absolute; left: 10px; bottom: 10px; z-index: 6; height: 26px; padding: 0 12px; border: 0; border-radius: 13px; background: rgba(0,0,0,.5); color: #ff6b6b; font: 700 11px 'Montserrat', sans-serif; cursor: pointer; transition: background .2s, transform .2s var(--spring); }
+  .stopall:hover { background: rgba(0,0,0,.72); } .stopall:active { transform: scale(.94); }
   .azoom .hb svg { width: 21px; height: 21px; fill: #fff; stroke: none; }
   .azoom .hb.redo svg { transform: scaleX(-1); }
   .azoom .hb:disabled { opacity: .3; cursor: default; pointer-events: none; }
@@ -804,6 +806,7 @@
         <div class="aworld" id="aworld"></div>
         <div class="aempty" id="aempty">Press + to add a mapped button, add a Button Input linked to it, then wire it to an Audio’s play pin.</div>
         <div class="azoom"><button class="hb" id="aexp" title="Enlarge the node editor"><svg viewBox="0 0 24 24" class="ex-out"><path d="M18.5 5.5l-13 13M12.5 5.5h6v6M5.5 12.5v6h6"/></svg><svg viewBox="0 0 24 24" class="ex-in"><path d="M13 11l5.5-5.5M11 13l-5.5 5.5M13 5.5V11h5.5M11 18.5V13H5.5"/></svg></button><button class="hb" id="aundo" title="Undo (Ctrl+Z)" disabled><svg viewBox="0 0 24 24"><path d="M8,19q-0.42,0-0.71-0.29Q7,18.43 7,18t0.29-0.71T8,17h6.1q1.57,0 2.74-1T18,13.5T16.84,11T14.1,10H7.8l1.9,1.9q0.28,0.28 0.28,0.7q0,0.42-0.28,0.7T9,13.58q-0.42,0-0.7-0.28L4.7,9.7Q4.55,9.55 4.49,9.38T4.43,9T4.49,8.63T4.7,8.3L8.3,4.7Q8.58,4.42 9,4.42q0.43,0 0.7,0.28Q9.98,4.97 9.98,5.4T9.7,6.1L7.8,8h6.3q2.43,0 4.16,1.57T20,13.5t-1.74,3.93Q16.53,19 14.1,19H8Z"/></svg></button><button class="hb redo" id="aredo" title="Redo (Ctrl+Y)" disabled><svg viewBox="0 0 24 24"><path d="M8,19q-0.42,0-0.71-0.29Q7,18.43 7,18t0.29-0.71T8,17h6.1q1.57,0 2.74-1T18,13.5T16.84,11T14.1,10H7.8l1.9,1.9q0.28,0.28 0.28,0.7q0,0.42-0.28,0.7T9,13.58q-0.42,0-0.7-0.28L4.7,9.7Q4.55,9.55 4.49,9.38T4.43,9T4.49,8.63T4.7,8.3L8.3,4.7Q8.58,4.42 9,4.42q0.43,0 0.7,0.28Q9.98,4.97 9.98,5.4T9.7,6.1L7.8,8h6.3q2.43,0 4.16,1.57T20,13.5t-1.74,3.93Q16.53,19 14.1,19H8Z"/></svg></button><button id="azoom" title="Reset zoom"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21M10.5 8v5M8 10.5h5"/></svg></button><span class="zp" id="azp">100%</span></div>
+      <button class="stopall" id="stopAll" type="button" title="Stop everything: sounds, waits and loops">Stop everything</button>
       </div>
       <svg class="awires" id="awires"></svg>
     </div>
@@ -2260,7 +2263,7 @@
       if (Array.isArray(a.links)) {
         const seen = new Set();
         a.links.slice(0, 600).forEach(l => {
-          if (!Array.isArray(l) || !seenN.has(l[0]) || l[0] === l[1]) return;
+          if (!Array.isArray(l) || !seenN.has(l[0])) return;
           const from = out.nodes.find(n => n.id === l[0]); if (!SPEC[from.t].out) return;
           const tn = out.nodes.find(n => n.id === l[1]), tb = out.btns.some(b => b.id === l[1]), p = l[2] | 0;
           if (!tn || p < 0 || p >= insOf(tn)) return;
@@ -2901,10 +2904,14 @@
       hit = rects.some(r => x > r.x - pad && x < r.x + r.w + pad && y > r.y - pad && y < r.y + r.h + pad);
     }
     if (!hit) return null;
-    const m = 30, g = 12, A = [aw[0] + sv[0] * m, aw[1] + sv[1] * m], B = [bw[0] + ev[0] * m, bw[1] + ev[1] * m];
-    const lo = [Math.min(A[0], B[0]) - 160, Math.min(A[1], B[1]) - 160], hi = [Math.max(A[0], B[0]) + 160, Math.max(A[1], B[1]) + 160];
-    const R = rects.filter(r => r.x < hi[0] && r.x + r.w > lo[0] && r.y < hi[1] && r.y + r.h > lo[1]).slice(0, 12).map(r => ({ x: r.x - g, y: r.y - g, w: r.w + 2 * g, h: r.h + 2 * g }));
-    const inside = (x, y) => R.some(r => x > r.x + .01 && x < r.x + r.w - .01 && y > r.y + .01 && y < r.y + r.h - .01);
+    let m = 30, g = 12, A, B, R, inside = () => true;
+    for (const [mm, gg] of [[30, 12], [18, 8], [11, 4], [7, 2]]) {       // nodes packed tightly: shorten the stub and the margin until the wire can leave its pin and reach the next one
+      m = mm; g = gg; A = [aw[0] + sv[0] * m, aw[1] + sv[1] * m]; B = [bw[0] + ev[0] * m, bw[1] + ev[1] * m];
+      const lo = [Math.min(A[0], B[0]) - 160, Math.min(A[1], B[1]) - 160], hi = [Math.max(A[0], B[0]) + 160, Math.max(A[1], B[1]) + 160];
+      R = rects.filter(r => r.x < hi[0] && r.x + r.w > lo[0] && r.y < hi[1] && r.y + r.h > lo[1]).slice(0, 12).map(r => ({ x: r.x - g, y: r.y - g, w: r.w + 2 * g, h: r.h + 2 * g }));
+      inside = (x, y) => R.some(r => x > r.x + .01 && x < r.x + r.w - .01 && y > r.y + .01 && y < r.y + r.h - .01);
+      if (!inside(A[0], A[1]) && !inside(B[0], B[1])) break;
+    }
     if (inside(A[0], A[1]) || inside(B[0], B[1])) return null;
     const xs = [...new Set([A[0], B[0], ...R.flatMap(r => [r.x, r.x + r.w])])].sort((p, q) => p - q), ys = [...new Set([A[1], B[1], ...R.flatMap(r => [r.y, r.y + r.h])])].sort((p, q) => p - q);
     const blockH = (y, x1, x2) => R.some(r => y > r.y + .01 && y < r.y + r.h - .01 && Math.min(x1, x2) < r.x + r.w - .01 && Math.max(x1, x2) > r.x + .01);
@@ -3032,7 +3039,6 @@
     if (prev && prev.isConnected && !prev.classList.contains('off') && dist(prev) < R * 1.5) return mk(prev);   // stay on the pin we're already snapped to (no flicker at the edge)
     let best = null, bd = R;
     aworld.querySelectorAll('.ip:not(.soon):not(.off)').forEach(pin => {
-      if (pin.closest('.anode').dataset.id === fromId) return;
       const d = dist(pin); if (d < bd) { bd = d; best = pin; }
     });
     return best ? mk(best) : null;
@@ -3051,11 +3057,10 @@
     return hit;
   }
   function addLink(from, to, p, fp) {
-    const fn = nodeById(from); if (from === to || !fn || !SPEC[fn.t].out) return;
+    const fn = nodeById(from); if (!fn || !SPEC[fn.t].out) return;
     fp = fn.t === 'mover' ? Math.max(0, Math.min(15, fp | 0)) : fn.t === 'split' ? Math.max(0, Math.min(fn.so - 1, fp | 0)) : fp ? 1 : 0;
     const tn = nodeById(to); if (!tn || p >= insOf(tn)) return;
     if (tn.t === 'print' && p === 1) { toast('Coming soon...'); return; }
-    if (tn && !isValIn(tn, p) && downstream(to, from)) { toast('That would make a loop'); return; }
     if (tn && !(SPEC[tn.t].multi || (SPEC[tn.t].multiPins || []).includes(p))) auto.links = auto.links.filter(l => !(l[1] === to && l[2] === p));   // one wire per pin
     if (auto.links.some(l => l[0] === from && l[1] === to && l[2] === p && l[3] === fp)) return;
     auto.links.push([from, to, p, fp]); save();
@@ -3266,8 +3271,11 @@
     if (n && n.t === 'random' && ls.length) ls = [ls[Math.floor(Math.random() * ls.length)]];       // RANDOM picks one way out
     ls.forEach(l => { glowLink(l); deliver(l[1], l[2], id, seen, st); });
   }
+  const cycT = new Set();
   function deliver(to, p, src, prev, st) {
-    const n = nodeById(to); if (!n || (prev.has(to) && !(n.t === 'loop' && p === 1))) return; const seen = new Set(prev).add(to);
+    const n = nodeById(to); if (!n) return;
+    if (prev.has(to) && !(n.t === 'loop' && p === 1)) { const t = setTimeout(() => { cycT.delete(t); deliver(to, p, src, new Set(), blank()); }, 60); cycT.add(t); return; }      // a wire that comes back round to a node it already passed: it goes again a moment later, so loops keep running (Stop everything ends them)
+    const seen = new Set(prev).add(to);
     if (VP[n.t] !== undefined && p >= VP[n.t]) return;     // those pins carry values, not signals
     flash(to);
     if (n.t === 'audio') {
@@ -3435,6 +3443,14 @@
     auto.nodes.forEach(n => clearWaits(n.id));
     loadAuto(JSON.parse(hist.cur)); hist.cur = autoJSON(); renderRows(); save(); updHist();
   }
+  function stopEverything() {
+    cycT.forEach(clearTimeout); cycT.clear(); auto.nodes.forEach(n => clearWaits(n.id));
+    Object.keys(players).forEach(id => { const p = players[id], it = get(id); try { p.pause(); p.currentTime = (it && it.trimStart) || 0; } catch (e) {} if (it) updateSeek(it); });
+    auto.nodes.forEach(n => { if (n.pend) n.pend = 0; const el = nodeEls[n.id]; if (el) el.classList.remove('waiting'); });
+    toast('Stopped everything');
+  }
+  $('#stopAll').addEventListener('click', e => { e.stopPropagation(); stopEverything(); });
+  $('#stopAll').addEventListener('pointerdown', e => e.stopPropagation());
   const undo = () => histGo(hist.u, hist.r), redo = () => histGo(hist.r, hist.u);
   $('#aexp').addEventListener('click', () => { autoDock.classList.toggle('full'); $('#aexp').title = autoDock.classList.contains('full') ? 'Shrink the node editor' : 'Enlarge the node editor'; setTimeout(drawWires, 120); setTimeout(drawWires, 800); });
   new ResizeObserver(() => drawWires()).observe(acanvas);
@@ -3498,7 +3514,7 @@
   /* what's new: edit this list when something ships (newest first) */
   const CHANGES = [
     { id: '2026-11-09', date: '9 Nov 2026', title: 'Polish and Toggle Mode', groups: [
-      ['New', ['[[Counter]] has a Reset pin on top: a signal into it sets the count back to 0. Old saves keep working, a wire into the count pin moves to its new place at the bottom', '[[LED Matrix]] Toggle Mode (on its bar): a signal at an LED that is already on turns it off. It fires once per signal, so one signal can\'t flip an LED on and straight back off', 'The Mover\'s rotate button moved from the node to the bar above the selection']],
+      ['New', ['Loops: a wire may now lead back to a node it already passed (even to its own input), and the signal goes round again a moment later, so loops keep running', 'A small red Stop everything button at the bottom-left of the node editor stops every sound, wait and loop at once', '[[Counter]] has a Reset pin on top: a signal into it sets the count back to 0. Old saves keep working, a wire into the count pin moves to its new place at the bottom', '[[LED Matrix]] Toggle Mode (on its bar): a signal at an LED that is already on turns it off. It fires once per signal, so one signal can\'t flip an LED on and straight back off', 'The Mover\'s rotate button moved from the node to the bar above the selection']],
       ['Look and feel', ['The sun / moon button moved to the bottom-right and animates: the sun sucks in its rays and curls into the moon, and back the other way, always turning clockwise', 'Switching theme fades the whole board, the dotted grid and every panel instead of snapping', 'The reset-view button is a glass button with a white icon, in light and dark', 'Dialogs (What\'s new, Edit length, sharing, naming) follow the dark theme', 'The theme button sits behind everything else, so it never covers the node editor or menus', 'The icon picker no longer clips the corner of the "None" tile and the tile edges', 'The [[Mover]] pin-mode button now reads "Single-Pin Mode" / "Multi-Pin Mode"']],
       ['Live sharing', ['Cursors follow the page each person has open: if I open a page, people on the board go behind it; if we both have the same page open I see their cursor on it; if they have a page open and I don\'t, I can\'t see it']],
       ['Changelog', ['This list now covers every change so far, and the newest entry is marked (latest)']]
