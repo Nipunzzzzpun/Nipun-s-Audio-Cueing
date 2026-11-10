@@ -514,9 +514,9 @@
   .anode.t-cgate .ip[data-p="0"] { background: #3d3d3d; }
   .anode.t-cgate .ip[data-p="1"] { top: 100%; left: 44px; margin: -8px 0 0 -8px; }
   .anode.t-cgate .ip[data-p="2"], .anode.t-cgate .ip[data-p="3"] { top: 0; margin: -8px 0 0 -8px; }
-  .anode.t-curve { display: block; width: 530px; height: 640px; padding: 0; border-radius: 28px; }
+  .anode.t-curve { display: block; width: 530px; height: 692px; padding: 0; border-radius: 28px; }
   .anode.t-curve .nm { position: absolute; left: 26px; top: 20px; }
-  .anode.t-curve .cpl { position: absolute; left: 26px; top: 58px; width: 100px; height: 112px; overscroll-behavior: contain; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 6px; }
+  .anode.t-curve .cpl { position: absolute; left: 26px; top: 58px; width: 100px; height: 164px; overscroll-behavior: contain; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 6px; }
   .anode.t-curve .cpl::-webkit-scrollbar { display: none; }
   .anode.t-curve .cpl button { flex: none; height: 20px; border: 2px solid transparent; border-radius: 11px; background: rgba(255,255,255,.22); color: #fff; font: 600 10.5px 'Montserrat', sans-serif; cursor: pointer; padding: 0; transition: border-color .25s ease, background .2s; }
   .anode.t-curve .cpl button:hover { background: rgba(255,255,255,.3); }
@@ -525,7 +525,7 @@
   .anode.t-curve .cpl button.add svg { width: 13px; height: 13px; fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; }
   .anode.t-curve .cvs { position: absolute; right: 24px; top: 22px; width: 310px; height: 310px; border-radius: 20px; background: #1c1c1c; cursor: crosshair; touch-action: none; overflow: hidden; }
   .anode.t-curve .cvs .gl { stroke: #262626; stroke-width: 1px; fill: none; } .anode.t-curve .cvs .gl.mj { stroke: #383838; }
-  .anode.t-curve .cvs.panning { cursor: grabbing; }
+  .anode.t-curve .cvs.panning { cursor: grabbing; } .anode.t-curve .cvs.onstop, .anode.t-curve .cvs.sliding { cursor: ew-resize; }
   .anode.t-curve .ip[data-p="12"], .anode.t-curve .ip[data-p="17"] { top: 100%; }
   .anode.t-curve .ip[data-p="11"] { top: 100%; }
   .anode.t-curve .cvs .sl { stroke: #34428a; stroke-width: 2.5px; fill: none; }
@@ -537,7 +537,7 @@
   .anode.t-curve .cvs .rl { stroke: #4f6bff; stroke-width: 2.5px; fill: none; }
   .anode.t-curve .cpn.off { opacity: .4; }
   .anode.t-curve .cpn { transition: opacity .2s; position: absolute; left: 22px; margin-top: -7px; font: 600 10.5px 'Montserrat', sans-serif; color: rgba(255,255,255,.35); white-space: nowrap; pointer-events: none; }
-  .anode.t-curve .cvl { position: absolute; top: 575px; width: 90px; display: flex; flex-direction: column; align-items: center; gap: 4px; font: 600 10px 'Montserrat', sans-serif; color: rgba(255,255,255,.4); }
+  .anode.t-curve .cvl { position: absolute; top: 627px; width: 90px; display: flex; flex-direction: column; align-items: center; gap: 4px; font: 600 10px 'Montserrat', sans-serif; color: rgba(255,255,255,.4); }
   .anode.t-curve .cvl .ni { width: 90px; text-align: center; }
   .anode.t-curve .ip { left: 0; margin: -8px 0 0 -8px; }
   .anode.t-curve .ip[data-p="10"], .anode.t-curve .ip[data-p="11"], .anode.t-curve .ip[data-p="12"] { top: 100%; }
@@ -590,8 +590,10 @@
   .anode.big .ip[data-p="0"] { top: 30px; } .anode.big .ip[data-p="1"] { top: 62px; }
   .anode.big .il { left: 22px; } .anode.big .il.l0 { top: 24px; } .anode.big .il.l1 { top: 56px; }
   .anode.big .ol { top: 40px; right: 25px; }
-  .anode.t-audio .ip[data-p="3"] { left: calc(66px + (100% - 130px) * .25); top: 100%; margin: -8px 0 0 -8px; }
-  .anode.t-audio .ip[data-p="4"] { left: calc(66px + (100% - 130px) * .75); top: 100%; margin: -8px 0 0 -8px; }
+  .anode.t-audio.big { min-width: 440px; } .anode.t-audio .r2 { grid-template-columns: 1fr 1fr 1fr; }
+  .anode.t-audio .ip[data-p="3"] { left: calc(66px + (100% - 154px) / 6); top: 100%; margin: -8px 0 0 -8px; }
+  .anode.t-audio .ip[data-p="4"] { left: calc(66px + 12px + (100% - 154px) / 2); top: 100%; margin: -8px 0 0 -8px; }
+  .anode.t-audio .ip[data-p="5"] { left: calc(66px + 24px + (100% - 154px) * 5 / 6); top: 100%; margin: -8px 0 0 -8px; }
   .anode.t-audio.big .ip[data-p="0"] { top: 20px; } .anode.t-audio.big .ip[data-p="1"] { top: 46px; } .anode.t-audio.big .ip[data-p="2"] { top: 72px; }
   .anode.t-audio.big .il.l0 { top: 14px; } .anode.t-audio.big .il.l1 { top: 40px; } .anode.t-audio.big .il.l2 { top: 66px; }
   .anode .ni.driven { background: rgba(224,168,240,.3); color: #fff; pointer-events: none; }
@@ -2365,7 +2367,7 @@ $('#copy').addEventListener('click', async () => {
   const autoDock = $('#autoDock'), acanvas = $('#acanvas'), aworld = $('#aworld'), awires = $('#awires'), amaps = $('#amaps'), mlist = $('#mlist'), minner = $('#minner'), azp = $('#azp'), autoin = autoDock.querySelector('.autoin');
   const RY0 = 24, RPITCH = 46, GAPX = 0, MAXB = 200, PURPLE = '#e0a8f0', VALC = 'cornflowerblue', STOPC = '#ff9a9a', DARK = '#3d3d3d';
   const SPEC = {
-    cgate: { ins: 4, out: true, multiPins: [0, 1] }, curve: { ins: 21, out: true, outs: 2, multiPins: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 16, 18, 19, 20] }, audio: { ins: 5, out: true, multi: true }, value: { ins: 5, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, ui: { ins: 0, out: true }, counter: { ins: 3, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
+    cgate: { ins: 4, out: true, multiPins: [0, 1] }, curve: { ins: 21, out: true, outs: 2, multiPins: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 16, 18, 19, 20] }, audio: { ins: 6, out: true, multi: true }, value: { ins: 5, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, ui: { ins: 0, out: true }, counter: { ins: 3, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
     and: { ins: 2, out: true, multi: true, gate: true }, or: { ins: 2, out: true, multi: true, gate: true }, nor: { ins: 2, out: true, multi: true, gate: true },
     xor: { ins: 2, out: true, multi: true, gate: true }, xand: { ins: 2, out: true, multi: true, gate: true },
     if: { ins: 5, out: true, multi: true }, prop: { ins: 1, out: true, multi: true }, loop: { ins: 5, out: true, outs: 2, multi: true }, random: { ins: 3, out: true, multi: true }, print: { ins: 2, out: true, multi: true }, light: { ins: 1, out: false, multi: true }, rgb: { ins: 3, out: true, multi: true }, matrix: { ins: 34, out: false, multi: true }, mover: { ins: 18, out: true, outs: 16, multi: true }, mvset: { ins: 2, out: true, outs: 2, multi: true }, split: { ins: 1, out: true, outs: 1, multi: true }
@@ -2409,7 +2411,7 @@ $('#copy').addEventListener('click', async () => {
   /* Curve (beta): a little bezier editor driven by wires. Grid is 0-100; a curved point has a handle that points along angle a */
   /* Grapher: x is time in seconds, y is the value. Points live in graph units; the viewer pans (drag empty space) and zooms (scroll) */
   const CVH = .5, CVL0 = .02, CVL1 = 50, CVW = 310;
-  const CVY = { 0: 190, 1: 214, 2: 238, 3: 262, 4: 286, 9: 310, 5: 346, 6: 370, 15: 394, 16: 418, 7: 442, 8: 466, 13: 490, 14: 514, 18: 542, 19: 566, 20: 606 };      // where each signal pin sits down the left side
+  const CVY = { 0: 242, 1: 266, 2: 290, 3: 314, 4: 338, 9: 362, 5: 398, 6: 422, 15: 446, 16: 470, 7: 494, 8: 518, 13: 542, 14: 566, 18: 594, 19: 618, 20: 658 };      // where each signal pin sits down the left side
   const CVLBL = { 0: 'Change to curve', 1: 'Select Up', 2: 'Select Down', 3: 'Add Point', 4: 'Delete Selection', 9: 'Run Graph', 5: 'Up', 6: 'Down', 15: 'Left', 16: 'Right', 7: 'Left (Rotate)', 8: 'Right (Rotate)', 13: 'Handles Further', 14: 'Handles Closer', 18: 'Increase Ending Line (+1s)', 19: 'Decrease Ending Line (-1s)', 20: 'Restart' };
   const cvView0 = () => ({ x: -.5, y: 3, k: 77.5 });      // top-left corner of the viewer in graph units, and pixels per unit
   function cvDef() { return { v: 2, sel: 0, view: cvView0(), pts: [{ x: 0, y: 0, c: 0, a: 45, l: CVH }, { x: 2, y: 2, c: 0, a: 45, l: CVH }] }; }
@@ -2474,7 +2476,11 @@ $('#copy').addEventListener('click', async () => {
     return busy;
   }
   let cvRaf = 0, cvLast = 0;
-  function cvLoop(now) { const dt = Math.min(50, Math.max(1, now - cvLast)); cvLast = now; let busy = false; if (autoOpen) auto.nodes.forEach(n => { if (n.t === 'curve' && cvFrame(n, dt)) busy = true; }); cvRaf = busy ? requestAnimationFrame(cvLoop) : 0; }
+  function cvLoop(now) {                                    // never lets one bad frame stop the Grapher for good: each node draws on its own, and the loop always re-arms
+    cvRaf = 0; const dt = Math.min(50, Math.max(1, now - cvLast)); cvLast = now; let busy = false;
+    if (autoOpen) auto.nodes.forEach(n => { if (n.t !== 'curve') return; try { if (cvFrame(n, dt)) busy = true; } catch (e) { console.error('Grapher draw failed', e); const sv = nodeEls[n.id] && nodeEls[n.id].querySelector('.cvs'); if (sv) sv._b = null; delete cvD[n.id]; } });
+    if (busy) cvRaf = requestAnimationFrame(cvLoop);
+  }
   function cvDraw() { if (!cvRaf) { cvLast = performance.now(); cvRaf = requestAnimationFrame(cvLoop); } }
   function curveSig(n, p) {
     const c = n.cv, P = c.pts, s = c.sel, pt = P[s], D = cvD[n.id], m = cvM(n);
@@ -2769,7 +2775,7 @@ $('#copy').addEventListener('click', async () => {
     if (n.t === 'audio') h += '<span class="il l0">play</span><span class="il l1">pause</span><span class="il l2">restart</span><span class="ol">done</span>';
     if (n.t === 'loop') h += '<span class="il l0">start</span><span class="il l1">break</span><span class="ol o0">each</span><span class="ol o1">done</span>';
     if (n.t === 'value') h += '<span class="il l0">run</span><span class="il l1">clear</span>';
-    if (n.t === 'audio') h += '<div class="ac"><div class="r1"><span class="nm"></span></div><div class="r2"><label class="cell"><small>vol</small><input class="ni av" type="number" min="0" max="100" title="Volume (0-100)"></label><label class="cell"><small>pitch</small><input class="ni ap" type="number" min="-24" max="24" step="1" title="Pitch in semitones (-24 to 24)"></label></div></div>';
+    if (n.t === 'audio') h += '<div class="ac"><div class="r1"><span class="nm"></span></div><div class="r2"><label class="cell"><small>vol</small><input class="ni av" type="number" min="0" max="100" title="Volume (0-100)"></label><label class="cell"><small>pitch</small><input class="ni ap" type="number" min="-24" max="24" step="1" title="Pitch in semitones (-24 to 24)"></label><label class="cell"><small>speed</small><input class="ni as" type="number" min="0.1" max="4" step="0.05" title="Speed of the cue (same as Speed on the board): 1 = normal"></label></div></div>';
     else if (n.t === 'value') h += '<div class="ac"><div class="r1"><span class="nm">VALUE</span><small class="cc"></small></div><div class="r2"><button class="nk op vm" title="What a run does to the value"></button><label class="cell"><small>by</small><input class="ni vx" type="number" step="any" title="The number to add / subtract / multiply / divide by"></label><label class="cell"><small>start</small><input class="ni vs" type="number" step="any" title="What the value starts at, and what Clear sets it back to"></label></div></div>';
     else if (n.t === 'loop') h += '<div class="ac"><div class="r1"><span class="nm">LOOP</span><small class="cc"></small></div><div class="r2"><button class="nk op lm" title="Loop mode"></button><label class="cell"><small>×</small><input class="ni lc" type="number" min="0" max="99999" step="1" title="How many times to loop (wire a value into the top pin to change it live)"></label><label class="cell"><small>every</small><input class="ni lt" type="number" min="0.05" max="3600" step="0.05" title="Seconds between each loop"><small>s</small></label></div></div>';
     else if (n.t === 'random') h += '<span class="nm">RANDOM</span><input class="ni rmin" type="number" step="1" title="Lowest number it can pick"><small>to</small><input class="ni rmax" type="number" step="1" title="Highest number it can pick"><small class="cc"></small>';
@@ -2840,8 +2846,10 @@ $('#copy').addEventListener('click', async () => {
           if (b.classList.contains('vhome')) { glide(cvView0()); return; }
           const xs = [0, cvT(n)], ys = [];                              // fit: every point, its handle tips, 0s and the stop line
           n.cv.pts.forEach(p => { xs.push(p.x); ys.push(p.y); if (p.c) { const dx = Math.cos(cvRad(p.a)) * p.l, dy = Math.sin(cvRad(p.a)) * p.l; xs.push(p.x + dx, p.x - dx); ys.push(p.y + dy, p.y - dy); } });
-          const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys), span = Math.max(x1 - x0, y1 - y0, .5), k = Math.max(4, Math.min(4000, CVW * .78 / span));
-          glide({ k, x: (x0 + x1) / 2 - CVW / 2 / k, y: (y0 + y1) / 2 + CVW / 2 / k });
+          const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+          const L = 34, R = CVW - 46, T = 50, B = CVW - 30;             // the free area: clear of the guide numbers and of the two buttons in the corner
+          const k = Math.max(4, Math.min(4000, (R - L) / Math.max(x1 - x0, .5), (B - T) / Math.max(y1 - y0, .5)));
+          glide({ k, x: (x0 + x1) / 2 - (L + R) / 2 / k, y: (y0 + y1) / 2 + (T + B) / 2 / k });
         });
       });
       el.querySelectorAll('.cvd button').forEach(b => { b.addEventListener('pointerdown', e => e.stopPropagation()); b.addEventListener('click', e => { e.stopPropagation(); n.rd = Math.max(0, Math.min(5, cvRd(n) + (b.classList.contains('dr') ? 1 : -1))); save(); cvDraw(n); }); });
@@ -2863,21 +2871,34 @@ $('#copy').addEventListener('click', async () => {
         e.preventDefault(); e.stopPropagation(); const w = n.cv.view, [mx, my] = local(e, svg.getBoundingClientRect()), wx = w.x + mx / w.k, wy = w.y - my / w.k;
         w.k = Math.max(4, Math.min(4000, w.k * Math.exp(-e.deltaY * .0015))); w.x = wx - mx / w.k; w.y = wy + my / w.k; cvDraw(n); clearTimeout(svg._st); svg._st = setTimeout(save, 300);
       }, { passive: false });
+      svg.addEventListener('pointermove', e => {                       // show a sideways cursor over the stop line
+        if (e.buttons) return; const w = n.cv.view, [mx] = local(e, svg.getBoundingClientRect()); svg.classList.toggle('onstop', !inputsL(n.id, 12).length && Math.abs(cvSx(w, cvT(n)) - mx) < 7);
+      });
       svg.addEventListener('dblclick', e => {                          // double-click a point: curve <-> straight
         e.stopPropagation(); const c = n.cv, w = c.view, [mx, my] = local(e, svg.getBoundingClientRect()); let hit = -1, best = 11;
         c.pts.forEach((p, i) => { const d = Math.hypot(cvSx(w, p.x) - mx, cvSy(w, p.y) - my); if (d < best) { best = d; hit = i; } });
-        if (hit < 0) return; c.sel = hit; c.pts[hit].c = c.pts[hit].c ? 0 : 1; save(); cvDraw(n);
+        if (hit < 0) {                                                 // empty space: a new point right there (snapped to Move Amount), slotted in by time
+          if (c.pts.length >= 32) { toast('That is the most points a Grapher can hold'); return; }
+          const m = cvM(n), sn = v => m > 0 ? +(Math.round(v / m) * m).toFixed(4) : +v.toFixed(3), x = sn(w.x + mx / w.k), y = sn(w.y - my / w.k);
+          const same = c.pts.findIndex(p => Math.abs(p.x - x) < 1e-6 && Math.abs(p.y - y) < 1e-6); if (same >= 0) { c.sel = same; save(); cvDraw(n); return; }
+          let i = c.pts.findIndex(p => p.x > x); if (i < 0) i = c.pts.length;
+          c.pts.splice(i, 0, { x, y, c: 0, a: 45, l: CVH }); c.sel = i; const D = cvD[n.id]; if (D) D.splice(i, 0, { x, y, a: 45, l: CVH, k: 0, s: 0 });
+          save(); cvDraw(n); return;
+        }
+        c.sel = hit; c.pts[hit].c = c.pts[hit].c ? 0 : 1; save(); cvDraw(n);
       });
       svg.addEventListener('pointerdown', e => {                       // drag a point, a handle tip (turns it and sets how far it reaches), or empty space to pan
         e.stopPropagation(); e.preventDefault(); const r = svg.getBoundingClientRect(), c = n.cv, w = c.view, [mx, my] = local(e, r), sp = c.pts[c.sel];
         let mode = null, best = 11;
         if (sp && sp.c) { const hx = Math.cos(cvRad(sp.a)) * sp.l, hy = Math.sin(cvRad(sp.a)) * sp.l; [[sp.x + hx, sp.y + hy], [sp.x - hx, sp.y - hy]].forEach(([x, y], k) => { if (Math.hypot(cvSx(w, x) - mx, cvSy(w, y) - my) < 9) mode = ['h', k]; }); }
         if (!mode) c.pts.forEach((p, i) => { const d = Math.hypot(cvSx(w, p.x) - mx, cvSy(w, p.y) - my); if (d < best) { best = d; mode = ['p', i]; } });
+        if (!mode && !inputsL(n.id, 12).length && Math.abs(cvSx(w, cvT(n)) - mx) < 7) mode = ['s'];      // grab the dark blue stop line
         if (!mode) mode = ['v', w.x, w.y, mx, my];
-        if (mode[0] === 'p') c.sel = mode[1]; cvDraw(n); svg.classList.toggle('panning', mode[0] === 'v');
+        if (mode[0] === 'p') c.sel = mode[1]; cvDraw(n); svg.classList.toggle('panning', mode[0] === 'v'); svg.classList.toggle('sliding', mode[0] === 's');
         const mv = ev => {
           const [x, y] = local(ev, r), q = c.pts[c.sel], D = cvD[n.id], gx = w.x + x / w.k, gy = w.y - y / w.k;
           if (mode[0] === 'v') { w.x = mode[1] - (x - mode[3]) / w.k; w.y = mode[2] + (y - mode[4]) / w.k; cvDraw(n); return; }
+          if (mode[0] === 's') { const m = cvM(n); n.ct = Math.max(0, Math.min(1e4, m > 0 ? +(Math.round(gx / m) * m).toFixed(4) : +gx.toFixed(3))); const ni = el.querySelector('.cvt'); if (ni && document.activeElement !== ni) ni.value = n.ct; cvDraw(n); return; }
           if (mode[0] === 'p') { const m = cvM(n), sn = v => m > 0 ? +(Math.round(v / m) * m).toFixed(4) : +v.toFixed(3); q.x = sn(gx); q.y = sn(gy); }      // points snap to steps of Move Amount (0 = no snapping)
           else {                                                       // handle tips snap to steps of Curve Snap, measured from the point (0 = free)
             const sp2 = cvS(n), sn = v => sp2 > 0 ? Math.round(v / sp2) * sp2 : v; let dx = sn(gx - q.x), dy = sn(gy - q.y); if (!dx && !dy) { dx = gx - q.x; dy = gy - q.y; }
@@ -2886,7 +2907,7 @@ $('#copy').addEventListener('click', async () => {
           if (D && D[c.sel]) Object.assign(D[c.sel], { x: q.x, y: q.y, a: q.a, l: q.l });      // follows the pointer exactly
           cvDraw(n);
         };
-        const up = () => { removeEventListener('pointermove', mv); removeEventListener('pointerup', up); svg.classList.remove('panning'); save(); };
+        const up = () => { removeEventListener('pointermove', mv); removeEventListener('pointerup', up); svg.classList.remove('panning', 'sliding'); save(); };
         addEventListener('pointermove', mv); addEventListener('pointerup', up);
       });
     }
@@ -2929,6 +2950,7 @@ $('#copy').addEventListener('click', async () => {
         if (c.contains('ik')) n.k = ok ? x : 0;
         else if (c.contains('av')) n.vol = ok ? Math.max(0, Math.min(100, x)) : 100;
         else if (c.contains('ap')) n.pitch = ok ? Math.max(-24, Math.min(24, x)) : 0;
+        else if (c.contains('as')) { const it = get(n.cue); if (it && ok) { it.speed = Math.max(.1, Math.min(4, x)); const pl = players[it.id]; if (pl) pl.playbackRate = it.speed; } }      // speed belongs to the cue itself, so the board's Speed changes with it
         else if (c.contains('nv')) n.v = ok ? x : 0;
         else if (c.contains('cvm')) n.cm = ok ? Math.max(0, Math.min(100, x)) : 1;
         else if (c.contains('cvq')) n.cs = ok ? Math.max(0, Math.min(1e4, x)) : .5;
@@ -3070,7 +3092,9 @@ $('#copy').addEventListener('click', async () => {
     const live = new Set(auto.nodes.map(n => n.id)); selSet.forEach(id => { if (!live.has(id)) selSet.delete(id); });
     Object.keys(nodeEls).forEach(id => { if (!live.has(id)) { nodeEls[id].remove(); delete nodeEls[id]; } });
     auto.nodes.forEach(n => {
-      const el = nodeEls[n.id] || (nodeEls[n.id] = buildNodeEl(n));
+      let el = nodeEls[n.id];
+      if (el && el._n && el._n !== n && !el.contains(document.activeElement)) { el.remove(); el = null; }      // undo / redo, a paste or a shared update swaps in fresh node objects: rebuild so the node's buttons act on the live one, not a stale copy
+      if (!el) el = nodeEls[n.id] = buildNodeEl(n); el._n = n;
       el.style.left = n.x + 'px'; el.style.top = n.y + 'px'; el.classList.toggle('picked', selSet.has(n.id)); el.classList.toggle('ingrp', !!n.g); { const cp = el.querySelector('.ncap'); if (cp && !cp.querySelector('input') && cp.textContent !== (n.cap || '')) cp.textContent = n.cap || ''; }
       if (n.t === 'split') layoutSplit(n, el);
       el.querySelectorAll('.ip').forEach(ip => { ip.style.background = n.pc && n.pc[ip.dataset.p] ? n.pc[ip.dataset.p] : inDef(n, +ip.dataset.p); });
@@ -3078,7 +3102,7 @@ $('#copy').addEventListener('click', async () => {
       if (n.t === 'audio') {
         const it = get(n.cue);
         el.querySelector('.nm').textContent = it ? it.name : 'Choose a cue'; el.classList.toggle('dim', !it || !it.src);
-        const av = el.querySelector('.av'), ap = el.querySelector('.ap'); if (document.activeElement !== av && !av.classList.contains('driven')) av.value = n.vol; if (document.activeElement !== ap && !ap.classList.contains('driven')) ap.value = n.pitch;
+        const av = el.querySelector('.av'), ap = el.querySelector('.ap'); if (document.activeElement !== av && !av.classList.contains('driven')) av.value = n.vol; if (document.activeElement !== ap && !ap.classList.contains('driven')) ap.value = n.pitch; { const as = el.querySelector('.as'), cit = get(n.cue); as.disabled = !cit; if (document.activeElement !== as && !as.classList.contains('driven')) as.value = cit ? (cit.speed || 1) : 1; }
       } else if (n.t === 'key' || n.t === 'ui') {
         const nk = el.querySelector('.nk'), b = n.t === 'ui' ? items.find(x => x.id === n.btn && x.type === 'button') : auto.btns.find(x => x.id === n.btn); nk.textContent = b ? b.name : 'link a button'; nk.classList.toggle('set', !!b);
       } else if (n.t === 'counter') { const ni = el.querySelector('.ni'); if (document.activeElement !== ni && !ni.classList.contains('driven')) ni.value = n.n; updCounter(n); }
@@ -3192,6 +3216,8 @@ $('#copy').addEventListener('click', async () => {
     + '<button class="cap" title="Add or edit a caption under the node (clear the text to remove it)"><svg viewBox="0 0 24 24"><path d="M4 8h16M4 12h16M4 16h9"/></svg><span>Caption</span></button>'
     + '<button class="rot" title="Turn it to the other side of the matrix"><svg viewBox="0 0 24 24" style="transform:scaleX(-1);fill:#fff;stroke:none"><path d="M19.75,12.05q-0.3,0-0.59-0.21q-0.29-0.21-0.36-0.54q-0.13-0.47-0.31-0.94T18.05,9.48Q17.88,9.2 17.93,8.86T18.2,8.3Q18.58,7.95 19.06,8T19.8,8.48q0.32,0.55 0.57,1.13q0.25,0.57 0.4,1.2q0.13,0.5-0.19,0.88t-0.84,0.38Zm-6.7,8.7q0-0.3 0.21-0.59T13.8,19.8q0.47-0.13 0.94-0.31t0.89-0.44q0.28-0.18 0.61-0.13T16.8,19.2q0.35,0.38 0.3,0.86T16.63,20.8q-0.57,0.32-1.15,0.56T14.3,21.78q-0.5,0.13-0.88-0.17t-0.38-0.85ZM18.2,17.8q-0.22-0.2-0.27-0.55t0.13-0.63q0.25-0.43 0.44-0.89q0.19-0.46 0.31-0.94q0.07-0.32 0.35-0.54t0.6-0.21q0.55,0 0.85,0.38t0.18,0.88q-0.18,0.6-0.41,1.18T19.8,17.63q-0.25,0.43-0.74,0.48T18.2,17.8ZM9.83,21.75q-2.98-0.8-4.88-3.2t-1.9-5.5q0-3.75 2.63-6.37t6.38-2.63H12.2L11.33,3.17q-0.28-0.27-0.28-0.7t0.3-0.72q0.27-0.28 0.7-0.28t0.72,0.28l2.58,2.6Q15.5,4.5 15.56,4.67t0.06,0.38T15.56,5.43T15.35,5.75l-2.6,2.6q-0.27,0.28-0.7,0.28t-0.7-0.28t-0.28-0.7t0.28-0.7l0.9-0.9h-0.2q-2.93,0-4.96,2.04q-2.04,2.04-2.04,4.96q0,2.43 1.47,4.29T10.3,19.8q0.32,0.07 0.54,0.35q0.21,0.28 0.21,0.6q0,0.52-0.36,0.82T9.83,21.75Z"/></svg><span>Rotate</span></button>'
     + '<button class="mtg" title="Toggle Mode: a signal at an LED that is already on turns it off"><svg viewBox="0 0 24 24" style="fill:#fff;stroke:none"><path d="M15.54,15.54Q17,14.08 17,12q0-2.08-1.46-3.54T12,7Q9.93,7 8.46,8.46T7,12t1.46,3.54T12,17t3.54-1.46ZM12,22q-2.07,0-3.9-0.79q-1.82-0.79-3.17-2.14Q3.58,17.73 2.79,15.9T2,12Q2,9.92 2.79,8.1Q3.58,6.27 4.93,4.93Q6.28,3.57 8.1,2.79Q9.93,2 12,2t3.9,0.79t3.17,2.14q1.35,1.35 2.14,3.17Q22,9.92 22,12t-0.79,3.9t-2.14,3.17q-1.35,1.35-3.17,2.14T12,22Zm0-2q3.35,0 5.68-2.32T20,12T17.68,6.32T12,4T6.33,6.32T4,12t2.33,5.68T12,20Z"/></svg><span>Toggle Mode</span></button>'
+    + '<button class="atrim" title="Edit the length of this cue">' + MI.trim + '<span>Edit Length</span></button>'
+    + '<button class="aspd" title="Change the speed of this cue">' + MI.speed + '<span>Speed</span></button>'
     + '<button class="sar" title="Semi-Auto Repeat: every Run signal starts the graph again from 0 (Restart is not used)"><svg viewBox="0 -960 960 960" style="fill:#fff;stroke:none"><path d="m274-200 34 34q12 12 11.5 28T308-110q-12 12-28.5 12.5T251-109L148-212q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l103-103q12-12 28.5-11.5T308-370q11 12 11.5 28T308-314l-34 34h406v-120q0-17 11.5-28.5T720-440q17 0 28.5 11.5T760-400v120q0 33-23.5 56.5T680-200H274Zm412-480H280v120q0 17-11.5 28.5T240-520q-17 0-28.5-11.5T200-560v-120q0-33 23.5-56.5T280-760h406l-34-34q-12-12-11.5-28t11.5-28q12-12 28.5-12.5T709-851l103 103q6 6 8.5 13t2.5 15q0 8-2.5 15t-8.5 13L709-589q-12 12-28.5 11.5T652-590q-11-12-11.5-28t11.5-28l34-34Z"/></svg><span>Semi-Auto Repeat</span></button>'
     + '<button class="elp" title="Turn the Increase / Decrease Ending Line pins on or off"><svg viewBox="0 0 24 24" style="fill:#fff;stroke:none"><path d="M18.83,14.83Q20,13.65 20,12T18.83,9.17T16,8T13.18,9.17T12,12t1.18,2.82T16,16t2.82-1.18ZM16,18q-2.25,0-3.91-1.43T10.08,13H3q-0.42,0-0.71-0.29Q2,12.43 2,12t0.29-0.71T3,11h7.08q0.35-2.15 2.01-3.57T16,6q2.5,0 4.25,1.75T22,12t-1.75,4.25T16,18Zm0-6Z"/></svg><span>Enable Ending Line Pins</span></button>'
     + '<button class="hld" title="Allow Holding: holding the button keeps sending signals until you let go"><svg viewBox="0 0 24 24" style="fill:#fff;stroke:none"><path d="M8.48,0q2.5,0 4.25,1.75T14.48,6q0,0.63-0.13,1.21T13.98,8.38q-0.13,0.27-0.39,0.35T13.05,8.67T12.66,8.25t0.01-0.63q0.15-0.4 0.22-0.8T12.98,6q0-1.88-1.31-3.19T8.48,1.5T5.29,2.81T3.98,6q0,0.43 0.06,0.84T4.25,7.63Q4.38,7.95 4.26,8.25T3.88,8.67T3.34,8.71Q3.08,8.63 2.95,8.35Q2.73,7.8 2.6,7.21Q2.48,6.63 2.48,6q0-2.5 1.75-4.25T8.48,0Zm0,2.5q1.45,0 2.48,1.02T11.98,6q0,0.25-0.04,0.47T11.85,6.93q-0.1,0.32-0.38,0.47T10.9,7.45T10.44,7.07Q10.28,6.8 10.38,6.5Q10.4,6.43 10.45,6q0-0.82-0.59-1.41T8.45,4T7.04,4.57T6.45,6q0,0.13 0.01,0.26T6.53,6.52Q6.6,6.82 6.45,7.07T6,7.4T5.44,7.32T5.08,6.88Q5.03,6.7 5,6.49Q4.98,6.27 4.98,6Q4.98,4.52 6,3.51T8.48,2.5Zm2,19.5q-0.7,0-1.31-0.3T8.13,20.85L3.1,14.48q-0.2-0.22-0.17-0.54t0.23-0.51q0.5-0.53 1.2-0.63t1.3,0.28L7.5,14.2V6q0-0.43 0.29-0.71T8.5,5Q8.93,5 9.23,5.29Q9.53,5.57 9.53,6v5H17q1.25,0 2.13,0.88T20,14v4q0,1.65-1.18,2.82T16,22H10.48Z"/></svg><span>Allow Holding</span></button>'
@@ -3230,6 +3256,7 @@ $('#copy').addEventListener('click', async () => {
     const grpBtn = asb.querySelector('.grp'), un = isOneGroup(ns);
     const rotBtn = asb.querySelector('.rot'); const movs = ns.filter(n => n.t === 'mover'), mats = ns.filter(n => n.t === 'matrix'); rotBtn.style.display = movs.length ? '' : 'none';
     const tgBtn = asb.querySelector('.mtg'); tgBtn.style.display = mats.length ? '' : 'none'; if (mats.length) { tgBtn.querySelector('path').setAttribute('d', mats[0].mtg ? TG_ON : TG_OFF); tgBtn.classList.toggle('lit', !!mats[0].mtg); }
+    { const an = ns.length === 1 && ns[0].t === 'audio' ? get(ns[0].cue) : null; ['.atrim', '.aspd'].forEach(q => { const b = asb.querySelector(q); b.style.display = an ? '' : 'none'; b.disabled = !(an && an.src); }); }
     const sarBtn = asb.querySelector('.sar'), ss = ns.filter(n => n.t === 'curve'); sarBtn.style.display = ss.length ? '' : 'none'; if (ss.length) sarBtn.classList.toggle('lit', !!ss[0].sar);
     const elpBtn = asb.querySelector('.elp'), es = ns.filter(n => n.t === 'curve'); elpBtn.style.display = es.length ? '' : 'none'; if (es.length) { elpBtn.querySelector('span').textContent = es[0].elp ? 'Disable Ending Line Pins' : 'Enable Ending Line Pins'; elpBtn.classList.toggle('lit', !!es[0].elp); }
     const hldBtn = asb.querySelector('.hld'), hs = ns.filter(n => n.t === 'ui' || n.t === 'key'); hldBtn.style.display = hs.length ? '' : 'none'; if (hs.length) { hldBtn.querySelector('span').textContent = hs[0].hold ? 'Disable Holding' : 'Allow Holding'; hldBtn.classList.toggle('lit', !!hs[0].hold); }
@@ -3272,6 +3299,8 @@ $('#copy').addEventListener('click', async () => {
   asb.querySelector('.dup').addEventListener('click', dupSel);
   const selOf = t => selNodes().filter(n => n.t === t);
   asb.querySelector('.mtg').addEventListener('click', e => { e.stopPropagation(); const ms = selOf('matrix'); if (!ms.length) return; const to = ms[0].mtg ? 0 : 1; ms.forEach(n => { n.mtg = to; }); save(); placeBar(); });
+  asb.querySelector('.atrim').addEventListener('click', e => { e.stopPropagation(); const n = selNodes()[0], it = n && get(n.cue); if (it && it.src) openLength(it); });
+  asb.querySelector('.aspd').addEventListener('click', e => { e.stopPropagation(); const n = selNodes()[0], it = n && get(n.cue); if (it && it.src) openSpeed(it); });
   asb.querySelector('.sar').addEventListener('click', e => { e.stopPropagation(); const ss = selNodes().filter(n => n.t === 'curve'); if (!ss.length) return; const to = ss[0].sar ? 0 : 1; ss.forEach(n => { n.sar = to; cvDraw(n); }); save(); syncNodes(); drawWires(); placeBar(); });
   asb.querySelector('.elp').addEventListener('click', e => { e.stopPropagation(); const es = selNodes().filter(n => n.t === 'curve'); if (!es.length) return; const to = es[0].elp ? 0 : 1; es.forEach(n => { n.elp = to; }); save(); syncNodes(); drawWires(); placeBar(); });
   asb.querySelector('.hld').addEventListener('click', e => { e.stopPropagation(); const hs = selNodes().filter(n => n.t === 'ui' || n.t === 'key'); if (!hs.length) return; const to = hs[0].hold ? 0 : 1; hs.forEach(n => { n.hold = to; }); save(); placeBar(); });
@@ -3708,10 +3737,11 @@ $('#copy').addEventListener('click', async () => {
   const pin = (id, p, seen) => inputsL(id, p).some(l => val(l[0], seen));
   /* volume and pitch: set in the node, or driven by whatever is wired into its top (volume) / bottom (pitch) pin */
   function applyAudio(n, it, pl) {
-    const vl = inputsL(n.id, 3)[0], pt = inputsL(n.id, 4)[0];
+    const vl = inputsL(n.id, 3)[0], pt = inputsL(n.id, 4)[0], sp = inputsL(n.id, 5)[0];
+    const speed = Math.max(.1, Math.min(4, +(sp ? numOf(sp[0], new Set([n.id]), sp[3]) : it.speed || 1) || 1));
     const vol = Math.max(0, Math.min(100, +(vl ? numOf(vl[0], new Set([n.id]), vl[3]) : n.vol) || 0));
     const st = Math.max(-24, Math.min(24, +(pt ? numOf(pt[0], new Set([n.id]), pt[3]) : n.pitch) || 0));
-    pl.volume = vol / 100; pl.playbackRate = Math.max(.0625, Math.min(16, (it.speed || 1) * Math.pow(2, st / 12)));
+    pl.volume = vol / 100; pl.playbackRate = Math.max(.0625, Math.min(16, speed * Math.pow(2, st / 12)));
     pl.preservesPitch = pl.mozPreservesPitch = pl.webkitPreservesPitch = st !== 0 ? false : it.keepPitch !== false;
   }
   /* when a cue finishes by itself, its right-hand pin sends a signal out */
@@ -3748,7 +3778,7 @@ $('#copy').addEventListener('click', async () => {
       if (n.t !== 'curve') return; const r = cvRun[n.id]; if (!r) return; r.end = cvT(n);
       if (r.paused) { r.x = Math.min(r.end, r.pos); r.y = cvY(n.cv, r.x); return; } if (!r.on) return;
       r.x = Math.min(r.end, (performance.now() - r.t0) / 1000); r.y = cvY(n.cv, r.x);
-      if (r.x >= r.end) { r.on = false; r.paused = false; cvDraw(n); emit(n.id, new Set([n.id]), blank(), 1); }      // the red Done pin fires when the line reaches the end
+      if (r.x >= r.end) { r.on = false; r.paused = false; if (n.sar) { r.x = 0; r.y = cvY(n.cv, 0); } /* Semi-Auto Repeat: back to the start (0s) when it finishes */ cvDraw(n); emit(n.id, new Set([n.id]), blank(), 1); }      // the red Done pin fires when the line reaches the end
     });
   }, 33);
   setInterval(() => {                                      // value mode: while open, whenever the value coming in changes it is passed on
@@ -3869,10 +3899,10 @@ $('#copy').addEventListener('click', async () => {
       else if (n.t === 'audio') {
         const p = players[n.cue], it = get(n.cue), on = !!(p && !p.paused); el.classList.toggle('live', on); if (on && it) applyAudio(n, it, p);
         // when a wire drives volume / pitch, the box shows the live value coming in
-        [['.av', 3, 0, 100, n.vol], ['.ap', 4, -24, 24, n.pitch]].forEach(([sel, pn, lo, hi, own]) => {
+        [['.av', 3, 0, 100, n.vol], ['.ap', 4, -24, 24, n.pitch], ['.as', 5, .1, 4, it ? it.speed || 1 : 1]].forEach(([sel, pn, lo, hi, own]) => {
           const box = el.querySelector(sel), l = inputsL(n.id, pn)[0];
           box.classList.toggle('driven', !!l); box.readOnly = !!l;
-          const str = String(l ? Math.round(Math.max(lo, Math.min(hi, +numOf(l[0], new Set([n.id]), l[3]) || 0)) * 10) / 10 : own);
+          const str = String(l ? Math.round(Math.max(lo, Math.min(hi, +numOf(l[0], new Set([n.id]), l[3]) || 0)) * 100) / 100 : own);
           if (document.activeElement !== box && box.value !== str) box.value = str;
         });
       }
