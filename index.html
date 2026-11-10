@@ -503,17 +503,15 @@
   .anode.t-counter .ip[data-p="2"], .anode.t-wait .ip[data-p="1"], .anode.t-if .ip[data-p="1"], .anode.t-number .ip[data-p="1"], .anode.t-random .ip[data-p="1"], .anode.t-random .ip[data-p="2"], .anode.t-loop .ip[data-p="2"], .anode.t-loop .ip[data-p="3"] { top: 100%; margin: -8px 0 0 -8px; }
   .anode.t-random .ni { width: 56px; }
   .anode.t-random .cc { color: #fff; font-weight: 600; font-size: 12px; }
-  .anode.t-cgate { width: 345px; height: 104px; padding: 0 42px 0 28px; gap: 0; box-sizing: border-box; border-radius: 34px; }
-  .anode.t-cgate .nm { font-size: 20px; font-weight: 500; width: 83px; flex: none; }
-  .anode.t-cgate .gc { display: flex; flex-direction: column; gap: 6px; width: 192px; flex: none; }
-  .anode.t-cgate .g1 { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-  .anode.t-cgate .nk { min-width: 0; height: 23px; padding: 0; border-radius: 12px; background: #555; white-space: nowrap; text-align: center; font: 500 11.5px 'Montserrat', sans-serif; color: #fff; }
-  .anode.t-cgate .gv { height: 32px; border-radius: 16px; background: #555; display: grid; place-items: center; font: 500 18px 'Montserrat', sans-serif; overflow: hidden; white-space: nowrap; padding: 0 12px; }
-  .anode.t-cgate .ip, .anode.t-cgate .port { width: 25px; height: 25px; border-width: 5.5px; }
-  .anode.t-cgate .ip { left: -12.5px; margin-top: -12.5px; } .anode.t-cgate .port { right: -12.5px; margin-top: -12.5px; }
-  .anode.t-cgate .ip[data-p="0"] { background: #7a7a7a; }
-  .anode.t-cgate .ip[data-p="1"] { top: 100%; left: 50px; margin: -12.5px 0 0 -12.5px; }
-  .anode.t-cgate .ip[data-p="2"], .anode.t-cgate .ip[data-p="3"] { top: 0; margin: -12.5px 0 0 -12.5px; }
+  .anode.t-cgate { width: 372px; height: 92px; padding: 0 30px 0 24px; gap: 14px; box-sizing: border-box; border-radius: 17px; }
+  .anode.t-cgate .nm { font-size: 15px; width: 62px; flex: none; }
+  .anode.t-cgate .gc { display: flex; flex-direction: column; gap: 11px; flex: 1; min-width: 0; }
+  .anode.t-cgate .g1 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .anode.t-cgate .nk { min-width: 0; padding: 0 8px; white-space: nowrap; text-align: center; }
+  .anode.t-cgate .gv { height: 22px; border-radius: 11px; background: rgba(255,255,255,.16); display: grid; place-items: center; font: 600 12px 'Montserrat', sans-serif; overflow: hidden; white-space: nowrap; padding: 0 12px; }
+  .anode.t-cgate .ip[data-p="0"] { background: #3d3d3d; }
+  .anode.t-cgate .ip[data-p="1"] { top: 100%; left: 44px; margin: -8px 0 0 -8px; }
+  .anode.t-cgate .ip[data-p="2"], .anode.t-cgate .ip[data-p="3"] { top: 0; margin: -8px 0 0 -8px; }
   .anode.t-cgate.gopen { box-shadow: 0 0 0 2px rgba(90,120,255,.55); }
   .anode.t-print .ip[data-p="1"] { top: 100%; margin: -8px 0 0 -8px; }
   .anode.t-print .ni.pt { width: 150px; text-align: left; padding: 0 12px; }
@@ -2264,7 +2262,7 @@
   /* Gate: lets signals and changing values through only while it is open. Toggle Mode: a signal on the blue pin flips it open / shut. Hold Mode: open while the blue pin is held or keeps getting signals */
   const gst = {};
   const gs = id => gst[id] || (gst[id] = { open: false, ls: 0, v: 0, was: false });
-  const gOpen = n => { const s = gs(n.id); return n.bm === 'hold' ? performance.now() - s.ls < 300 || pin(n.id, 1, new Set([n.id])) : !!s.open; };
+  const gOpen = n => { const s = gs(n.id); return n.bm === 'hold' ? performance.now() - s.ls < 300 : !!s.open; };      // Hold Mode: open while signals keep coming (a source with Allow Holding), otherwise only a moment
   const gIn = (n, seen) => { const l = inputsL(n.id, 0)[0]; return l ? +numOf(l[0], new Set(seen || []).add(n.id), l[3]) || 0 : 0; };
   const VP = { mvset: 1, audio: 3, value: 2, loop: 2, counter: 2, wait: 1, if: 1, number: 1, random: 1, print: 1 };      // first input pin of each node that carries a value (not a signal)
   const OPS = [['<', 'less than'], ['>', 'greater than'], ['=', 'equal to'], ['≤', 'at most'], ['≥', 'at least'], ['≠', 'not equal to']];
@@ -2514,7 +2512,7 @@
     else if (n.t === 'print') h += '<span class="nm">Print</span><input class="ni pt" type="text" maxlength="80" placeholder="message" title="Text to pop up. Wire a value into the pin below to show it after the text">';
     else if (n.t === 'mvset') h += '<span class="ml l">L</span><span class="ml r">R</span><input class="ni nv" type="number" min="0" step="1" title="Which pin the line jumps to (0 is the first). Or wire a number into the bottom pin. Wire L and R to the same Mover&#39;s left and right pins, then send a signal into the top pin">';
     else if (n.t === 'number') h += '<span class="nm">Number</span><input class="ni nv" type="number" step="any" title="A number other nodes can read">';
-    else if (n.t === 'cgate') h += '<span class="nm">Gate</span><div class="gc"><div class="g1"><button class="nk rm" title="Repeat changing values (Value Mode) or signals (Signal Mode)"></button><button class="nk bm" title="What the blue pin does: Toggle Mode flips the gate open / shut, Hold Mode keeps it open while the blue pin is held"></button></div><div class="gv" title="The value passing through"></div></div>';
+    else if (n.t === 'cgate') h += '<span class="nm">Gate</span><div class="gc"><div class="g1"><button class="nk op rm" title="Repeat changing values (Value Mode) or signals (Signal Mode)"></button><button class="nk op bm" title="What the blue pin does: Toggle Mode flips the gate open / shut, Hold Mode keeps it open while the blue pin is held"></button></div><div class="gv" title="The value passing through"></div></div>';
     else if (n.t === 'if') h += '<span class="nm">IF</span><button class="nk im" title="Compare a number (Value) or words (Text)"></button><button class="nk op" title="How to compare"></button><input class="ni ik" type="number" step="any" title="Number to compare with"><input class="ni tx" type="text" maxlength="60" placeholder="text" title="Text to compare with">';
     else if (n.t === 'prop') h += '<button class="nk pp" title="The mode this sends. Wire its output into a property pin"></button>';
     else if (n.t === 'ui') h += '<span class="nm">UI Button</span><button class="nk" title="Choose which button on the main board this watches"></button>';
@@ -3313,7 +3311,7 @@
     if (n.t === 'number') return numV(n) !== 0;
     if (n.t === 'loop') return !!loops[id];
     if (n.t === 'value') return vcur(n) !== 0;
-    if (n.t === 'key' || n.t === 'ui') return !!n.btn && (n.t === 'ui' ? ubHeld.has(n.btn) : isHeld(n.btn));
+    if (n.t === 'key' || n.t === 'ui') return !!n.btn && !!n.hold && (n.t === 'ui' ? ubHeld.has(n.btn) : isHeld(n.btn));      // only a node with Allow Holding counts as held; without it a press is one signal
     if (n.t === 'cgate') return gOpen(n);
     if (n.t === 'counter') return (cnt[id] || 0) > 0;
     if (n.t === 'random') { const [lo, hi] = rRange(n); return (n.rv || 0) >= (lo + hi) / 2 && n.rv !== undefined; }
