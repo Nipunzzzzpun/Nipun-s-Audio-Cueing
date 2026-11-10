@@ -363,7 +363,7 @@
   .asbar { position: absolute; z-index: 7; display: none; flex-wrap: wrap; justify-content: center; gap: 2px; padding: 4px; border-radius: 16px; background: rgba(12,12,14,.94); border: 1.5px solid rgba(255,255,255,.16); box-shadow: 0 8px 24px rgba(0,0,0,.35); animation: sbIn .25s var(--spring) both; }
   @keyframes sbIn { from { opacity: 0; transform: translateY(6px) scale(.94); } }
   .asbar button { height: 30px; padding: 0 12px 0 9px; border: 0; border-radius: 12px; background: none; color: #fff; font: 600 12px 'Montserrat', sans-serif; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; transition: background .15s; }
-  .asbar button.elp.lit, .asbar button.hld.lit, .asbar button.mtg.lit { background: rgba(255,255,255,.18); }
+  .asbar button.sar.lit, .asbar button.elp.lit, .asbar button.hld.lit, .asbar button.mtg.lit { background: rgba(255,255,255,.18); }
   .asbar button:hover { background: rgba(255,255,255,.15); } .asbar button.del:hover { background: #e5484d; } .asbar button.mv { cursor: grab; touch-action: none; }
   .asbar svg { width: 15px; height: 15px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
   .asbar .sw { width: 15px; height: 15px; border-radius: 50%; background: conic-gradient(#ff6b6b, #ffd36b, #7bed9f, #6bb8ff, #c58bff, #ff6b6b); flex: none; }
@@ -514,7 +514,7 @@
   .anode.t-cgate .ip[data-p="0"] { background: #3d3d3d; }
   .anode.t-cgate .ip[data-p="1"] { top: 100%; left: 44px; margin: -8px 0 0 -8px; }
   .anode.t-cgate .ip[data-p="2"], .anode.t-cgate .ip[data-p="3"] { top: 0; margin: -8px 0 0 -8px; }
-  .anode.t-curve { display: block; width: 530px; height: 604px; padding: 0; border-radius: 28px; }
+  .anode.t-curve { display: block; width: 530px; height: 640px; padding: 0; border-radius: 28px; }
   .anode.t-curve .nm { position: absolute; left: 26px; top: 20px; }
   .anode.t-curve .cpl { position: absolute; left: 26px; top: 58px; width: 100px; height: 112px; overscroll-behavior: contain; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 6px; }
   .anode.t-curve .cpl::-webkit-scrollbar { display: none; }
@@ -527,7 +527,7 @@
   .anode.t-curve .cvs .gl { stroke: #262626; stroke-width: 1px; fill: none; } .anode.t-curve .cvs .gl.mj { stroke: #383838; }
   .anode.t-curve .cvs.panning { cursor: grabbing; }
   .anode.t-curve .ip[data-p="12"], .anode.t-curve .ip[data-p="17"] { top: 100%; }
-  .anode.t-curve .ip[data-p="11"] { display: none; }
+  .anode.t-curve .ip[data-p="11"] { top: 100%; }
   .anode.t-curve .cvs .sl { stroke: #34428a; stroke-width: 2.5px; fill: none; }
   .anode.t-curve .cvs .rt { fill: #6f8cff; font: 600 13px 'Montserrat', sans-serif; }
   .anode.t-curve .cvs .rg { transition: opacity .2s; }
@@ -537,13 +537,17 @@
   .anode.t-curve .cvs .rl { stroke: #4f6bff; stroke-width: 2.5px; fill: none; }
   .anode.t-curve .cpn.off { opacity: .4; }
   .anode.t-curve .cpn { transition: opacity .2s; position: absolute; left: 22px; margin-top: -7px; font: 600 10.5px 'Montserrat', sans-serif; color: rgba(255,255,255,.35); white-space: nowrap; pointer-events: none; }
-  .anode.t-curve .cvl { position: absolute; top: 541px; width: 92px; display: flex; flex-direction: column; align-items: center; gap: 4px; font: 600 10px 'Montserrat', sans-serif; color: rgba(255,255,255,.4); }
-  .anode.t-curve .cvl .ni { width: 92px; text-align: center; }
+  .anode.t-curve .cvl { position: absolute; top: 575px; width: 90px; display: flex; flex-direction: column; align-items: center; gap: 4px; font: 600 10px 'Montserrat', sans-serif; color: rgba(255,255,255,.4); }
+  .anode.t-curve .cvl .ni { width: 90px; text-align: center; }
   .anode.t-curve .ip { left: 0; margin: -8px 0 0 -8px; }
   .anode.t-curve .ip[data-p="10"], .anode.t-curve .ip[data-p="11"], .anode.t-curve .ip[data-p="12"] { top: 100%; }
-  .anode.t-curve .port { top: 427px; margin-top: -8px; }
+  .anode.t-curve .port { top: 411px; margin-top: -8px; } .anode.t-curve .port[data-o="1"] { top: 443px; }
   .anode.t-curve .cvv { position: absolute; right: 24px; top: 352px; width: 310px; height: 150px; border-radius: 20px; background: #1c1c1c; display: grid; place-items: center; }
   .anode.t-curve .cvv b { font: 400 46px 'Major Mono Display', monospace; color: #fff; letter-spacing: -.02em; }
+  .anode.t-curve .cvb { position: absolute; right: 34px; top: 30px; display: flex; gap: 2px; z-index: 1; }
+  .anode.t-curve .cvb button { width: 28px; height: 28px; padding: 0; border: 0; border-radius: 9px; background: rgba(28,28,28,.6); display: grid; place-items: center; cursor: pointer; transition: background .2s, transform .25s var(--spring); }
+  .anode.t-curve .cvb button:hover { background: rgba(255,255,255,.12); } .anode.t-curve .cvb button:active { transform: scale(.9); }
+  .anode.t-curve .cvb svg { width: 18px; height: 18px; fill: #fff; }
   .anode.t-curve .cvd { position: absolute; left: 18px; bottom: 10px; display: flex; align-items: center; gap: 2px; }
   .anode.t-curve .cvd button { width: 26px; height: 26px; border: 0; padding: 0; border-radius: 13px; background: none; display: grid; place-items: center; cursor: pointer; transition: background .2s, opacity .2s; }
   .anode.t-curve .cvd button:hover:not(:disabled) { background: rgba(255,255,255,.1); } .anode.t-curve .cvd button:disabled { opacity: .3; cursor: default; }
@@ -1039,7 +1043,7 @@
   }
   /* motion blur: things blur in the direction they move (a button toggles it) */
   const motionBlur = (() => {
-    const STRENGTH = .6, MAX_BLUR = 25, SMOOTH = .5, MIN_V = .4, MAX_EL = 3000, NS = 'http://www.w3.org/2000/svg', SKIP = new Set(['SCRIPT', 'STYLE', 'LINK', 'META', 'HEAD', 'TITLE', 'NOSCRIPT', 'BR', 'SVG', 'DEFS', 'PATH']);
+    const STRENGTH = .6, MAX_BLUR = 25, SMOOTH = .3, MIN_V = .4, MAX_EL = 3000, NS = 'http://www.w3.org/2000/svg', SKIP = new Set(['SCRIPT', 'STYLE', 'LINK', 'META', 'HEAD', 'TITLE', 'NOSCRIPT', 'BR', 'SVG', 'DEFS', 'PATH']);
     let svg = null, defs = null, prev, vel, fx, active, id = 0, raf = 0, running = false;
     function attach(el) {
       const f = document.createElementNS(NS, 'filter'), fid = 'mb' + (id++); f.setAttribute('id', fid);
@@ -1049,30 +1053,31 @@
       const d = { f, b, orig, idle: 0 }; fx.set(el, d); active.add(el); return d;
     }
     function release(el) { const d = fx.get(el); if (!d) return; el.style.filter = d.orig || ''; d.f.remove(); fx.delete(el); active.delete(el); }
-    function tick() {
+    /* only the things that actually move are watched: board items, other people's cursors and (while open) the node editor's nodes.
+       The board / editor camera itself gets a cheap GPU blur instead of an SVG filter, so panning stays smooth */
+    let lastT = 0; const cam = new Map();
+    function camBlur(el, v) {
+      const c = cam.get(el) || { a: 0, orig: el.style.filter }, t = Math.min(6, Math.hypot(v.x, v.y) * .12);
+      c.a += (t - c.a) * .3; if (c.a < .05) { c.a = 0; if (cam.has(el)) { el.style.filter = c.orig || ''; cam.delete(el); } return; }
+      cam.set(el, c); el.style.filter = 'blur(' + c.a.toFixed(2) + 'px)';
+    }
+    function tick(now) {
       if (!running) return;
-      const vh = innerHeight, vw = innerWidth, els = document.body.querySelectorAll('*'), n = Math.min(els.length, MAX_EL), rects = new Array(n);
-      for (let i = 0; i < n; i++) {
-        const el = els[i];
-        if (SKIP.has(el.tagName.toUpperCase()) || (el instanceof SVGElement && el.ownerSVGElement) || el.id === 'blurBtn' || el.id === 'fxBtn') { rects[i] = null; continue; }
-        const r = el.getBoundingClientRect();
-        rects[i] = (r.width && r.height && r.bottom > -200 && r.top < vh + 200 && r.right > -200 && r.left < vw + 200) ? r : null;
+      const k = Math.min(3, Math.max(.3, (now - (lastT || now - 16.7)) / 16.7)); lastT = now;          // speeds per 60 fps frame, so an uneven frame rate does not flicker the blur
+      const vh = innerHeight, vw = innerWidth, edOpen = typeof autoOpen !== 'undefined' && autoOpen;
+      const cams = [world]; if (edOpen) cams.push(aworld);
+      const list = [...world.children, ...document.querySelectorAll('.rcur')]; if (edOpen) list.push(...aworld.children);
+      const speed = el => { const r = el.getBoundingClientRect(); if (!r.width || !r.height || r.bottom < -200 || r.top > vh + 200 || r.right < -200 || r.left > vw + 200) return null; const p = prev.get(el); prev.set(el, { x: r.left, y: r.top }); if (!p) { vel.set(el, { x: 0, y: 0 }); return null; } const old = vel.get(el) || { x: 0, y: 0 }, v = { x: old.x + ((r.left - p.x) / k - old.x) * SMOOTH, y: old.y + ((r.top - p.y) / k - old.y) * SMOOTH }; vel.set(el, v); return v; };
+      cams.forEach(el => { const v = speed(el); camBlur(el, v || { x: 0, y: 0 }); });
+      for (const el of list) {
+        const v = speed(el), pv = (el.parentElement && vel.get(el.parentElement)) || { x: 0, y: 0 }, rx = v ? Math.abs(v.x - pv.x) : 0, ry = v ? Math.abs(v.y - pv.y) : 0;      // relative to the board, so panning alone does not blur every item on its own
+        let d = fx.get(el); const tx = rx > MIN_V ? Math.min(MAX_BLUR, rx * STRENGTH) : 0, ty = ry > MIN_V ? Math.min(MAX_BLUR, ry * STRENGTH) : 0;
+        if (!d) { if (!tx && !ty) continue; d = attach(el); d.sx = 0; d.sy = 0; }
+        d.sx += (tx - d.sx) * .35; d.sy += (ty - d.sy) * .35;                 // eased in and out, so it never pops
+        if (d.sx < .05 && d.sy < .05 && !tx && !ty) { release(el); continue; }
+        d.b.setAttribute('stdDeviation', d.sx.toFixed(2) + ' ' + d.sy.toFixed(2));
       }
-      const work = [];
-      for (let i = 0; i < n; i++) {
-        const el = els[i], r = rects[i]; if (!r) continue;
-        const p = prev.get(el); prev.set(el, { x: r.left, y: r.top });
-        if (!p) { vel.set(el, { x: 0, y: 0 }); continue; }
-        const old = vel.get(el) || { x: 0, y: 0 }, v = { x: old.x + (r.left - p.x - old.x) * SMOOTH, y: old.y + (r.top - p.y - old.y) * SMOOTH };
-        vel.set(el, v);
-        const pv = (el.parentElement && vel.get(el.parentElement)) || { x: 0, y: 0 };      // relative to the parent, so nested things blur on their own
-        work.push([el, Math.abs(v.x - pv.x), Math.abs(v.y - pv.y)]);
-      }
-      for (const [el, rx, ry] of work) {
-        const moving = rx > MIN_V || ry > MIN_V; let d = fx.get(el);
-        if (moving) { if (!d) d = attach(el); d.idle = 0; d.b.setAttribute('stdDeviation', Math.min(MAX_BLUR, rx * STRENGTH).toFixed(2) + ' ' + Math.min(MAX_BLUR, ry * STRENGTH).toFixed(2)); }
-        else if (d && ++d.idle > 6) release(el);
-      }
+      [...active].forEach(el => { if (!el.isConnected) release(el); });
       raf = requestAnimationFrame(tick);
     }
     return on => {
@@ -1081,7 +1086,7 @@
         svg = document.createElementNS(NS, 'svg'); svg.setAttribute('width', '0'); svg.setAttribute('height', '0'); svg.style.cssText = 'position:absolute;pointer-events:none;'; defs = document.createElementNS(NS, 'defs'); svg.appendChild(defs); document.documentElement.appendChild(svg);
         prev = new WeakMap(); vel = new WeakMap(); fx = new WeakMap(); active = new Set(); running = true;
         raf = requestAnimationFrame(tick);
-      } else { running = false; cancelAnimationFrame(raf); [...active].forEach(release); if (svg) svg.remove(); svg = null; }
+      } else { running = false; cancelAnimationFrame(raf); [...active].forEach(release); cam.forEach((c, el) => { el.style.filter = c.orig || ''; }); cam.clear(); lastT = 0; if (svg) svg.remove(); svg = null; }
     };
   })();
   (() => {
@@ -2360,7 +2365,7 @@ $('#copy').addEventListener('click', async () => {
   const autoDock = $('#autoDock'), acanvas = $('#acanvas'), aworld = $('#aworld'), awires = $('#awires'), amaps = $('#amaps'), mlist = $('#mlist'), minner = $('#minner'), azp = $('#azp'), autoin = autoDock.querySelector('.autoin');
   const RY0 = 24, RPITCH = 46, GAPX = 0, MAXB = 200, PURPLE = '#e0a8f0', VALC = 'cornflowerblue', STOPC = '#ff9a9a', DARK = '#3d3d3d';
   const SPEC = {
-    cgate: { ins: 4, out: true, multiPins: [0, 1] }, curve: { ins: 20, out: true, multiPins: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 16, 18, 19] }, audio: { ins: 5, out: true, multi: true }, value: { ins: 5, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, ui: { ins: 0, out: true }, counter: { ins: 3, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
+    cgate: { ins: 4, out: true, multiPins: [0, 1] }, curve: { ins: 21, out: true, outs: 2, multiPins: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 16, 18, 19, 20] }, audio: { ins: 5, out: true, multi: true }, value: { ins: 5, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, ui: { ins: 0, out: true }, counter: { ins: 3, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
     and: { ins: 2, out: true, multi: true, gate: true }, or: { ins: 2, out: true, multi: true, gate: true }, nor: { ins: 2, out: true, multi: true, gate: true },
     xor: { ins: 2, out: true, multi: true, gate: true }, xand: { ins: 2, out: true, multi: true, gate: true },
     if: { ins: 5, out: true, multi: true }, prop: { ins: 1, out: true, multi: true }, loop: { ins: 5, out: true, outs: 2, multi: true }, random: { ins: 3, out: true, multi: true }, print: { ins: 2, out: true, multi: true }, light: { ins: 1, out: false, multi: true }, rgb: { ins: 3, out: true, multi: true }, matrix: { ins: 34, out: false, multi: true }, mover: { ins: 18, out: true, outs: 16, multi: true }, mvset: { ins: 2, out: true, outs: 2, multi: true }, split: { ins: 1, out: true, outs: 1, multi: true }
@@ -2404,8 +2409,8 @@ $('#copy').addEventListener('click', async () => {
   /* Curve (beta): a little bezier editor driven by wires. Grid is 0-100; a curved point has a handle that points along angle a */
   /* Grapher: x is time in seconds, y is the value. Points live in graph units; the viewer pans (drag empty space) and zooms (scroll) */
   const CVH = .5, CVL0 = .02, CVL1 = 50, CVW = 310;
-  const CVY = { 0: 190, 1: 214, 2: 238, 3: 262, 4: 286, 9: 310, 5: 346, 6: 370, 15: 394, 16: 418, 7: 442, 8: 466, 13: 490, 14: 514, 18: 542, 19: 566 };      // where each signal pin sits down the left side
-  const CVLBL = { 0: 'Change to curve', 1: 'Select Up', 2: 'Select Down', 3: 'Add Point', 4: 'Delete Selection', 9: 'Run Graph', 5: 'Up', 6: 'Down', 15: 'Left', 16: 'Right', 7: 'Left (Rotate)', 8: 'Right (Rotate)', 13: 'Handles Further', 14: 'Handles Closer', 18: 'Increase Ending Line (+1s)', 19: 'Decrease Ending Line (-1s)' };
+  const CVY = { 0: 190, 1: 214, 2: 238, 3: 262, 4: 286, 9: 310, 5: 346, 6: 370, 15: 394, 16: 418, 7: 442, 8: 466, 13: 490, 14: 514, 18: 542, 19: 566, 20: 606 };      // where each signal pin sits down the left side
+  const CVLBL = { 0: 'Change to curve', 1: 'Select Up', 2: 'Select Down', 3: 'Add Point', 4: 'Delete Selection', 9: 'Run Graph', 5: 'Up', 6: 'Down', 15: 'Left', 16: 'Right', 7: 'Left (Rotate)', 8: 'Right (Rotate)', 13: 'Handles Further', 14: 'Handles Closer', 18: 'Increase Ending Line (+1s)', 19: 'Decrease Ending Line (-1s)', 20: 'Restart' };
   const cvView0 = () => ({ x: -.5, y: 3, k: 77.5 });      // top-left corner of the viewer in graph units, and pixels per unit
   function cvDef() { return { v: 2, sel: 0, view: cvView0(), pts: [{ x: 0, y: 0, c: 0, a: 45, l: CVH }, { x: 2, y: 2, c: 0, a: 45, l: CVH }] }; }
   function cvNorm(c) {
@@ -2415,7 +2420,7 @@ $('#copy').addEventListener('click', async () => {
     const w = c.view || {}, view = { x: N(w.x, -.5, 1e4), y: N(w.y, 3, 1e4), k: Math.max(4, Math.min(4000, N(w.k, 77.5, 1e4))) };
     return { v: 2, pts, view, sel: Math.max(0, Math.min(pts.length - 1, c.sel | 0)) };
   }
-  const cvM = n => Math.max(0, Math.min(1e4, liveIn(n, 10, n.cm))), cvR = () => 45, cvT = n => Math.max(0, Math.min(1e4, liveIn(n, 12, n.ct))), cvS = n => Math.max(0, Math.min(1e4, liveIn(n, 17, n.cs)));      // cvT: where the stop line is, in seconds
+  const cvM = n => Math.max(0, Math.min(1e4, liveIn(n, 10, n.cm))), cvR = n => Math.max(0, Math.min(360, liveIn(n, 11, n.gr))), cvT = n => Math.max(0, Math.min(1e4, liveIn(n, 12, n.ct))), cvS = n => Math.max(0, Math.min(1e4, liveIn(n, 17, n.cs)));      // cvT: where the stop line is, in seconds
   const cvRad = a => a * Math.PI / 180;
   /* a point's handles stick out along angle a (anticlockwise, y up) by length l; k is how curved it is (0 sharp, 1 curved, in between while it animates) */
   const cvK = p => p.k !== undefined ? p.k : (p.c ? 1 : 0);
@@ -2462,7 +2467,8 @@ $('#copy').addEventListener('click', async () => {
     D.forEach((d, i) => { const r = B.ps.children[i], z = 5.5 + .8 * d.s, px = cvSx(w, d.x), py = cvSy(w, d.y); r.setAttribute('x', px - z); r.setAttribute('y', py - z); r.setAttribute('width', 2 * z); r.setAttribute('height', 2 * z); r.setAttribute('rx', (1 + (z - 1) * (1 - d.k)).toFixed(2)); r.style.fillOpacity = d.s.toFixed(3); });      // curved points are squares, straight ones circles; the selected one is filled
     const vb = el.querySelector('.cvv b'); if (vb) { const tx = String(cvVal(n)); if (vb.textContent !== tx) vb.textContent = tx; const di = el.querySelector('.cvd i'), rd = cvRd(n); if (di) { if (di.textContent !== String(rd)) di.textContent = rd; const bl = el.querySelector('.cvd .dl'), br = el.querySelector('.cvd .dr'); if (bl.disabled !== (rd <= 0)) bl.disabled = rd <= 0; if (br.disabled !== (rd >= 5)) br.disabled = rd >= 5; } }      // the value coming out right now
     const rn = cvRun[n.id];
-    if (rn && rn.on) { const t = Math.min(rn.end, (performance.now() - rn.t0) / 1000), px = cvSx(w, t); B.rl.setAttribute('d', 'M' + px.toFixed(1) + ' 0V' + CVW); B.rt.setAttribute('x', (px + 9).toFixed(1)); B.rt.textContent = t.toFixed(2) + 's'; B.rg.style.opacity = 1; busy = true; } else B.rg.style.opacity = 0;
+    if (rn && (rn.on || rn.paused)) { const t = rn.on ? Math.min(rn.end, (performance.now() - rn.t0) / 1000) : Math.min(rn.end, rn.pos), px = cvSx(w, t); B.rl.setAttribute('d', 'M' + px.toFixed(1) + ' 0V' + CVW); B.rt.setAttribute('x', (px + 9).toFixed(1)); B.rt.textContent = t.toFixed(2) + 's'; B.rg.style.opacity = 1; if (rn.on) busy = true; } else B.rg.style.opacity = 0;
+    { const lb = el.querySelector('.cpn[data-p="9"]'), tx = !n.sar && rn && rn.on ? 'Pause Graph' : 'Run Graph'; if (lb && lb.textContent !== tx) lb.textContent = tx; }
     if (list._n !== c.pts.length) { list._n = c.pts.length; list.innerHTML = c.pts.map((_, i) => '<button type="button" data-i="' + i + '">Point ' + (i + 1) + '</button>').join('') + '<button type="button" class="add" data-add="1" title="Add a point in the middle of the view"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>'; list._sel = -1; }
     if (list._sel !== c.sel) { list._sel = c.sel; [...list.children].forEach((b, i) => b.classList.toggle('on', i === c.sel)); const on = list.children[c.sel]; if (on && (on.offsetTop + on.offsetHeight > list.scrollTop + list.clientHeight || on.offsetTop < list.scrollTop)) list.scrollTo({ top: on.offsetTop - 4, behavior: 'smooth' }); }
     return busy;
@@ -2503,7 +2509,20 @@ $('#copy').addEventListener('click', async () => {
   }
   const cvRd = n => Math.max(0, Math.min(5, n.rd | 0));
   const cvVal = n => { const r = cvRun[n.id], v = r ? r.y : 0; return +v.toFixed(cvRd(n)); };      // rounded to the digits picked under the value
-  function cvStart(n) { cvRun[n.id] = { t0: performance.now(), x: 0, end: cvT(n), y: cvY(n.cv, 0) }; }      // plays from 0s to the stop line, in real time
+  function cvStart(n) { cvRun[n.id] = { t0: performance.now(), x: 0, end: cvT(n), y: cvY(n.cv, 0), on: true, paused: false, pos: 0 }; }      // plays from 0s to the stop line, in real time
+  function cvRunPin(n) {                                    // Semi-Auto Repeat: every signal starts again from 0. Otherwise the pin plays / pauses / resumes
+    const r = cvRun[n.id], now = performance.now();
+    if (n.sar || !r || (!r.on && !r.paused)) cvStart(n);
+    else if (r.on) { r.pos = Math.min(r.end, (now - r.t0) / 1000); r.on = false; r.paused = true; }
+    else { r.t0 = now - r.pos * 1000; r.on = true; r.paused = false; }
+    cvDraw(n);
+  }
+  function cvRestart(n) {                                   // back to 0s: keeps playing if it was playing, otherwise waits there (paused)
+    if (n.sar) return; let r = cvRun[n.id]; const now = performance.now();
+    if (r && r.on) r.t0 = now;
+    else { if (!r) { cvStart(n); r = cvRun[n.id]; } r.on = false; r.paused = true; r.pos = 0; r.x = 0; r.y = cvY(n.cv, 0); }
+    cvDraw(n);
+  }
   const gst = {};
   const gs = id => gst[id] || (gst[id] = { open: false, ls: 0, v: 0, was: false });
   const gOpen = n => { const s = gs(n.id); return n.bm === 'hold' ? performance.now() - s.ls < 300 : !!s.open; };      // Hold Mode: open while signals keep coming (a source with Allow Holding), otherwise only a moment
@@ -2603,7 +2622,7 @@ $('#copy').addEventListener('click', async () => {
       if (Array.isArray(a.nodes)) a.nodes.slice(0, 120).forEach(n => {
         if (!n || !idOk(n.id) || !SPEC[n.t] || seenN.has(n.id) || out.btns.some(b => b.id === n.id)) return; seenN.add(n.id);
         const pc = {}; if (n.pc && typeof n.pc === 'object') Object.keys(n.pc).slice(0, 200).forEach(k => { if (/^(o\d{0,2}|\d{1,2})$/.test(k) && HEX.test(n.pc[k])) pc[k] = n.pc[k]; });
-        out.nodes.push({ id: n.id, t: n.t, x: isFinite(n.x) ? num(n.x, 5000) : 30, y: isFinite(n.y) ? num(n.y, 5000) : 30, cue: idOk(n.cue) ? n.cue : '', btn: idOk(n.btn) ? n.btn : '', hold: (n.t === 'ui' || n.t === 'key') && n.hold ? 1 : 0, cm: isFinite(n.cm) ? num(n.cm, 1e6) : 1, gr: isFinite(n.gr) ? num(n.gr, 1e6) : 45, ct: isFinite(n.ct) ? Math.max(0, Math.min(1e4, +n.ct)) : 2, cs: isFinite(n.cs) ? Math.max(0, Math.min(1e4, +n.cs)) : .5, rd: isFinite(n.rd) ? Math.max(0, Math.min(5, Math.round(+n.rd))) : 2, elp: n.elp ? 1 : 0, cv: cvNorm(n.cv), rm: n.rm === 'signal' ? 'signal' : 'value', bm: n.bm === 'hold' ? 'hold' : 'toggle',
+        out.nodes.push({ id: n.id, t: n.t, x: isFinite(n.x) ? num(n.x, 5000) : 30, y: isFinite(n.y) ? num(n.y, 5000) : 30, cue: idOk(n.cue) ? n.cue : '', btn: idOk(n.btn) ? n.btn : '', hold: (n.t === 'ui' || n.t === 'key') && n.hold ? 1 : 0, cm: isFinite(n.cm) ? num(n.cm, 1e6) : 1, gr: isFinite(n.gr) ? num(n.gr, 1e6) : 45, ct: isFinite(n.ct) ? Math.max(0, Math.min(1e4, +n.ct)) : 2, cs: isFinite(n.cs) ? Math.max(0, Math.min(1e4, +n.cs)) : .5, rd: isFinite(n.rd) ? Math.max(0, Math.min(5, Math.round(+n.rd))) : 2, elp: n.elp ? 1 : 0, sar: n.sar ? 1 : 0, cv: cvNorm(n.cv), rm: n.rm === 'signal' ? 'signal' : 'value', bm: n.bm === 'hold' ? 'hold' : 'toggle',
           n: Math.max(1, Math.min(99, Math.round(+n.n) || 2)), vm: ['add', 'sub', 'mul', 'div'].includes(n.vm) ? n.vm : 'add', vx: isFinite(n.vx) ? num(n.vx, 1e9) : 1, vs: isFinite(n.vs) ? num(n.vs, 1e9) : 0, vol: isFinite(n.vol) ? Math.max(0, Math.min(100, +n.vol)) : 100, pitch: isFinite(n.pitch) ? Math.max(-24, Math.min(24, +n.pitch)) : 0, v: isFinite(n.v) ? num(n.v, 1e6) : 100, op: OPS.some(o => o[0] === n.op) ? n.op : '>', k: isFinite(n.k) ? num(n.k, 1e6) : 0, sec: isFinite(n.sec) ? Math.max(0, Math.min(3600, +n.sec)) : 1, rmin: isFinite(n.rmin) ? num(n.rmin, 1e6) : 0, rmax: isFinite(n.rmax) ? num(n.rmax, 1e6) : 100, im: n.im === 'text' ? 'text' : 'value', it: ['is', 'isnt', 'has'].includes(n.it) ? n.it : 'is', tx: typeof n.tx === 'string' ? n.tx.slice(0, 60) : '', g: typeof n.g === 'string' && /^[a-z0-9]{1,16}$/.test(n.g) ? n.g : '', txt: typeof n.txt === 'string' ? n.txt.slice(0, 80) : 'Hello!', lm: n.lm === 'forever' ? 'forever' : 'until', lc: isFinite(n.lc) ? Math.max(0, Math.min(99999, Math.round(+n.lc))) : 3, lt: isFinite(n.lt) ? Math.max(.05, Math.min(3600, +n.lt)) : 1, cr: isFinite(n.cr) ? Math.max(0, Math.min(255, Math.round(+n.cr))) : 0, cg: isFinite(n.cg) ? Math.max(0, Math.min(255, Math.round(+n.cg))) : 0, cb: isFinite(n.cb) ? Math.max(0, Math.min(255, Math.round(+n.cb))) : 0, mw: Math.max(1, Math.min(16, Math.round(+n.mw) || 8)), mh: Math.max(1, Math.min(16, Math.round(+n.mh) || 8)), mx: Array.from({ length: 16 }, (_, i) => Array.isArray(n.mx) ? (n.mx[i] | 0) & 65535 : 0), pr: PROPS.some(o => o.id === n.pr) ? n.pr : 'add', cap: typeof n.cap === 'string' ? n.cap.slice(0, 60) : '', mvw: Math.max(1, Math.min(16, Math.round(+n.mvw) || 5)), mvk: Math.max(0, Math.min(15, Math.round(+n.mvk) || 0)), mvs: n.mvs ? 1 : 0, mvr: n.mvr ? 1 : 0, mtg: n.mtg ? 1 : 0, mcl: n.mcl && typeof n.mcl === 'object' ? Object.fromEntries(Object.entries(n.mcl).filter(([k, c]) => /^\d{1,3}$/.test(k) && +k < 256 && HEX.test(c)).slice(0, 256)) : {}, pc, ...cleanSplit(n) });
       });
       if (Array.isArray(a.links)) {
@@ -2622,7 +2641,6 @@ $('#copy').addEventListener('click', async () => {
     if (!(a && a.ctm)) { out.links.forEach(l => { const t = out.nodes.find(n => n.id === l[1]); if (t && t.t === 'counter' && l[2] === 1) l[2] = 2; }); out.nodes.forEach(n => { if (n.t === 'counter' && n.pc && n.pc['1']) { n.pc['2'] = n.pc['1']; delete n.pc['1']; } }); }      // older saves: the Counter's count wire moved from pin 1 to pin 2 (pin 1 is now Reset)
     if (!(a && a.aum)) { out.links.forEach(l => { const t = out.nodes.find(n => n.id === l[1]); if (t && t.t === 'audio' && l[2] >= 2) l[2]++; }); out.nodes.forEach(n => { if (n.t === 'audio' && n.pc) { ['3', '2'].forEach(k => { if (n.pc[k]) { n.pc[String(+k + 1)] = n.pc[k]; delete n.pc[k]; } }); } }); }      // older saves: the Audio's volume / pitch pins moved down one to make room for Restart
     if (!(a && a.gm)) { out.links.forEach(l => { const t = out.nodes.find(n => n.id === l[1]); if (t && t.t === 'curve' && l[2] >= 9) l[2]++; }); out.nodes.forEach(n => { if (n.t === 'curve' && n.pc) { Object.keys(n.pc).filter(k => +k >= 9 && /^\d+$/.test(k)).sort((x, y) => y - x).forEach(k => { n.pc[+k + 1] = n.pc[k]; delete n.pc[k]; }); } }); }      // Grapher got a Run pin at 9, so its value pins moved along
-    out.links = out.links.filter(l => { const t = out.nodes.find(n => n.id === l[1]); return !(t && t.t === 'curve' && l[2] === 11); });      // Grapher no longer has Rotate Amount
     out.ifm = 1; out.ctm = 1; out.aum = 1; out.gm = 1;
     out.links = out.links.filter(l => { const t = out.nodes.find(n => n.id === l[1]); return !(t && t.t === 'print' && l[2] === 1); });      // Print's value pin isn't available yet
     auto = out;
@@ -2634,7 +2652,7 @@ $('#copy').addEventListener('click', async () => {
   const norm = k => k.length === 1 ? k.toLowerCase() : k;
   const keyLabel = k => !k ? 'key' : k.length === 1 ? k.toUpperCase() : ({ ' ': 'Space', ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→', Control: 'Ctrl' }[k] || k);
   const rowY = i => RY0 + i * RPITCH;
-  const RGBPIN = ['#ff5a5a', '#c4ff6a', '#5a78ff'], inDef = (n, p) => n && n.t === 'rgb' ? RGBPIN[p] : n && ((n.t === 'counter' && p === 1) || (n.t === 'audio' && p === 2)) ? '#ff7b7b' : n && n.t === 'cgate' && p === 1 ? VALC : n && n.t === 'curve' && p === 9 ? VALC : n && n.t === 'curve' && p < 5 ? ['#ff7a2a', '#6a1bff', '#6a1bff', '#c4ff6a', '#ff5a5a'][p] : isPropPin(n, p) ? PROPC : isValIn(n, p) ? VALC : '';
+  const RGBPIN = ['#ff5a5a', '#c4ff6a', '#5a78ff'], inDef = (n, p) => n && n.t === 'rgb' ? RGBPIN[p] : n && ((n.t === 'counter' && p === 1) || (n.t === 'audio' && p === 2)) ? '#ff7b7b' : n && n.t === 'cgate' && p === 1 ? VALC : n && n.t === 'curve' && p === 9 ? VALC : n && n.t === 'curve' && p === 20 ? '#ff7b7b' : n && n.t === 'curve' && p < 5 ? ['#ff7a2a', '#6a1bff', '#6a1bff', '#c4ff6a', '#ff5a5a'][p] : isPropPin(n, p) ? PROPC : isValIn(n, p) ? VALC : '';
   const isValSrc = n => n && (n.t === 'number' || n.t === 'value' || n.t === 'curve'), isValIn = (n, p) => n && (n.t === 'curve' ? [10, 11, 12, 17].includes(p) : VP[n.t] !== undefined && p >= VP[n.t]) && VP[n.t] !== undefined && p >= VP[n.t];     // value pins default to cornflower blue
   const pinColor = (n, k) => (n && n.pc && n.pc[k]) || (k === 'o' ? (n && n.t === 'prop' ? PROPC : isValSrc(n) ? VALC : PURPLE) : k === 'o1' ? (n && (n.t === 'split' || n.t === 'mvset' || n.t === 'mover') ? PURPLE : STOPC) : /^o\d+$/.test(k) ? PURPLE : DARK);
   function autoDropCue(id) {
@@ -2759,8 +2777,8 @@ $('#copy').addEventListener('click', async () => {
     else if (n.t === 'mvset') h += '<span class="ml l">L</span><span class="ml r">R</span><input class="ni nv" type="number" min="0" step="1" title="Which pin the line jumps to (0 is the first). Or wire a number into the bottom pin. Wire L and R to the same Mover&#39;s left and right pins, then send a signal into the top pin">';
     else if (n.t === 'number') h += '<span class="nm">Number</span><input class="ni nv" type="number" step="any" title="A number other nodes can read">';
     else if (n.t === 'curve') {
-      h += '<span class="nm">Grapher</span><div class="cpl"></div><svg class="cvs" viewBox="0 0 310 310"></svg><div class="cvv"><b>0</b><div class="cvd" title="Digits after the point"><button type="button" class="dl" aria-label="Fewer digits"><svg viewBox="0 0 24 24"><path d="M14.5 6.5 9 12l5.5 5.5"/></svg></button><i>2</i><button type="button" class="dr" aria-label="More digits"><svg viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5"/></svg></button></div><span>Value</span></div>' + Object.keys(CVLBL).map(p => '<span class="cpn" data-p="' + p + '" style="top:' + CVY[p] + 'px">' + CVLBL[p] + '</span>').join('')
-        + '<label class="cvl" style="left:202px"><span>Move Amount</span><input class="ni cvm" type="number" min="0" step="0.1"></label><label class="cvl" style="left:308px"><span>Stop Line Time</span><input class="ni cvt" type="number" min="0" step="0.1"></label><label class="cvl" style="left:414px"><span>Curve Snap</span><input class="ni cvq" type="number" min="0" step="0.1"></label>';
+      h += '<span class="nm">Grapher</span><div class="cpl"></div><svg class="cvs" viewBox="0 0 310 310"></svg><div class="cvb"><button type="button" class="vfit" title="Fit everything in view"><svg viewBox="0 0 24 24"><path d="M20,8V6H18q-0.43,0-0.71-0.29Q17,5.43 17,5t0.29-0.71T18,4h2q0.83,0 1.41,0.59Q22,5.18 22,6V8q0,0.42-0.29,0.71T21,9T20.29,8.71T20,8ZM2,8V6Q2,5.18 2.59,4.59T4,4H6Q6.43,4 6.71,4.29T7,5T6.71,5.71T6,6H4V8Q4,8.42 3.71,8.71T3,9T2.29,8.71T2,8ZM20,20H18q-0.43,0-0.71-0.29Q17,19.43 17,19t0.29-0.71T18,18h2V16q0-0.43 0.29-0.71T21,15q0.43,0 0.71,0.29T22,16v2q0,0.82-0.59,1.41T20,20ZM4,20q-0.82,0-1.41-0.59T2,18V16q0-0.43 0.29-0.71T3,15t0.71,0.29T4,16v2H6q0.43,0 0.71,0.29T7,19T6.71,19.71T6,20H4Zm2-6V10Q6,9.17 6.59,8.59T8,8h8q0.82,0 1.41,0.59T18,10v4q0,0.82-0.59,1.41T16,16H8q-0.82,0-1.41-0.59T6,14Z"/></svg></button><button type="button" class="vhome" title="Back to 0, 0"><svg viewBox="0 0 24 24"><path d="M13,18.83V22q0,0.43-0.29,0.71T12,23t-0.71-0.29Q11,22.43 11,22V18.83l-0.4,0.4Q10.33,19.5 9.91,19.5T9.2,19.2q-0.28-0.27-0.28-0.7T9.2,17.8l2.1-2.1q0.3-0.3 0.7-0.3t0.7,0.3l2.1,2.1q0.28,0.27 0.29,0.69T14.8,19.2q-0.28,0.28-0.69,0.29T13.4,19.23L13,18.83ZM5.18,13H2q-0.42,0-0.71-0.29Q1,12.43 1,12t0.29-0.71T2,11H5.18l-0.4-0.4Q4.5,10.33 4.5,9.91T4.8,9.2Q5.08,8.92 5.5,8.92T6.2,9.2l2.1,2.1Q8.6,11.6 8.6,12T8.3,12.7L6.2,14.8q-0.27,0.28-0.69,0.29T4.8,14.8q-0.28-0.27-0.29-0.69T4.78,13.4L5.18,13Zm13.65,0l0.4,0.4q0.27,0.28 0.27,0.69T19.2,14.8q-0.28,0.28-0.7,0.28T17.8,14.8l-2.1-2.1q-0.3-0.3-0.3-0.7t0.3-0.7l2.1-2.1q0.27-0.28 0.69-0.29T19.2,9.2q0.27,0.28 0.29,0.69T19.23,10.6L18.83,11H22q0.43,0 0.71,0.29T23,12t-0.29,0.71T22,13H18.83ZM12,13.5q-0.63,0-1.06-0.44T10.5,12t0.44-1.06T12,10.5t1.06,0.44T13.5,12t-0.44,1.06T12,13.5ZM11,5.18V2q0-0.43 0.29-0.71T12,1t0.71,0.29T13,2V5.18l0.4-0.4Q13.68,4.5 14.09,4.5T14.8,4.8q0.28,0.28 0.28,0.7T14.8,6.2L12.7,8.3Q12.4,8.6 12,8.6T11.3,8.3L9.2,6.2Q8.93,5.93 8.91,5.51T9.2,4.8Q9.48,4.52 9.89,4.51T10.6,4.77L11,5.18Z"/></svg></button></div><div class="cvv"><b>0</b><div class="cvd" title="Digits after the point"><button type="button" class="dl" aria-label="Fewer digits"><svg viewBox="0 0 24 24"><path d="M14.5 6.5 9 12l5.5 5.5"/></svg></button><i>2</i><button type="button" class="dr" aria-label="More digits"><svg viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5"/></svg></button></div><span>Value</span></div>' + Object.keys(CVLBL).map(p => '<span class="cpn" data-p="' + p + '" style="top:' + CVY[p] + 'px">' + CVLBL[p] + '</span>').join('')
+        + '<label class="cvl" style="left:110px"><span>Rotate Amount</span><input class="ni cvr" type="number" min="0" max="360"></label><label class="cvl" style="left:212px"><span>Move Amount</span><input class="ni cvm" type="number" min="0" step="0.1"></label><label class="cvl" style="left:314px"><span>Stop Line Time</span><input class="ni cvt" type="number" min="0" step="0.1"></label><label class="cvl" style="left:416px"><span>Curve Snap</span><input class="ni cvq" type="number" min="0" step="0.1"></label>';
     }
     else if (n.t === 'cgate') h += '<span class="nm">Gate</span><div class="gc"><div class="g1"><button class="nk op rm" title="Repeat changing values (Value Mode) or signals (Signal Mode)"></button><button class="nk op bm" title="What the blue pin does: Toggle Mode flips the gate open / shut, Hold Mode keeps it open while the blue pin is held"></button></div><div class="gv" title="The value passing through"></div></div>';
     else if (n.t === 'if') h += '<span class="nm">IF</span><button class="nk im" title="Compare a number (Value) or words (Text)"></button><button class="nk op" title="How to compare"></button><input class="ni ik" type="number" step="any" title="Number to compare with"><input class="ni tx" type="text" maxlength="60" placeholder="text" title="Text to compare with">';
@@ -2810,6 +2828,22 @@ $('#copy').addEventListener('click', async () => {
       const svg = el.querySelector('.cvs'), list = el.querySelector('.cpl');
       el.querySelectorAll('.ip').forEach(ip => { const p = +ip.dataset.p; if (CVY[p] !== undefined) ip.style.top = CVY[p] + 'px'; });
       list.addEventListener('pointerdown', e => e.stopPropagation());
+      const glide = to => {                                            // the view slides smoothly to a new spot
+        const w = n.cv.view, from = { x: w.x, y: w.y, k: w.k }, t0 = performance.now(), D = 320; cancelAnimationFrame(svg._va);
+        const step = now => { const f = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - f, 3); w.k = from.k * Math.pow(to.k / from.k, e); w.x = from.x + (to.x - from.x) * e; w.y = from.y + (to.y - from.y) * e; cvDraw(n); if (f < 1) svg._va = requestAnimationFrame(step); else save(); };
+        svg._va = requestAnimationFrame(step);
+      };
+      el.querySelectorAll('.cvb button').forEach(b => {
+        b.addEventListener('pointerdown', e => e.stopPropagation());
+        b.addEventListener('click', e => {
+          e.stopPropagation();
+          if (b.classList.contains('vhome')) { glide(cvView0()); return; }
+          const xs = [0, cvT(n)], ys = [];                              // fit: every point, its handle tips, 0s and the stop line
+          n.cv.pts.forEach(p => { xs.push(p.x); ys.push(p.y); if (p.c) { const dx = Math.cos(cvRad(p.a)) * p.l, dy = Math.sin(cvRad(p.a)) * p.l; xs.push(p.x + dx, p.x - dx); ys.push(p.y + dy, p.y - dy); } });
+          const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys), span = Math.max(x1 - x0, y1 - y0, .5), k = Math.max(4, Math.min(4000, CVW * .78 / span));
+          glide({ k, x: (x0 + x1) / 2 - CVW / 2 / k, y: (y0 + y1) / 2 + CVW / 2 / k });
+        });
+      });
       el.querySelectorAll('.cvd button').forEach(b => { b.addEventListener('pointerdown', e => e.stopPropagation()); b.addEventListener('click', e => { e.stopPropagation(); n.rd = Math.max(0, Math.min(5, cvRd(n) + (b.classList.contains('dr') ? 1 : -1))); save(); cvDraw(n); }); });
       list.addEventListener('wheel', e => { if (list.scrollHeight > list.clientHeight) e.stopPropagation(); }, { passive: true });     // the list scrolls instead of zooming the editor
       list.addEventListener('click', e => {
@@ -3066,7 +3100,7 @@ $('#copy').addEventListener('click', async () => {
         if (document.activeElement !== ni && !ni.classList.contains('driven')) ni.value = n.k; if (document.activeElement !== tx) tx.value = n.tx;
         el.querySelectorAll('.ip')[1].classList.toggle('off', tm && !inputsL(n.id, 1).length);                         // the number pin is only for Value mode
       }
-      else if (n.t === 'curve') { [18, 19].forEach(p => { const ip = el.querySelector('.ip[data-p="' + p + '"]'), lb = el.querySelector('.cpn[data-p="' + p + '"]'); if (ip) ip.classList.toggle('off', !n.elp && !inputsL(n.id, p).length); if (lb) lb.classList.toggle('off', !n.elp); }); [['.cvm', n.cm], ['.cvt', n.ct], ['.cvq', n.cs]].forEach(([q, val]) => { const ni = el.querySelector(q); if (document.activeElement !== ni && !ni.classList.contains('driven')) ni.value = val; }); cvDraw(n); }
+      else if (n.t === 'curve') { [18, 19, 20].forEach(p => { const dis = p === 20 ? !!n.sar : !n.elp, ip = el.querySelector('.ip[data-p="' + p + '"]'), lb = el.querySelector('.cpn[data-p="' + p + '"]'); if (ip) ip.classList.toggle('off', dis && !inputsL(n.id, p).length); if (lb) lb.classList.toggle('off', dis); }); [['.cvm', n.cm], ['.cvr', n.gr], ['.cvt', n.ct], ['.cvq', n.cs]].forEach(([q, val]) => { const ni = el.querySelector(q); if (document.activeElement !== ni && !ni.classList.contains('driven')) ni.value = val; }); cvDraw(n); }
       else if (n.t === 'cgate') { el.querySelector('.rm').textContent = n.rm === 'signal' ? 'Signal Mode' : 'Value Mode'; el.querySelector('.bm').textContent = n.bm === 'hold' ? 'Hold Mode' : 'Toggle Mode'; }
       else if (n.t === 'prop') { const o = PROPS.find(x => x.id === n.pr) || PROPS[0]; el.querySelector('.pp').innerHTML = '<i>' + o.sm + '</i>' + o.short; }
       else if (n.t === 'light') el.querySelector('.lamp').style.setProperty('--lc', n.pc && n.pc['0'] ? n.pc['0'] : '#ffd84d');
@@ -3078,7 +3112,7 @@ $('#copy').addEventListener('click', async () => {
   function removeNode(id) { clearWaits(id); auto.nodes = auto.nodes.filter(n => n.id !== id); auto.links = auto.links.filter(l => l[0] !== id && l[1] !== id); save(); }
   function addNode(t, cue) {
     const n = auto.nodes.length, col = n % 2, row = Math.floor(n / 2) % 3;     // drop new nodes on a loose grid so they never stack
-    auto.nodes.push({ id: uid(), t, x: Math.round((30 - v.x) / v.z + col * 320 + Math.floor(n / 6) * 26), y: Math.round((24 - v.y) / v.z + row * 70 + Math.floor(n / 6) * 26), cue: cue || '', btn: '', n: 2, sec: 1, vol: 100, pitch: 0, v: t === 'mvset' ? 0 : 100, vm: 'add', vx: 1, vs: t === 'value' ? 100 : 0, op: '>', k: 0, lm: 'until', lc: 3, lt: 1, rmin: 0, rmax: 100, txt: 'Hello!', im: 'value', it: 'is', tx: '', si: 1, so: 1, sc: [[0, 0]], sw: 38, sh: 66, sp: null, cr: 0, cg: 0, cb: 0, mw: 5, mh: 5, mx: Array(16).fill(0), mcl: {}, mvw: 5, mvk: 0, mvr: 0, mvs: 0, mtg: 0, pr: 'add', rm: 'value', bm: 'toggle', cm: 1, gr: 45, ct: 2, cs: .5, rd: 2, elp: 0, cv: cvDef(), pc: {} });
+    auto.nodes.push({ id: uid(), t, x: Math.round((30 - v.x) / v.z + col * 320 + Math.floor(n / 6) * 26), y: Math.round((24 - v.y) / v.z + row * 70 + Math.floor(n / 6) * 26), cue: cue || '', btn: '', n: 2, sec: 1, vol: 100, pitch: 0, v: t === 'mvset' ? 0 : 100, vm: 'add', vx: 1, vs: t === 'value' ? 100 : 0, op: '>', k: 0, lm: 'until', lc: 3, lt: 1, rmin: 0, rmax: 100, txt: 'Hello!', im: 'value', it: 'is', tx: '', si: 1, so: 1, sc: [[0, 0]], sw: 38, sh: 66, sp: null, cr: 0, cg: 0, cb: 0, mw: 5, mh: 5, mx: Array(16).fill(0), mcl: {}, mvw: 5, mvk: 0, mvr: 0, mvs: 0, mtg: 0, pr: 'add', rm: 'value', bm: 'toggle', cm: 1, gr: 45, ct: 2, cs: .5, rd: 2, elp: 0, sar: 0, cv: cvDef(), pc: {} });
     save();
   }
 
@@ -3158,6 +3192,7 @@ $('#copy').addEventListener('click', async () => {
     + '<button class="cap" title="Add or edit a caption under the node (clear the text to remove it)"><svg viewBox="0 0 24 24"><path d="M4 8h16M4 12h16M4 16h9"/></svg><span>Caption</span></button>'
     + '<button class="rot" title="Turn it to the other side of the matrix"><svg viewBox="0 0 24 24" style="transform:scaleX(-1);fill:#fff;stroke:none"><path d="M19.75,12.05q-0.3,0-0.59-0.21q-0.29-0.21-0.36-0.54q-0.13-0.47-0.31-0.94T18.05,9.48Q17.88,9.2 17.93,8.86T18.2,8.3Q18.58,7.95 19.06,8T19.8,8.48q0.32,0.55 0.57,1.13q0.25,0.57 0.4,1.2q0.13,0.5-0.19,0.88t-0.84,0.38Zm-6.7,8.7q0-0.3 0.21-0.59T13.8,19.8q0.47-0.13 0.94-0.31t0.89-0.44q0.28-0.18 0.61-0.13T16.8,19.2q0.35,0.38 0.3,0.86T16.63,20.8q-0.57,0.32-1.15,0.56T14.3,21.78q-0.5,0.13-0.88-0.17t-0.38-0.85ZM18.2,17.8q-0.22-0.2-0.27-0.55t0.13-0.63q0.25-0.43 0.44-0.89q0.19-0.46 0.31-0.94q0.07-0.32 0.35-0.54t0.6-0.21q0.55,0 0.85,0.38t0.18,0.88q-0.18,0.6-0.41,1.18T19.8,17.63q-0.25,0.43-0.74,0.48T18.2,17.8ZM9.83,21.75q-2.98-0.8-4.88-3.2t-1.9-5.5q0-3.75 2.63-6.37t6.38-2.63H12.2L11.33,3.17q-0.28-0.27-0.28-0.7t0.3-0.72q0.27-0.28 0.7-0.28t0.72,0.28l2.58,2.6Q15.5,4.5 15.56,4.67t0.06,0.38T15.56,5.43T15.35,5.75l-2.6,2.6q-0.27,0.28-0.7,0.28t-0.7-0.28t-0.28-0.7t0.28-0.7l0.9-0.9h-0.2q-2.93,0-4.96,2.04q-2.04,2.04-2.04,4.96q0,2.43 1.47,4.29T10.3,19.8q0.32,0.07 0.54,0.35q0.21,0.28 0.21,0.6q0,0.52-0.36,0.82T9.83,21.75Z"/></svg><span>Rotate</span></button>'
     + '<button class="mtg" title="Toggle Mode: a signal at an LED that is already on turns it off"><svg viewBox="0 0 24 24" style="fill:#fff;stroke:none"><path d="M15.54,15.54Q17,14.08 17,12q0-2.08-1.46-3.54T12,7Q9.93,7 8.46,8.46T7,12t1.46,3.54T12,17t3.54-1.46ZM12,22q-2.07,0-3.9-0.79q-1.82-0.79-3.17-2.14Q3.58,17.73 2.79,15.9T2,12Q2,9.92 2.79,8.1Q3.58,6.27 4.93,4.93Q6.28,3.57 8.1,2.79Q9.93,2 12,2t3.9,0.79t3.17,2.14q1.35,1.35 2.14,3.17Q22,9.92 22,12t-0.79,3.9t-2.14,3.17q-1.35,1.35-3.17,2.14T12,22Zm0-2q3.35,0 5.68-2.32T20,12T17.68,6.32T12,4T6.33,6.32T4,12t2.33,5.68T12,20Z"/></svg><span>Toggle Mode</span></button>'
+    + '<button class="sar" title="Semi-Auto Repeat: every Run signal starts the graph again from 0 (Restart is not used)"><svg viewBox="0 -960 960 960" style="fill:#fff;stroke:none"><path d="m274-200 34 34q12 12 11.5 28T308-110q-12 12-28.5 12.5T251-109L148-212q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l103-103q12-12 28.5-11.5T308-370q11 12 11.5 28T308-314l-34 34h406v-120q0-17 11.5-28.5T720-440q17 0 28.5 11.5T760-400v120q0 33-23.5 56.5T680-200H274Zm412-480H280v120q0 17-11.5 28.5T240-520q-17 0-28.5-11.5T200-560v-120q0-33 23.5-56.5T280-760h406l-34-34q-12-12-11.5-28t11.5-28q12-12 28.5-12.5T709-851l103 103q6 6 8.5 13t2.5 15q0 8-2.5 15t-8.5 13L709-589q-12 12-28.5 11.5T652-590q-11-12-11.5-28t11.5-28l34-34Z"/></svg><span>Semi-Auto Repeat</span></button>'
     + '<button class="elp" title="Turn the Increase / Decrease Ending Line pins on or off"><svg viewBox="0 0 24 24" style="fill:#fff;stroke:none"><path d="M18.83,14.83Q20,13.65 20,12T18.83,9.17T16,8T13.18,9.17T12,12t1.18,2.82T16,16t2.82-1.18ZM16,18q-2.25,0-3.91-1.43T10.08,13H3q-0.42,0-0.71-0.29Q2,12.43 2,12t0.29-0.71T3,11h7.08q0.35-2.15 2.01-3.57T16,6q2.5,0 4.25,1.75T22,12t-1.75,4.25T16,18Zm0-6Z"/></svg><span>Enable Ending Line Pins</span></button>'
     + '<button class="hld" title="Allow Holding: holding the button keeps sending signals until you let go"><svg viewBox="0 0 24 24" style="fill:#fff;stroke:none"><path d="M8.48,0q2.5,0 4.25,1.75T14.48,6q0,0.63-0.13,1.21T13.98,8.38q-0.13,0.27-0.39,0.35T13.05,8.67T12.66,8.25t0.01-0.63q0.15-0.4 0.22-0.8T12.98,6q0-1.88-1.31-3.19T8.48,1.5T5.29,2.81T3.98,6q0,0.43 0.06,0.84T4.25,7.63Q4.38,7.95 4.26,8.25T3.88,8.67T3.34,8.71Q3.08,8.63 2.95,8.35Q2.73,7.8 2.6,7.21Q2.48,6.63 2.48,6q0-2.5 1.75-4.25T8.48,0Zm0,2.5q1.45,0 2.48,1.02T11.98,6q0,0.25-0.04,0.47T11.85,6.93q-0.1,0.32-0.38,0.47T10.9,7.45T10.44,7.07Q10.28,6.8 10.38,6.5Q10.4,6.43 10.45,6q0-0.82-0.59-1.41T8.45,4T7.04,4.57T6.45,6q0,0.13 0.01,0.26T6.53,6.52Q6.6,6.82 6.45,7.07T6,7.4T5.44,7.32T5.08,6.88Q5.03,6.7 5,6.49Q4.98,6.27 4.98,6Q4.98,4.52 6,3.51T8.48,2.5Zm2,19.5q-0.7,0-1.31-0.3T8.13,20.85L3.1,14.48q-0.2-0.22-0.17-0.54t0.23-0.51q0.5-0.53 1.2-0.63t1.3,0.28L7.5,14.2V6q0-0.43 0.29-0.71T8.5,5Q8.93,5 9.23,5.29Q9.53,5.57 9.53,6v5H17q1.25,0 2.13,0.88T20,14v4q0,1.65-1.18,2.82T16,22H10.48Z"/></svg><span>Allow Holding</span></button>'
     + '<button class="mvm" title="Many input pins, or one pin that the line points at"><svg viewBox="0 0 24 24"><path d="M12 4v8M6 12h12M6 12v8M18 12v8"/></svg><span>Single-Pin Mode</span></button>'
@@ -3195,6 +3230,7 @@ $('#copy').addEventListener('click', async () => {
     const grpBtn = asb.querySelector('.grp'), un = isOneGroup(ns);
     const rotBtn = asb.querySelector('.rot'); const movs = ns.filter(n => n.t === 'mover'), mats = ns.filter(n => n.t === 'matrix'); rotBtn.style.display = movs.length ? '' : 'none';
     const tgBtn = asb.querySelector('.mtg'); tgBtn.style.display = mats.length ? '' : 'none'; if (mats.length) { tgBtn.querySelector('path').setAttribute('d', mats[0].mtg ? TG_ON : TG_OFF); tgBtn.classList.toggle('lit', !!mats[0].mtg); }
+    const sarBtn = asb.querySelector('.sar'), ss = ns.filter(n => n.t === 'curve'); sarBtn.style.display = ss.length ? '' : 'none'; if (ss.length) sarBtn.classList.toggle('lit', !!ss[0].sar);
     const elpBtn = asb.querySelector('.elp'), es = ns.filter(n => n.t === 'curve'); elpBtn.style.display = es.length ? '' : 'none'; if (es.length) { elpBtn.querySelector('span').textContent = es[0].elp ? 'Disable Ending Line Pins' : 'Enable Ending Line Pins'; elpBtn.classList.toggle('lit', !!es[0].elp); }
     const hldBtn = asb.querySelector('.hld'), hs = ns.filter(n => n.t === 'ui' || n.t === 'key'); hldBtn.style.display = hs.length ? '' : 'none'; if (hs.length) { hldBtn.querySelector('span').textContent = hs[0].hold ? 'Disable Holding' : 'Allow Holding'; hldBtn.classList.toggle('lit', !!hs[0].hold); }
     const mvBtn = asb.querySelector('.mvm'); mvBtn.style.display = movs.length ? '' : 'none'; if (movs.length) mvBtn.querySelector('span').textContent = movs[0].mvs ? 'Multi-Pin Mode' : 'Single-Pin Mode';
@@ -3236,6 +3272,7 @@ $('#copy').addEventListener('click', async () => {
   asb.querySelector('.dup').addEventListener('click', dupSel);
   const selOf = t => selNodes().filter(n => n.t === t);
   asb.querySelector('.mtg').addEventListener('click', e => { e.stopPropagation(); const ms = selOf('matrix'); if (!ms.length) return; const to = ms[0].mtg ? 0 : 1; ms.forEach(n => { n.mtg = to; }); save(); placeBar(); });
+  asb.querySelector('.sar').addEventListener('click', e => { e.stopPropagation(); const ss = selNodes().filter(n => n.t === 'curve'); if (!ss.length) return; const to = ss[0].sar ? 0 : 1; ss.forEach(n => { n.sar = to; cvDraw(n); }); save(); syncNodes(); drawWires(); placeBar(); });
   asb.querySelector('.elp').addEventListener('click', e => { e.stopPropagation(); const es = selNodes().filter(n => n.t === 'curve'); if (!es.length) return; const to = es[0].elp ? 0 : 1; es.forEach(n => { n.elp = to; }); save(); syncNodes(); drawWires(); placeBar(); });
   asb.querySelector('.hld').addEventListener('click', e => { e.stopPropagation(); const hs = selNodes().filter(n => n.t === 'ui' || n.t === 'key'); if (!hs.length) return; const to = hs[0].hold ? 0 : 1; hs.forEach(n => { n.hold = to; }); save(); placeBar(); });
   asb.querySelector('.rot').addEventListener('click', e => { e.stopPropagation(); const ms = selOf('mover'); if (!ms.length) return; const to = ms[0].mvr ? 0 : 1; ms.forEach(n => { n.mvr = to; }); save(); drawWires(); placeBar(); });
@@ -3295,8 +3332,15 @@ $('#copy').addEventListener('click', async () => {
   /* dynamic wires: a wire runs as its normal loose curve, but if that curve would cross a node it is re-routed around the nodes in the way.
      All routing happens in board (world) space and is only converted to the screen when the path is written, so zooming and panning
      transform a route exactly (no recomputation, no jitter). */
+  const pinOut = new Map();                                       // how far a node's pins stick out past its edges (top / bottom / left / right), so wires keep clear of them too
+  function pinReach(n, el) {
+    const k = n.id + ':' + el.offsetWidth + 'x' + el.offsetHeight + ':' + el.children.length, c = pinOut.get(n.id); if (c && c.k === k) return c;
+    const W = el.offsetWidth, H = el.offsetHeight; let t = 0, b = 0, l = 0, r = 0;
+    el.querySelectorAll('.ip, .port').forEach(p => { if (p.offsetParent !== el) return; const y = p.offsetTop, x = p.offsetLeft; t = Math.max(t, -y); b = Math.max(b, y + p.offsetHeight - H); l = Math.max(l, -x); r = Math.max(r, x + p.offsetWidth - W); });
+    const o = { k, t, b, l, r }; pinOut.set(n.id, o); return o;
+  }
   function nodeRects() {
-    return auto.nodes.map(n => { const el = nodeEls[n.id]; return el ? { x: parseFloat(el.style.left), y: parseFloat(el.style.top), w: el.offsetWidth, h: el.offsetHeight } : null; }).filter(Boolean);
+    return auto.nodes.map(n => { const el = nodeEls[n.id]; if (!el) return null; const p = pinReach(n, el); return { x: parseFloat(el.style.left) - p.l, y: parseFloat(el.style.top) - p.t, w: el.offsetWidth + p.l + p.r, h: el.offsetHeight + p.t + p.b }; }).filter(Boolean);
   }
   let wst = new Map(), wstNext = new Map(), wLast = 0, wKick = 0, wEase = 1, wBusy = false;
   const resample = (P, n) => {                                    // the same polyline with n points spaced evenly along its length
@@ -3322,6 +3366,7 @@ $('#copy').addEventListener('click', async () => {
     let hit = false;
     for (let i = 1; i < 24 && !hit; i++) {
       const t = i / 24, u = 1 - t, x = u * u * u * aw[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * bw[0], y = u * u * u * aw[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * bw[1];
+      if (Math.hypot(x - aw[0], y - aw[1]) < 16 || Math.hypot(x - bw[0], y - bw[1]) < 16) continue;      // right next to its own pins (which stick out of the node) is not a collision
       hit = rects.some(r => x > r.x - pad && x < r.x + r.w + pad && y > r.y - pad && y < r.y + r.h + pad);
     }
     if (!hit) return null;
@@ -3438,7 +3483,7 @@ $('#copy').addEventListener('click', async () => {
     addDef('<linearGradient id="lg' + i + '" gradientUnits="userSpaceOnUse" x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '"><stop offset="0" stop-color="' + c1 + '"/><stop offset="1" stop-color="' + c2 + '"/></linearGradient>');
     return 'url(#lg' + i + ')';
   }
-  function badLink(l) { const t = nodeById(l[1]); return !!t && ((t.t === 'curve' && (l[2] === 18 || l[2] === 19) && !t.elp) || (t.t === 'loop' && l[2] === 2 && t.lm === 'forever') || (t.t === 'if' && l[2] === 1 && t.im === 'text')); }
+  function badLink(l) { const t = nodeById(l[1]); return !!t && ((t.t === 'curve' && (((l[2] === 18 || l[2] === 19) && !t.elp) || (l[2] === 20 && t.sar))) || (t.t === 'loop' && l[2] === 2 && t.lm === 'forever') || (t.t === 'if' && l[2] === 1 && t.im === 'text')); }
   new ResizeObserver(drawWires).observe(acanvas);
   mlist.addEventListener('scroll', drawWires);
   awires.addEventListener('click', e => { const g = e.target.closest('.wg'); if (!g) return; auto.links.splice(+g.dataset.n, 1); save(); toast('Disconnected'); });
@@ -3700,9 +3745,10 @@ $('#copy').addEventListener('click', async () => {
   const cycT = new Set(), heldCue = {};
   setInterval(() => {                                      // Grapher: the blue line sweeps left to right, and the curve's height under it is the value
     auto.nodes.forEach(n => {
-      if (n.t !== 'curve') return; const r = cvRun[n.id]; if (!r || !r.on) return;
+      if (n.t !== 'curve') return; const r = cvRun[n.id]; if (!r) return; r.end = cvT(n);
+      if (r.paused) { r.x = Math.min(r.end, r.pos); r.y = cvY(n.cv, r.x); return; } if (!r.on) return;
       r.x = Math.min(r.end, (performance.now() - r.t0) / 1000); r.y = cvY(n.cv, r.x);
-      if (r.x >= r.end) { r.on = false; cvDraw(n); emit(n.id, new Set([n.id]), blank()); }
+      if (r.x >= r.end) { r.on = false; r.paused = false; cvDraw(n); emit(n.id, new Set([n.id]), blank(), 1); }      // the red Done pin fires when the line reaches the end
     });
   }, 33);
   setInterval(() => {                                      // value mode: while open, whenever the value coming in changes it is passed on
@@ -3720,7 +3766,7 @@ $('#copy').addEventListener('click', async () => {
     if (n.t === 'curve' && [10, 11, 12, 17].includes(p)) return;
     if (n.t !== 'curve' && VP[n.t] !== undefined && p >= VP[n.t]) return;     // those pins carry values, not signals
     if (n.t === 'cgate' && p >= 2) return;
-    if (n.t === 'curve') { flash(to); if (p === 18 || p === 19) { if (n.elp) { n.ct = Math.max(0, Math.min(1e4, +((n.ct || 0) + (p === 18 ? 1 : -1)).toFixed(4))); save(); syncNodes(); cvDraw(); } } else if (p === 9) { cvStart(n); cvRun[n.id].on = true; cvDraw(n); } else curveSig(n, p); return; }                   // the two orange pins only pick modes
+    if (n.t === 'curve') { flash(to); if (p === 18 || p === 19) { if (n.elp) { n.ct = Math.max(0, Math.min(1e4, +((n.ct || 0) + (p === 18 ? 1 : -1)).toFixed(4))); save(); syncNodes(); cvDraw(); } } else if (p === 9) cvRunPin(n); else if (p === 20) cvRestart(n); else curveSig(n, p); return; }                   // the two orange pins only pick modes
     flash(to);
     if (n.t === 'cgate') {
       const g = gs(to);
@@ -3796,7 +3842,7 @@ $('#copy').addEventListener('click', async () => {
     if (srcs.length && st.miss && !st.played && !st.stopped && !st.delayed) toast('That cue has no audio file yet');
     const row = only ? null : minner.querySelector('.mrow[data-id="' + b.id + '"]'); if (row) { row.classList.remove('ran'); void row.offsetWidth; row.classList.add('ran'); }
   }
-  const VPIN = { curve: [[10, '.cvm', cvM], [12, '.cvt', cvT], [17, '.cvq', cvS]], loop: [[2, '.lc', n => loopTotal(n)], [3, '.lt', lEvery]], counter: [[2, '.ni', cN]], wait: [[1, '.ni', wSec]], if: [[1, n => n.im === 'text' ? '.tx' : '.ik', n => n.im === 'text' ? null : ifK(n)], [4, '.nm', null]], number: [[1, '.ni', numV]], mvset: [[1, '.ni', n => mvV(n)]], print: [[1, '.pt', null]], random: [[1, '.rmin', n => rRange(n)[0]], [2, '.rmax', n => rRange(n)[1]]] };
+  const VPIN = { curve: [[10, '.cvm', cvM], [11, '.cvr', cvR], [12, '.cvt', cvT], [17, '.cvq', cvS]], loop: [[2, '.lc', n => loopTotal(n)], [3, '.lt', lEvery]], counter: [[2, '.ni', cN]], wait: [[1, '.ni', wSec]], if: [[1, n => n.im === 'text' ? '.tx' : '.ik', n => n.im === 'text' ? null : ifK(n)], [4, '.nm', null]], number: [[1, '.ni', numV]], mvset: [[1, '.ni', n => mvV(n)]], print: [[1, '.pt', null]], random: [[1, '.rmin', n => rRange(n)[0]], [2, '.rmax', n => rRange(n)[1]]] };
   const rgbVal = n => [0, 1, 2].map(i => { const l = inputsL(n.id, i)[0]; return Math.max(0, Math.min(255, Math.round(l ? +numOf(l[0], new Set([n.id]), l[3]) || 0 : n['c' + 'rgb'[i]] || 0))); });
   let lightRaf = 0;
   function lightTick() {
@@ -3905,7 +3951,7 @@ $('#copy').addEventListener('click', async () => {
   }
   function stopEverything() {
     cycT.forEach(clearTimeout); cycT.clear(); auto.nodes.forEach(n => clearWaits(n.id));
-    Object.keys(heldCue).forEach(k => delete heldCue[k]); Object.keys(gst).forEach(k => { gst[k].open = false; gst[k].ls = 0; }); Object.keys(cvRun).forEach(k => { cvRun[k].on = false; const cn = nodeById(k); if (cn) cvDraw(cn); });
+    Object.keys(heldCue).forEach(k => delete heldCue[k]); Object.keys(gst).forEach(k => { gst[k].open = false; gst[k].ls = 0; }); Object.keys(cvRun).forEach(k => { cvRun[k].on = false; cvRun[k].paused = false; const cn = nodeById(k); if (cn) cvDraw(cn); });
     Object.keys(players).forEach(id => { const p = players[id], it = get(id); try { p.pause(); p.currentTime = (it && it.trimStart) || 0; } catch (e) {} if (it) updateSeek(it); });
     auto.nodes.forEach(n => { if (n.pend) n.pend = 0; const el = nodeEls[n.id]; if (el) el.classList.remove('waiting'); });
     toast('Stopped everything');
@@ -3975,7 +4021,7 @@ $('#copy').addEventListener('click', async () => {
   /* what's new: edit this list when something ships (newest first) */
   const CHANGES = [
     { id: '2026-11-09', date: '9 Nov 2026', title: 'Polish and Toggle Mode', groups: [
-      ['New', ['Output button next to Copy save: choose which speaker or headphones the board plays through (Chrome and Edge on a computer). ', 'New [[Grapher]] (Beta) node: a curve editor you control with signals. Curved points are squares and straight ones circles (filled when selected); move points up, down, left and right, turn their handles and push them further or closer, and everything glides smoothly. The graph runs in seconds: Run Graph plays a blue line from 0s to the dark blue Stop Line (set its time in seconds) in real time, and the height of the curve under it comes out of the Value pin. Drag empty space to pan, Ctrl + scroll to zoom; the guide numbers follow. Right-click it and pick Enable Ending Line Pins to use the +1s / -1s pins that move the Stop Line. ', 'New [[Gate]] node: lets signals and changing values through only while it is open. The blue pin opens it (Toggle Mode flips it open / shut, Hold Mode keeps it open while the pin is held), and the two orange pins pick Value Mode (repeats the value coming in whenever it changes) or Signal Mode (repeats signals). ', '[[UI Button]] and [[Button Input]] nodes have an Allow Holding option in their selection bar: hold the button (or its key) and it keeps sending signals until you let go. ', '[[Audio]] has a red Restart pin (rewinds the sound to the beginning and stops it) and its Stop pin is now Pause: it holds the sound where it is, and Play carries on from there. Volume and pitch pins moved down one, old saves are updated for you', '[[LOOP]]: a signal into Break stops the loop without sending anything out of Done (Done only fires when the loop finishes)', 'Loops: a wire may now lead back to a node it already passed (even to its own input), and the signal goes round again a moment later, so loops keep running', 'A small red Stop everything button at the bottom-left of the node editor stops every sound, wait and loop at once', '[[Counter]] has a Reset pin on top: a signal into it sets the count back to 0. Old saves keep working, a wire into the count pin moves to its new place at the bottom', '[[LED Matrix]] Toggle Mode (on its bar): a signal at an LED that is already on turns it off. It fires once per signal, so one signal can\'t flip an LED on and straight back off', 'The Mover\'s rotate button moved from the node to the bar above the selection']],
+      ['New', ['Output button next to Copy save: choose which speaker or headphones the board plays through (Chrome and Edge on a computer). ', 'New [[Grapher]] (Beta) node: a curve editor you control with signals. Curved points are squares and straight ones circles (filled when selected); move points up, down, left and right, turn their handles and push them further or closer, and everything glides smoothly. The graph runs in seconds: Run Graph plays a blue line from 0s to the dark blue Stop Line (set its time in seconds) in real time, and the height of the curve under it comes out of the Value pin. Drag empty space to pan, Ctrl + scroll to zoom; the guide numbers follow. Right-click it and pick Enable Ending Line Pins to use the +1s / -1s pins that move the Stop Line. Run Graph plays and pauses (it reads Pause Graph while playing) and Restart jumps back to 0s; turn on Semi-Auto Repeat from the right-click menu to make every Run signal start again from 0 instead. ', 'New [[Gate]] node: lets signals and changing values through only while it is open. The blue pin opens it (Toggle Mode flips it open / shut, Hold Mode keeps it open while the pin is held), and the two orange pins pick Value Mode (repeats the value coming in whenever it changes) or Signal Mode (repeats signals). ', '[[UI Button]] and [[Button Input]] nodes have an Allow Holding option in their selection bar: hold the button (or its key) and it keeps sending signals until you let go. ', '[[Audio]] has a red Restart pin (rewinds the sound to the beginning and stops it) and its Stop pin is now Pause: it holds the sound where it is, and Play carries on from there. Volume and pitch pins moved down one, old saves are updated for you', '[[LOOP]]: a signal into Break stops the loop without sending anything out of Done (Done only fires when the loop finishes)', 'Loops: a wire may now lead back to a node it already passed (even to its own input), and the signal goes round again a moment later, so loops keep running', 'A small red Stop everything button at the bottom-left of the node editor stops every sound, wait and loop at once', '[[Counter]] has a Reset pin on top: a signal into it sets the count back to 0. Old saves keep working, a wire into the count pin moves to its new place at the bottom', '[[LED Matrix]] Toggle Mode (on its bar): a signal at an LED that is already on turns it off. It fires once per signal, so one signal can\'t flip an LED on and straight back off', 'The Mover\'s rotate button moved from the node to the bar above the selection']],
       ['Look and feel', ['A motion blur button above the sun / moon: things blur in the direction they move. A green dot shows when it is on, and it remembers your choice', 'The sun / moon button moved to the bottom-right and animates: the sun sucks in its rays and curls into the moon, and back the other way, always turning clockwise', 'Switching theme fades the whole board, the dotted grid and every panel instead of snapping', 'The reset-view button is a glass button with a white icon, in light and dark', 'Dialogs (What\'s new, Edit length, sharing, naming) follow the dark theme', 'The theme button sits behind everything else, so it never covers the node editor or menus', 'The icon picker no longer clips the corner of the "None" tile and the tile edges', 'The [[Mover]] pin-mode button now reads "Single-Pin Mode" / "Multi-Pin Mode"']],
       ['Live sharing', ['Cursors follow the page each person has open: if I open a page, people on the board go behind it; if we both have the same page open I see their cursor on it; if they have a page open and I don\'t, I can\'t see it']],
       ['Changelog', ['This list now covers every change so far, and the newest entry is marked (latest)']]
