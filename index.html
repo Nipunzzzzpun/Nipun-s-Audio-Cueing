@@ -197,13 +197,19 @@
   .bar .step svg { width: 12px; height: 12px; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
   .bar .swatch { width: 34px; padding: 0; display: grid; place-items: center; margin-right: 4px; }
   .bar .swatch i { width: 20px; height: 20px; border-radius: 7px; border: 2px solid rgba(255,255,255,.85); background: var(--c, #111); transition: background .25s ease; }
+  .bar .seg { display: flex; gap: 2px; padding: 2px; margin-right: 4px; border-radius: 12px; background: rgba(0,0,0,.35); }
+  .bar .seg button { width: 30px; height: 30px; padding: 0; border-radius: 9px; background: none; display: grid; place-items: center; }
+  .bar .seg button:hover { background: rgba(255,255,255,.14); }
+  .bar .seg button.on { background: #fff; } .bar .seg button.on svg { stroke: #000; }
+  .bar .seg svg { width: 17px; height: 17px; fill: none; stroke: #fff; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; transition: stroke .2s; }
   .bar .sep { width: 1px; height: 22px; background: rgba(255,255,255,.25); margin: 0 6px 0 2px; flex: none; }
   .bar .danger:hover { background: #b3261e; }
   .bar .txt, .bar .img {
     display: flex; align-items: center; max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap; pointer-events: none;
     transition: max-width .45s var(--ease), opacity .3s ease;
   }
-  .bar.is-text .txt { max-width: 460px; opacity: 1; pointer-events: auto; }
+  .bar.is-text .txt { max-width: 720px; opacity: 1; pointer-events: auto; }
+  .bar .txt > *, .bar .img > * { flex: none; }
   .bar.is-image .img { max-width: 220px; opacity: 1; pointer-events: auto; }
 
   /* ---------- popovers: font list + colour picker ---------- */
@@ -545,7 +551,8 @@
   .anode.t-curve .cvl .ni { width: 90px; text-align: center; }
   .anode.t-curve .ip { left: 0; margin: -8px 0 0 -8px; }
   .anode.t-curve .ip[data-p="10"], .anode.t-curve .ip[data-p="11"], .anode.t-curve .ip[data-p="12"] { top: 100%; }
-  .anode.t-curve .port { top: 411px; margin-top: -8px; } .anode.t-curve .port[data-o="1"] { top: 443px; }
+  .anode.t-curve .port { top: 530px; margin-top: -8px; } .anode.t-curve .port[data-o="1"] { top: 556px; } .anode.t-curve .port[data-o="2"] { top: 582px; }
+  .anode.t-curve .cpo { position: absolute; right: 22px; margin-top: -7px; font: 600 10.5px 'Montserrat', sans-serif; color: rgba(255,255,255,.55); white-space: nowrap; pointer-events: none; }
   .anode.t-curve .cvv { position: absolute; right: 24px; top: 352px; width: 310px; height: 150px; border-radius: 20px; background: #1c1c1c; display: grid; place-items: center; }
   .anode.t-curve .cvv b { font: 400 46px 'Major Mono Display', monospace; color: #fff; letter-spacing: -.02em; }
   .anode.t-curve .cvb { position: absolute; right: 34px; top: 30px; display: flex; gap: 2px; z-index: 1; }
@@ -559,6 +566,7 @@
   .anode.t-curve .cvd i { font: 500 15px 'Montserrat', sans-serif; font-style: normal; color: #fff; min-width: 18px; text-align: center; }
   .anode.t-curve .cvv span { position: absolute; right: 26px; bottom: 16px; font: 500 12.5px 'Montserrat', sans-serif; color: rgba(255,255,255,.6); }
   .anode.t-curve .cvs .gn { fill: rgba(255,255,255,.38); font: 600 10.5px 'Montserrat', sans-serif; pointer-events: none; }
+  svg.gi { display: inline-block; width: 15px; height: 15px; fill: currentColor; stroke: none; vertical-align: -3px; }
   .anode.t-cgate.gopen { box-shadow: 0 0 0 2px rgba(90,120,255,.55); }
   .anode.t-print .ip[data-p="1"] { top: 100%; margin: -8px 0 0 -8px; }
   .anode.t-print .ni.pt { width: 150px; text-align: left; padding: 0 12px; }
@@ -859,6 +867,7 @@
         <button data-d="-1" aria-label="Smaller" tabindex="-1"><svg viewBox="0 0 24 24"><polyline points="6,9 12,15 18,9"/></svg></button>
       </div></div>
     <button class="swatch" id="colorBtn" title="Colour"><i></i></button>
+    <span class="seg" id="taSeg" title="Line up the text"><button data-ta="left" title="Align left" aria-label="Align left"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 10h10M4 14h16M4 18h10"/></svg></button><button data-ta="center" title="Align center" aria-label="Align center"><svg viewBox="0 0 24 24"><path d="M4 6h16M7 10h10M4 14h16M7 18h10"/></svg></button><button data-ta="right" title="Align right" aria-label="Align right"><svg viewBox="0 0 24 24"><path d="M4 6h16M10 10h10M4 14h16M10 18h10"/></svg></button></span><span class="seg" id="vaSeg" title="Which way the box grows when the text gets longer"><button data-va="top" title="Anchor top" aria-label="Anchor top"><svg viewBox="0 0 24 24"><path d="M5 4h14M12 20V9M8.5 12.5 12 9l3.5 3.5"/></svg></button><button data-va="middle" title="Anchor middle" aria-label="Anchor middle"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 3v5.5M9.5 6 12 8.5 14.5 6M12 21v-5.5M9.5 18 12 15.5l2.5 2.5"/></svg></button><button data-va="bottom" title="Anchor bottom" aria-label="Anchor bottom"><svg viewBox="0 0 24 24"><path d="M5 20h14M12 4v11M8.5 11.5 12 15l3.5-3.5"/></svg></button></span>
     <span class="sep"></span>
   </div>
   <div class="img"><button id="replace">Replace image</button><span class="sep"></span></div>
@@ -1033,7 +1042,7 @@
     audio: { w: 200, h: 66, name: 'Audio Name', src: '', loop: false, trimStart: 0, trimEnd: 0, speed: 1, keepPitch: true },
     image: { w: 260, h: 190, src: '' },
     button: { w: 160, h: 36, name: 'Button', key: '', ic: '', ib: '#ffffff', sq: true },
-    text:  { w: 280, h: 40, html: 'Text', font: 'Montserrat', fs: 32, color: '#111111', bold: false, italic: false }
+    text:  { w: 280, h: 40, html: 'Text', font: 'Montserrat', fs: 32, color: '#111111', bold: false, italic: false, ta: 'left', va: 'top' }
   };
   const SAFE_SRC = /^data:((image|audio)\/[a-z0-9.+-]+|application\/octet-stream);base64,/i;
   const ubHeld = new Set(); let ubBind = null;
@@ -1159,6 +1168,7 @@
       if (typeof raw.font === 'string') it.font = raw.font.slice(0, 40);
       if (/^#[0-9a-f]{6}$/i.test(raw.color)) it.color = raw.color;
       it.bold = !!raw.bold; it.italic = !!raw.italic;
+      it.ta = ['left', 'center', 'right'].includes(raw.ta) ? raw.ta : 'left'; it.va = ['top', 'middle', 'bottom'].includes(raw.va) ? raw.va : 'top';
     }
     return it;
   }
@@ -1392,6 +1402,12 @@
     el.style.width = it.w + 'px';
     const c = document.createElement('div'); c.className = 'content'; c.innerHTML = it.html;
     el.appendChild(c); styleText(it, el);
+    /* vertical anchor: when the text gets taller or shorter, the box grows down (top), both ways (middle) or up (bottom) */
+    let lastH = 0; new ResizeObserver(() => {
+      const h = el.offsetHeight; if (!h) return; const d = lastH ? h - lastH : 0; lastH = h;
+      if (!d || !it.va || it.va === 'top' || selId !== it.id) return;
+      it.y = Math.round(it.y - (it.va === 'bottom' ? d : d / 2)); position(it, el); syncSel(); clearTimeout(el._vat); el._vat = setTimeout(save, 300);
+    }).observe(el);
     c.addEventListener('blur', () => { it.html = clean(c.innerHTML) || 'Text'; c.contentEditable = 'false'; editingId = null; save(); });
     c.addEventListener('input', () => { it.html = c.innerHTML; syncSel(); netLive(); });
     c.addEventListener('keydown', e => { if (e.key === 'Escape') c.blur(); e.stopPropagation(); });
@@ -1400,7 +1416,7 @@
   function styleText(it, el) {
     const c = el.querySelector('.content');
     c.style.fontFamily = fam(it.font); c.style.fontSize = it.fs + 'px'; c.style.color = darkOn && /^#111111$/i.test(it.color) ? '#f2f2f2' : it.color;      // the default black text turns white on the dark board
-    c.style.fontWeight = it.bold ? 700 : 400; c.style.fontStyle = it.italic ? 'italic' : 'normal';
+    c.style.fontWeight = it.bold ? 700 : 400; c.style.fontStyle = it.italic ? 'italic' : 'normal'; c.style.textAlign = it.ta || 'left';
     el.style.width = it.w + 'px';
   }
   function startEdit(id, selectAll) {
@@ -1778,8 +1794,18 @@
     cbtn.style.setProperty('--c', it.color);
     bar.querySelector('.b').classList.toggle('on', !!it.bold);
     bar.querySelector('.i').classList.toggle('on', !!it.italic);
+    bar.querySelectorAll('[data-ta]').forEach(b => b.classList.toggle('on', b.dataset.ta === (it.ta || 'left')));
+    bar.querySelectorAll('[data-va]').forEach(b => b.classList.toggle('on', b.dataset.va === (it.va || 'top')));
     fmenu.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.font === it.font));
   }
+  bar.querySelectorAll('[data-ta], [data-va]').forEach(b => {
+    b.addEventListener('mousedown', e => e.preventDefault());
+    b.addEventListener('click', () => {
+      const it = get(selId); if (!it || it.type !== 'text') return;
+      if (b.dataset.ta) { it.ta = b.dataset.ta; styleText(it, els[it.id]); } else it.va = b.dataset.va;
+      syncBar(it); save(); syncSel();
+    });
+  });
   bar.querySelectorAll('[data-cmd]').forEach(b => {
     b.addEventListener('mousedown', e => e.preventDefault());
     b.addEventListener('click', () => {
@@ -2371,7 +2397,7 @@ $('#copy').addEventListener('click', async () => {
   const autoDock = $('#autoDock'), acanvas = $('#acanvas'), aworld = $('#aworld'), awires = $('#awires'), amaps = $('#amaps'), mlist = $('#mlist'), minner = $('#minner'), azp = $('#azp'), autoin = autoDock.querySelector('.autoin');
   const RY0 = 24, RPITCH = 46, GAPX = 0, MAXB = 200, PURPLE = '#e0a8f0', VALC = 'cornflowerblue', STOPC = '#ff9a9a', DARK = '#3d3d3d';
   const SPEC = {
-    cgate: { ins: 4, out: true, multiPins: [0, 1] }, curve: { ins: 21, out: true, outs: 2, multiPins: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 16, 18, 19, 20] }, audio: { ins: 6, out: true, multi: true }, value: { ins: 5, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, ui: { ins: 0, out: true }, counter: { ins: 3, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
+    cgate: { ins: 4, out: true, multiPins: [0, 1] }, curve: { ins: 21, out: true, outs: 3, multiPins: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 16, 18, 19, 20] }, audio: { ins: 6, out: true, multi: true }, value: { ins: 5, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, ui: { ins: 0, out: true }, counter: { ins: 3, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
     and: { ins: 2, out: true, multi: true, gate: true }, or: { ins: 2, out: true, multi: true, gate: true }, nor: { ins: 2, out: true, multi: true, gate: true },
     xor: { ins: 2, out: true, multi: true, gate: true }, xand: { ins: 2, out: true, multi: true, gate: true },
     if: { ins: 5, out: true, multi: true }, prop: { ins: 1, out: true, multi: true }, loop: { ins: 5, out: true, outs: 2, multi: true }, random: { ins: 3, out: true, multi: true }, print: { ins: 2, out: true, multi: true }, light: { ins: 1, out: false, multi: true }, rgb: { ins: 3, out: true, multi: true }, matrix: { ins: 34, out: false, multi: true }, mover: { ins: 18, out: true, outs: 16, multi: true }, mvset: { ins: 2, out: true, outs: 2, multi: true }, split: { ins: 1, out: true, outs: 1, multi: true }
@@ -2521,6 +2547,8 @@ $('#copy').addEventListener('click', async () => {
   const cvRd = n => Math.max(0, Math.min(5, n.rd | 0));
   const cvVal = n => { const r = cvRun[n.id], v = r ? r.y : 0; return +v.toFixed(cvRd(n)); };      // rounded to the digits picked under the value
   function cvStart(n) { cvRun[n.id] = { t0: performance.now(), x: 0, end: cvT(n), y: cvY(n.cv, 0), on: true, paused: false, pos: 0 }; }      // plays from 0s to the stop line, in real time
+  const cvPrev = {};                                        // Change pin: fires whenever the (rounded) value coming out is different from last time
+  function cvChange(n) { const v = cvVal(n); if (cvPrev[n.id] === undefined) { cvPrev[n.id] = v; return; } if (cvPrev[n.id] !== v) { cvPrev[n.id] = v; emit(n.id, new Set([n.id]), blank(), 2); } }
   function cvRunPin(n) {                                    // Semi-Auto Repeat: every signal starts again from 0. Otherwise the pin plays / pauses / resumes
     const r = cvRun[n.id], now = performance.now();
     if (n.sar || !r || (!r.on && !r.paused)) cvStart(n);
@@ -2534,6 +2562,7 @@ $('#copy').addEventListener('click', async () => {
     else { if (!r) { cvStart(n); r = cvRun[n.id]; } r.on = false; r.paused = true; r.pos = 0; r.x = 0; r.y = cvY(n.cv, 0); }
     cvDraw(n);
   }
+  const GIC = { value: '<svg class="gi" viewBox="0 0 24 24"><path d="M9,16L8.18,19.27Q8.1,19.6 7.85,19.8T7.25,20q-0.47,0-0.77-0.38T6.3,18.8L7,16H4.28q-0.5,0-0.8-0.39q-0.3-0.39-0.17-0.86Q3.38,14.4 3.65,14.2T4.28,14H7.5l1-4H5.78q-0.5,0-0.8-0.39Q4.68,9.23 4.8,8.75Q4.88,8.4 5.15,8.2T5.78,8H9L9.83,4.72Q9.9,4.4 10.15,4.2T10.75,4q0.48,0 0.78,0.38T11.7,5.2L11,8h4l0.83-3.28Q15.9,4.4 16.15,4.2T16.75,4q0.48,0 0.78,0.38T17.7,5.2L17,8h2.73q0.5,0 0.8,0.39T20.7,9.25Q20.63,9.6 20.35,9.8T19.73,10H16.5l-1,4h2.73q0.5,0 0.8,0.39q0.3,0.39 0.18,0.86q-0.08,0.35-0.35,0.55T18.23,16H15l-0.82,3.27Q14.1,19.6 13.85,19.8T13.25,20q-0.47,0-0.77-0.38T12.3,18.8L13,16H9Zm0.5-2h4l1-4h-4l-1,4Z"/></svg>', signal: '<svg class="gi" viewBox="0 0 24 24"><path d="M5,21q-0.42,0-0.71-0.29Q4,20.43 4,20V19q-0.27-0.27-0.64-0.44T3,18V15q0-0.43 0.29-0.71T4,14H5V7Q5,5.35 6.18,4.17T9,3t2.83,1.17T13,7V17q0,0.82 0.59,1.41T15,19t1.41-0.59T17,17V10H16q-0.42,0-0.71-0.29T15,9V6q0-0.4 0.36-0.56Q15.73,5.27 16,5V4q0-0.43 0.29-0.71T17,3h2q0.43,0 0.71,0.29T20,4V5q0.28,0.27 0.64,0.44T21,6V9q0,0.42-0.29,0.71T20,10H19v7q0,1.65-1.18,2.82T15,21t-2.82-1.18T11,17V7q0-0.82-0.59-1.41T9,5Q8.18,5 7.59,5.59Q7,6.18 7,7v7H8q0.43,0 0.71,0.29T9,15v3q0,0.4-0.36,0.56T8,19v1q0,0.43-0.29,0.71T7,21H5Z"/></svg>', toggle: '<svg class="gi" viewBox="0 0 24 24"><path d="M7,18q-2.5,0-4.25-1.75T1,12T2.75,7.75T7,6H17q2.5,0 4.25,1.75T23,12t-1.75,4.25T17,18H7Zm12.13-3.88Q20,13.25 20,12T19.13,9.88T17,9T14.88,9.88T14,12t0.88,2.13T17,15t2.13-0.88Z"/></svg>', hold: '<svg class="gi" viewBox="0 0 24 24"><path d="M8.48,0q2.5,0 4.25,1.75T14.48,6q0,0.63-0.13,1.21T13.98,8.38q-0.13,0.27-0.39,0.35T13.05,8.67T12.66,8.25t0.01-0.63q0.15-0.4 0.22-0.8T12.98,6q0-1.88-1.31-3.19T8.48,1.5T5.29,2.81T3.98,6q0,0.43 0.06,0.84T4.25,7.63Q4.38,7.95 4.26,8.25T3.88,8.67T3.34,8.71Q3.08,8.63 2.95,8.35Q2.73,7.8 2.6,7.21Q2.48,6.63 2.48,6q0-2.5 1.75-4.25T8.48,0Zm0,2.5q1.45,0 2.48,1.02T11.98,6q0,0.25-0.04,0.47T11.85,6.93q-0.1,0.32-0.38,0.47T10.9,7.45T10.44,7.07Q10.28,6.8 10.38,6.5Q10.4,6.43 10.45,6q0-0.82-0.59-1.41T8.45,4T7.04,4.57T6.45,6q0,0.13 0.01,0.26T6.53,6.52Q6.6,6.82 6.45,7.07T6,7.4T5.44,7.32T5.08,6.88Q5.03,6.7 5,6.49Q4.98,6.27 4.98,6Q4.98,4.52 6,3.51T8.48,2.5Zm2,19.5q-0.7,0-1.31-0.3T8.13,20.85L3.1,14.48q-0.2-0.22-0.17-0.54t0.23-0.51q0.5-0.53 1.2-0.63t1.3,0.28L7.5,14.2V6q0-0.43 0.29-0.71T8.5,5Q8.93,5 9.23,5.29Q9.53,5.57 9.53,6v5H17q1.25,0 2.13,0.88T20,14v4q0,1.65-1.18,2.82T16,22H10.48Z"/></svg>' };      // Google icons for the Gate modes
   const gst = {};
   const gs = id => gst[id] || (gst[id] = { open: false, ls: 0, v: 0, was: false });
   const gOpen = n => { const s = gs(n.id); return n.bm === 'hold' ? performance.now() - s.ls < 300 : !!s.open; };      // Hold Mode: open while signals keep coming (a source with Allow Holding), otherwise only a moment
@@ -2546,7 +2575,7 @@ $('#copy').addEventListener('click', async () => {
   /* property pins: a node's mode (VALUE's Add, IF's comparison, LOOP's until / forever) can be set by a wire. A Property node picks the mode; a plain number picks by position (0 = first option) */
   const PROPC = '#ffc15e';
   const PROPS = [...VMODES.map(m => ({ id: m[0], label: 'VALUE: ' + m[1], sm: m[2], short: m[1] })), ...OPS.map(o => ({ id: o[0], label: 'IF: ' + o[1], sm: o[0], short: o[1] })), ...TOPS.map(o => ({ id: o[0], label: 'IF text: ' + o[1], sm: o[2], short: o[1] })),
-    { id: 'value', label: 'IF: compare a Value', sm: '#', short: 'Value' }, { id: 'text', label: 'IF: compare Text', sm: 'Aa', short: 'Text' }, { id: 'gvalue', label: 'GATE: Value Mode', sm: '#', short: 'Value' }, { id: 'gsignal', label: 'GATE: Signal Mode', sm: '~', short: 'Signal' }, { id: 'gtoggle', label: 'GATE: Toggle Mode', sm: '⇄', short: 'Toggle' }, { id: 'ghold', label: 'GATE: Hold Mode', sm: '●', short: 'Hold' },
+    { id: 'value', label: 'IF: compare a Value', sm: '#', short: 'Value' }, { id: 'text', label: 'IF: compare Text', sm: 'Aa', short: 'Text' }, { id: 'gvalue', label: 'GATE: Value Mode', get sm() { return GIC.value; }, short: 'Value' }, { id: 'gsignal', label: 'GATE: Signal Mode', get sm() { return GIC.signal; }, short: 'Signal' }, { id: 'gtoggle', label: 'GATE: Toggle Mode', get sm() { return GIC.toggle; }, short: 'Toggle' }, { id: 'ghold', label: 'GATE: Hold Mode', get sm() { return GIC.hold; }, short: 'Hold' },
     { id: 'until', label: 'LOOP: until', sm: '↻', short: 'Until' }, { id: 'forever', label: 'LOOP: forever', sm: '∞', short: 'Forever' }];
   const PPIN = { cgate: [[2, '.rm'], [3, '.bm']], value: [[4, '.vm']], loop: [[4, '.lm']], if: [[2, '.op'], [3, '.im']] };       // [pin, the chip it sits under]
   const OPTFOR = { value: VMODES.map(m => m[0]), loop: ['until', 'forever'], if: [...OPS.map(o => o[0]), ...TOPS.map(o => o[0]), 'value', 'text'] };
@@ -2643,7 +2672,7 @@ $('#copy').addEventListener('click', async () => {
           const from = out.nodes.find(n => n.id === l[0]); if (!SPEC[from.t].out) return;
           const tn = out.nodes.find(n => n.id === l[1]), tb = out.btns.some(b => b.id === l[1]), p = l[2] | 0;
           if (!tn || p < 0 || p >= insOf(tn)) return;
-          const fp = from.t === 'mover' ? Math.max(0, Math.min(from.mvw - 1, l[3] | 0)) : from.t === 'split' ? Math.max(0, Math.min(from.so - 1, l[3] | 0)) : (from.t === 'audio' || from.t === 'loop' || from.t === 'mvset') && l[3] === 1 ? 1 : 0, k = l[0] + l[1] + p + fp; if (seen.has(k)) return; seen.add(k); out.links.push([l[0], l[1], p, fp]);
+          const fp = from.t === 'mover' ? Math.max(0, Math.min(from.mvw - 1, l[3] | 0)) : from.t === 'split' ? Math.max(0, Math.min(from.so - 1, l[3] | 0)) : from.t === 'curve' ? Math.max(0, Math.min(2, l[3] | 0)) : (from.t === 'audio' || from.t === 'loop' || from.t === 'mvset') && l[3] === 1 ? 1 : 0, k = l[0] + l[1] + p + fp; if (seen.has(k)) return; seen.add(k); out.links.push([l[0], l[1], p, fp]);
         });
       }
     }
@@ -2665,7 +2694,8 @@ $('#copy').addEventListener('click', async () => {
   const rowY = i => RY0 + i * RPITCH;
   const RGBPIN = ['#ff5a5a', '#c4ff6a', '#5a78ff'], inDef = (n, p) => n && n.t === 'rgb' ? RGBPIN[p] : n && ((n.t === 'counter' && p === 1) || (n.t === 'audio' && p === 2)) ? '#ff7b7b' : n && n.t === 'cgate' && p === 0 ? VALC : n && n.t === 'curve' && p === 9 ? VALC : n && n.t === 'curve' && p === 20 ? '#ff7b7b' : n && n.t === 'curve' && p < 5 ? ['#ff7a2a', '#6a1bff', '#6a1bff', '#c4ff6a', '#ff5a5a'][p] : isPropPin(n, p) ? PROPC : isValIn(n, p) ? VALC : '';
   const isValSrc = n => n && (n.t === 'number' || n.t === 'value' || n.t === 'curve'), isValIn = (n, p) => n && (n.t === 'curve' ? [10, 11, 12, 17].includes(p) : VP[n.t] !== undefined && p >= VP[n.t]) && VP[n.t] !== undefined && p >= VP[n.t];     // value pins default to cornflower blue
-  const pinColor = (n, k) => (n && n.pc && n.pc[k]) || (k === 'o' ? (n && n.t === 'prop' ? PROPC : isValSrc(n) ? VALC : PURPLE) : k === 'o1' ? (n && (n.t === 'split' || n.t === 'mvset' || n.t === 'mover') ? PURPLE : STOPC) : /^o\d+$/.test(k) ? PURPLE : DARK);
+  const CHGC = '#ffd84a';
+  const pinColor = (n, k) => (n && n.pc && n.pc[k]) || (n && n.t === 'curve' && k === 'o2' ? CHGC : null) || (k === 'o' ? (n && n.t === 'prop' ? PROPC : isValSrc(n) ? VALC : PURPLE) : k === 'o1' ? (n && (n.t === 'split' || n.t === 'mvset' || n.t === 'mover') ? PURPLE : STOPC) : /^o\d+$/.test(k) ? PURPLE : DARK);
   function autoDropCue(id) {
     const gone = auto.nodes.filter(n => n.t === 'audio' && n.cue === id).map(n => n.id);
     if (!gone.length) return;
@@ -2788,7 +2818,7 @@ $('#copy').addEventListener('click', async () => {
     else if (n.t === 'mvset') h += '<span class="ml l">L</span><span class="ml r">R</span><input class="ni nv" type="number" min="0" step="1" title="Which pin the line jumps to (0 is the first). Or wire a number into the bottom pin. Wire L and R to the same Mover&#39;s left and right pins, then send a signal into the top pin">';
     else if (n.t === 'number') h += '<span class="nm">Number</span><input class="ni nv" type="number" step="any" title="A number other nodes can read">';
     else if (n.t === 'curve') {
-      h += '<span class="nm">Grapher</span><div class="cpl"></div><svg class="cvs" viewBox="0 0 310 310"></svg><div class="cvb"><button type="button" class="vfit" title="Fit everything in view"><svg viewBox="0 0 24 24"><path d="M20,8V6H18q-0.43,0-0.71-0.29Q17,5.43 17,5t0.29-0.71T18,4h2q0.83,0 1.41,0.59Q22,5.18 22,6V8q0,0.42-0.29,0.71T21,9T20.29,8.71T20,8ZM2,8V6Q2,5.18 2.59,4.59T4,4H6Q6.43,4 6.71,4.29T7,5T6.71,5.71T6,6H4V8Q4,8.42 3.71,8.71T3,9T2.29,8.71T2,8ZM20,20H18q-0.43,0-0.71-0.29Q17,19.43 17,19t0.29-0.71T18,18h2V16q0-0.43 0.29-0.71T21,15q0.43,0 0.71,0.29T22,16v2q0,0.82-0.59,1.41T20,20ZM4,20q-0.82,0-1.41-0.59T2,18V16q0-0.43 0.29-0.71T3,15t0.71,0.29T4,16v2H6q0.43,0 0.71,0.29T7,19T6.71,19.71T6,20H4Zm2-6V10Q6,9.17 6.59,8.59T8,8h8q0.82,0 1.41,0.59T18,10v4q0,0.82-0.59,1.41T16,16H8q-0.82,0-1.41-0.59T6,14Z"/></svg></button><button type="button" class="vhome" title="Back to 0, 0"><svg viewBox="0 0 24 24"><path d="M13,18.83V22q0,0.43-0.29,0.71T12,23t-0.71-0.29Q11,22.43 11,22V18.83l-0.4,0.4Q10.33,19.5 9.91,19.5T9.2,19.2q-0.28-0.27-0.28-0.7T9.2,17.8l2.1-2.1q0.3-0.3 0.7-0.3t0.7,0.3l2.1,2.1q0.28,0.27 0.29,0.69T14.8,19.2q-0.28,0.28-0.69,0.29T13.4,19.23L13,18.83ZM5.18,13H2q-0.42,0-0.71-0.29Q1,12.43 1,12t0.29-0.71T2,11H5.18l-0.4-0.4Q4.5,10.33 4.5,9.91T4.8,9.2Q5.08,8.92 5.5,8.92T6.2,9.2l2.1,2.1Q8.6,11.6 8.6,12T8.3,12.7L6.2,14.8q-0.27,0.28-0.69,0.29T4.8,14.8q-0.28-0.27-0.29-0.69T4.78,13.4L5.18,13Zm13.65,0l0.4,0.4q0.27,0.28 0.27,0.69T19.2,14.8q-0.28,0.28-0.7,0.28T17.8,14.8l-2.1-2.1q-0.3-0.3-0.3-0.7t0.3-0.7l2.1-2.1q0.27-0.28 0.69-0.29T19.2,9.2q0.27,0.28 0.29,0.69T19.23,10.6L18.83,11H22q0.43,0 0.71,0.29T23,12t-0.29,0.71T22,13H18.83ZM12,13.5q-0.63,0-1.06-0.44T10.5,12t0.44-1.06T12,10.5t1.06,0.44T13.5,12t-0.44,1.06T12,13.5ZM11,5.18V2q0-0.43 0.29-0.71T12,1t0.71,0.29T13,2V5.18l0.4-0.4Q13.68,4.5 14.09,4.5T14.8,4.8q0.28,0.28 0.28,0.7T14.8,6.2L12.7,8.3Q12.4,8.6 12,8.6T11.3,8.3L9.2,6.2Q8.93,5.93 8.91,5.51T9.2,4.8Q9.48,4.52 9.89,4.51T10.6,4.77L11,5.18Z"/></svg></button></div><div class="cvv"><b>0</b><div class="cvd" title="Digits after the point"><button type="button" class="dl" aria-label="Fewer digits"><svg viewBox="0 0 24 24"><path d="M14.5 6.5 9 12l5.5 5.5"/></svg></button><i>2</i><button type="button" class="dr" aria-label="More digits"><svg viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5"/></svg></button></div><span>Value</span></div>' + Object.keys(CVLBL).map(p => '<span class="cpn" data-p="' + p + '" style="top:' + CVY[p] + 'px">' + CVLBL[p] + '</span>').join('')
+      h += '<span class="nm">Grapher</span><div class="cpl"></div><svg class="cvs" viewBox="0 0 310 310"></svg><div class="cvb"><button type="button" class="vfit" title="Fit everything in view"><svg viewBox="0 0 24 24"><path d="M20,8V6H18q-0.43,0-0.71-0.29Q17,5.43 17,5t0.29-0.71T18,4h2q0.83,0 1.41,0.59Q22,5.18 22,6V8q0,0.42-0.29,0.71T21,9T20.29,8.71T20,8ZM2,8V6Q2,5.18 2.59,4.59T4,4H6Q6.43,4 6.71,4.29T7,5T6.71,5.71T6,6H4V8Q4,8.42 3.71,8.71T3,9T2.29,8.71T2,8ZM20,20H18q-0.43,0-0.71-0.29Q17,19.43 17,19t0.29-0.71T18,18h2V16q0-0.43 0.29-0.71T21,15q0.43,0 0.71,0.29T22,16v2q0,0.82-0.59,1.41T20,20ZM4,20q-0.82,0-1.41-0.59T2,18V16q0-0.43 0.29-0.71T3,15t0.71,0.29T4,16v2H6q0.43,0 0.71,0.29T7,19T6.71,19.71T6,20H4Zm2-6V10Q6,9.17 6.59,8.59T8,8h8q0.82,0 1.41,0.59T18,10v4q0,0.82-0.59,1.41T16,16H8q-0.82,0-1.41-0.59T6,14Z"/></svg></button><button type="button" class="vhome" title="Back to 0, 0"><svg viewBox="0 0 24 24"><path d="M13,18.83V22q0,0.43-0.29,0.71T12,23t-0.71-0.29Q11,22.43 11,22V18.83l-0.4,0.4Q10.33,19.5 9.91,19.5T9.2,19.2q-0.28-0.27-0.28-0.7T9.2,17.8l2.1-2.1q0.3-0.3 0.7-0.3t0.7,0.3l2.1,2.1q0.28,0.27 0.29,0.69T14.8,19.2q-0.28,0.28-0.69,0.29T13.4,19.23L13,18.83ZM5.18,13H2q-0.42,0-0.71-0.29Q1,12.43 1,12t0.29-0.71T2,11H5.18l-0.4-0.4Q4.5,10.33 4.5,9.91T4.8,9.2Q5.08,8.92 5.5,8.92T6.2,9.2l2.1,2.1Q8.6,11.6 8.6,12T8.3,12.7L6.2,14.8q-0.27,0.28-0.69,0.29T4.8,14.8q-0.28-0.27-0.29-0.69T4.78,13.4L5.18,13Zm13.65,0l0.4,0.4q0.27,0.28 0.27,0.69T19.2,14.8q-0.28,0.28-0.7,0.28T17.8,14.8l-2.1-2.1q-0.3-0.3-0.3-0.7t0.3-0.7l2.1-2.1q0.27-0.28 0.69-0.29T19.2,9.2q0.27,0.28 0.29,0.69T19.23,10.6L18.83,11H22q0.43,0 0.71,0.29T23,12t-0.29,0.71T22,13H18.83ZM12,13.5q-0.63,0-1.06-0.44T10.5,12t0.44-1.06T12,10.5t1.06,0.44T13.5,12t-0.44,1.06T12,13.5ZM11,5.18V2q0-0.43 0.29-0.71T12,1t0.71,0.29T13,2V5.18l0.4-0.4Q13.68,4.5 14.09,4.5T14.8,4.8q0.28,0.28 0.28,0.7T14.8,6.2L12.7,8.3Q12.4,8.6 12,8.6T11.3,8.3L9.2,6.2Q8.93,5.93 8.91,5.51T9.2,4.8Q9.48,4.52 9.89,4.51T10.6,4.77L11,5.18Z"/></svg></button></div><span class="cpo" style="top:530px">Value Output</span><span class="cpo" style="top:556px">Done</span><span class="cpo" style="top:582px">Change</span><div class="cvv"><b>0</b><div class="cvd" title="Digits after the point"><button type="button" class="dl" aria-label="Fewer digits"><svg viewBox="0 0 24 24"><path d="M14.5 6.5 9 12l5.5 5.5"/></svg></button><i>2</i><button type="button" class="dr" aria-label="More digits"><svg viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5"/></svg></button></div><span>Value</span></div>' + Object.keys(CVLBL).map(p => '<span class="cpn" data-p="' + p + '" style="top:' + CVY[p] + 'px">' + CVLBL[p] + '</span>').join('')
         + '<label class="cvl" style="left:110px"><span>Rotate Amount</span><input class="ni cvr" type="number" min="0" max="360"></label><label class="cvl" style="left:212px"><span>Move Amount</span><input class="ni cvm" type="number" min="0" step="0.1"></label><label class="cvl" style="left:314px"><span>Stop Line Time</span><input class="ni cvt" type="number" min="0" step="0.1"></label><label class="cvl" style="left:416px"><span>Curve Snap</span><input class="ni cvq" type="number" min="0" step="0.1"></label>';
     }
     else if (n.t === 'cgate') h += '<span class="nm">Gate</span><div class="gc"><div class="g1"><button class="nk op rm" title="Repeat changing values (Value Mode) or signals (Signal Mode)"></button><button class="nk op bm" title="What the blue pin does: Toggle Mode flips the gate open / shut, Hold Mode keeps it open while the blue pin is held"></button></div><div class="gv" title="The value passing through"></div></div>';
@@ -2812,9 +2842,9 @@ $('#copy').addEventListener('click', async () => {
     else if (nk && n.t === 'loop') nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, [{ id: 'until', sm: '↻', label: 'Loop Until…' }, { id: 'forever', sm: '∞', label: 'Loop Forever' }], id => { n.lm = id; save(); }); });
     else if (nk && n.t === 'value') nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, VMODES.map(m => ({ id: m[0], sm: m[2], label: m[1] })), id => { n.vm = id; save(); }); });
     else if (nk && n.t === 'cgate') {
-      nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, [{ id: 'value', sm: '#', label: 'Value Mode' }, { id: 'signal', sm: '~', label: 'Signal Mode' }], id => { n.rm = id; save(); }); });
+      nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, [{ id: 'value', sm: GIC.value, label: 'Value Mode' }, { id: 'signal', sm: GIC.signal, label: 'Signal Mode' }], id => { n.rm = id; save(); }); });
       const bm = el.querySelector('.bm');
-      bm.addEventListener('click', e => { e.stopPropagation(); pickList(bm, [{ id: 'toggle', sm: '⇄', label: 'Toggle Mode' }, { id: 'hold', sm: '●', label: 'Hold Mode' }], id => { n.bm = id; save(); }); });
+      bm.addEventListener('click', e => { e.stopPropagation(); pickList(bm, [{ id: 'toggle', sm: GIC.toggle, label: 'Toggle Mode' }, { id: 'hold', sm: GIC.hold, label: 'Hold Mode' }], id => { n.bm = id; save(); }); });
     }
     else if (nk && n.t === 'if') {
       nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, [{ id: 'value', sm: '#', label: 'Value' }, { id: 'text', sm: 'Aa', label: 'Text' }], id => { n.im = id; save(); }); });
@@ -3108,7 +3138,7 @@ $('#copy').addEventListener('click', async () => {
       el.style.left = n.x + 'px'; el.style.top = n.y + 'px'; el.classList.toggle('picked', selSet.has(n.id)); el.classList.toggle('ingrp', !!n.g); { const cp = el.querySelector('.ncap'); if (cp && !cp.querySelector('input') && cp.textContent !== (n.cap || '')) cp.textContent = n.cap || ''; }
       if (n.t === 'split') layoutSplit(n, el);
       el.querySelectorAll('.ip').forEach(ip => { ip.style.background = n.pc && n.pc[ip.dataset.p] ? n.pc[ip.dataset.p] : inDef(n, +ip.dataset.p); });
-      el.querySelectorAll('.port').forEach(pt => { const c = n.pc && n.pc[outKey(+pt.dataset.o)]; pt.style.background = c || (pt.dataset.o === '1' && n.t !== 'split' && n.t !== 'mover' && n.t !== 'mvset' ? STOPC : n.t === 'prop' ? PROPC : isValSrc(n) ? VALC : ''); });
+      el.querySelectorAll('.port').forEach(pt => { const c = n.pc && n.pc[outKey(+pt.dataset.o)]; pt.style.background = c || (n.t === 'curve' && pt.dataset.o === '2' ? CHGC : pt.dataset.o === '1' && n.t !== 'split' && n.t !== 'mover' && n.t !== 'mvset' ? STOPC : n.t === 'prop' ? PROPC : isValSrc(n) ? VALC : ''); });
       if (n.t === 'audio') {
         const it = get(n.cue);
         el.querySelector('.nm').textContent = it ? it.name : 'Choose a cue'; el.classList.toggle('dim', !it || !it.src);
@@ -3302,6 +3332,7 @@ $('#copy').addEventListener('click', async () => {
       const c = JSON.parse(JSON.stringify(n, (k, val) => RT.includes(k) ? undefined : val)); c.id = uid(); ids.set(n.id, c.id);
       c.x += 36; c.y += 36; if (n.g) { if (!grp.has(n.g)) grp.set(n.g, 'g' + Math.random().toString(36).slice(2, 8)); c.g = grp.get(n.g); } return c;
     });
+    if (!auto.gn) auto.gn = {}; grp.forEach((nw, old) => { if (auto.gn[old]) auto.gn[nw] = auto.gn[old]; });      // the copied group keeps its name
     auto.nodes.push(...copies);
     auto.links.filter(l => ids.has(l[0]) && ids.has(l[1])).forEach(l => auto.links.push([ids.get(l[0]), ids.get(l[1]), l[2], l[3]]));
     selSet.clear(); copies.forEach(c => selSet.add(c.id)); save(); syncNodes();
@@ -3785,7 +3816,7 @@ $('#copy').addEventListener('click', async () => {
   const cycT = new Set(), heldCue = {};
   setInterval(() => {                                      // Grapher: the blue line sweeps left to right, and the curve's height under it is the value
     auto.nodes.forEach(n => {
-      if (n.t !== 'curve') return; const r = cvRun[n.id]; if (!r) return; r.end = cvT(n);
+      if (n.t !== 'curve') return; cvChange(n); const r = cvRun[n.id]; if (!r) return; r.end = cvT(n);
       if (r.paused) { r.x = Math.min(r.end, r.pos); r.y = cvY(n.cv, r.x); return; } if (!r.on) return;
       r.x = Math.min(r.end, (performance.now() - r.t0) / 1000); r.y = cvY(n.cv, r.x);
       if (r.x >= r.end) { r.on = false; r.paused = false; if (n.sar) { r.x = 0; r.y = cvY(n.cv, 0); } /* Semi-Auto Repeat: back to the start (0s) when it finishes */ cvDraw(n); emit(n.id, new Set([n.id]), blank(), 1); }      // the red Done pin fires when the line reaches the end
