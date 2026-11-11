@@ -511,7 +511,6 @@
   .anode.t-cgate .g1 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .anode.t-cgate .nk { min-width: 0; padding: 0 8px; white-space: nowrap; text-align: center; }
   .anode.t-cgate .gv { height: 22px; border-radius: 11px; background: rgba(255,255,255,.16); display: grid; place-items: center; font: 600 12px 'Montserrat', sans-serif; overflow: hidden; white-space: nowrap; padding: 0 12px; }
-  .anode.t-cgate .ip[data-p="0"] { background: #3d3d3d; }
   .anode.t-cgate .ip[data-p="1"] { top: 100%; left: 44px; margin: -8px 0 0 -8px; }
   .anode.t-cgate .ip[data-p="2"], .anode.t-cgate .ip[data-p="3"] { top: 0; margin: -8px 0 0 -8px; }
   .anode.t-curve { display: block; width: 530px; height: 692px; padding: 0; border-radius: 28px; }
@@ -2664,7 +2663,7 @@ $('#copy').addEventListener('click', async () => {
   const norm = k => k.length === 1 ? k.toLowerCase() : k;
   const keyLabel = k => !k ? 'key' : k.length === 1 ? k.toUpperCase() : ({ ' ': 'Space', ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→', Control: 'Ctrl' }[k] || k);
   const rowY = i => RY0 + i * RPITCH;
-  const RGBPIN = ['#ff5a5a', '#c4ff6a', '#5a78ff'], inDef = (n, p) => n && n.t === 'rgb' ? RGBPIN[p] : n && ((n.t === 'counter' && p === 1) || (n.t === 'audio' && p === 2)) ? '#ff7b7b' : n && n.t === 'cgate' && p === 1 ? VALC : n && n.t === 'curve' && p === 9 ? VALC : n && n.t === 'curve' && p === 20 ? '#ff7b7b' : n && n.t === 'curve' && p < 5 ? ['#ff7a2a', '#6a1bff', '#6a1bff', '#c4ff6a', '#ff5a5a'][p] : isPropPin(n, p) ? PROPC : isValIn(n, p) ? VALC : '';
+  const RGBPIN = ['#ff5a5a', '#c4ff6a', '#5a78ff'], inDef = (n, p) => n && n.t === 'rgb' ? RGBPIN[p] : n && ((n.t === 'counter' && p === 1) || (n.t === 'audio' && p === 2)) ? '#ff7b7b' : n && n.t === 'cgate' && p === 0 ? VALC : n && n.t === 'curve' && p === 9 ? VALC : n && n.t === 'curve' && p === 20 ? '#ff7b7b' : n && n.t === 'curve' && p < 5 ? ['#ff7a2a', '#6a1bff', '#6a1bff', '#c4ff6a', '#ff5a5a'][p] : isPropPin(n, p) ? PROPC : isValIn(n, p) ? VALC : '';
   const isValSrc = n => n && (n.t === 'number' || n.t === 'value' || n.t === 'curve'), isValIn = (n, p) => n && (n.t === 'curve' ? [10, 11, 12, 17].includes(p) : VP[n.t] !== undefined && p >= VP[n.t]) && VP[n.t] !== undefined && p >= VP[n.t];     // value pins default to cornflower blue
   const pinColor = (n, k) => (n && n.pc && n.pc[k]) || (k === 'o' ? (n && n.t === 'prop' ? PROPC : isValSrc(n) ? VALC : PURPLE) : k === 'o1' ? (n && (n.t === 'split' || n.t === 'mvset' || n.t === 'mover') ? PURPLE : STOPC) : /^o\d+$/.test(k) ? PURPLE : DARK);
   function autoDropCue(id) {
