@@ -516,7 +516,7 @@
   .anode.t-cgate .ip[data-p="2"], .anode.t-cgate .ip[data-p="3"] { top: 0; margin: -8px 0 0 -8px; }
   .anode.t-curve { display: block; width: 530px; height: 692px; padding: 0; border-radius: 28px; }
   .anode.t-curve .nm { position: absolute; left: 26px; top: 20px; }
-  .anode.t-curve .cpl { position: absolute; left: 26px; top: 58px; width: 100px; height: 164px; overscroll-behavior: contain; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 6px; }
+  .anode.t-curve .cpl { position: absolute; left: 26px; top: 58px; width: 148px; height: 164px; overscroll-behavior: contain; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 6px; }
   .anode.t-curve .cpl::-webkit-scrollbar { display: none; }
   .anode.t-curve .cpl button { flex: none; height: 20px; border: 2px solid transparent; border-radius: 11px; background: rgba(255,255,255,.22); color: #fff; font: 600 10.5px 'Montserrat', sans-serif; cursor: pointer; padding: 0; transition: border-color .25s ease, background .2s; }
   .anode.t-curve .cpl button:hover { background: rgba(255,255,255,.3); }
@@ -3093,7 +3093,11 @@ $('#copy').addEventListener('click', async () => {
     Object.keys(nodeEls).forEach(id => { if (!live.has(id)) { nodeEls[id].remove(); delete nodeEls[id]; } });
     auto.nodes.forEach(n => {
       let el = nodeEls[n.id];
-      if (el && el._n && el._n !== n && !el.contains(document.activeElement)) { el.remove(); el = null; }      // undo / redo, a paste or a shared update swaps in fresh node objects: rebuild so the node's buttons act on the live one, not a stale copy
+      if (el && el._n && el._n !== n) {
+        const ae = document.activeElement, typing = ae && el.contains(ae) && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable);
+        if (!typing) { el.remove(); el = null; }                       // a focused button doesn't count, only a box being typed in
+        else if (!el._stale) { el._stale = true; ae.addEventListener('blur', () => setTimeout(syncNodes), { once: true }); }      // rebuild as soon as typing stops
+      }      // undo / redo, a paste or a shared update swaps in fresh node objects: rebuild so the node's buttons act on the live one, not a stale copy
       if (!el) el = nodeEls[n.id] = buildNodeEl(n); el._n = n;
       el.style.left = n.x + 'px'; el.style.top = n.y + 'px'; el.classList.toggle('picked', selSet.has(n.id)); el.classList.toggle('ingrp', !!n.g); { const cp = el.querySelector('.ncap'); if (cp && !cp.querySelector('input') && cp.textContent !== (n.cap || '')) cp.textContent = n.cap || ''; }
       if (n.t === 'split') layoutSplit(n, el);
