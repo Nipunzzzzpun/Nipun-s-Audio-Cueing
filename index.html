@@ -521,6 +521,11 @@
   .anode.t-curve .cpl button { flex: none; height: 20px; border: 2px solid transparent; border-radius: 11px; background: rgba(255,255,255,.22); color: #fff; font: 600 10.5px 'Montserrat', sans-serif; cursor: pointer; padding: 0; transition: border-color .25s ease, background .2s; }
   .anode.t-curve .cpl button:hover { background: rgba(255,255,255,.3); }
   .anode.t-curve .cpl button.on { border-color: #fff; }
+  .anode.t-curve .cpl button { position: relative; }
+  .anode.t-curve .cpl .del { position: absolute; right: 4px; top: 50%; width: 22px; height: 16px; margin-top: -8px; border-radius: 8px; display: grid; place-items: center; opacity: 0; transform: scale(.6); pointer-events: none; transition: opacity .2s, transform .3s var(--spring), background .2s; }
+  .anode.t-curve .cpl button.on .del { opacity: 1; transform: none; pointer-events: auto; } .anode.t-curve .cpl .del:hover { background: rgba(255,255,255,.15); }
+  .anode.t-curve .cpl.min button.on .del { opacity: .3; pointer-events: none; }
+  .anode.t-curve .cpl .del svg { width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 2.6; stroke-linecap: round; }
   .anode.t-curve .cpl button.add { background: #1c1c1c; display: grid; place-items: center; } .anode.t-curve .cpl button.add:hover { background: #2a2a2a; }
   .anode.t-curve .cpl button.add svg { width: 13px; height: 13px; fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; }
   .anode.t-curve .cvs { position: absolute; right: 24px; top: 22px; width: 310px; height: 310px; border-radius: 20px; background: #1c1c1c; cursor: crosshair; touch-action: none; overflow: hidden; }
@@ -2471,7 +2476,8 @@ $('#copy').addEventListener('click', async () => {
     const rn = cvRun[n.id];
     if (rn && (rn.on || rn.paused)) { const t = rn.on ? Math.min(rn.end, (performance.now() - rn.t0) / 1000) : Math.min(rn.end, rn.pos), px = cvSx(w, t); B.rl.setAttribute('d', 'M' + px.toFixed(1) + ' 0V' + CVW); B.rt.setAttribute('x', (px + 9).toFixed(1)); B.rt.textContent = t.toFixed(2) + 's'; B.rg.style.opacity = 1; if (rn.on) busy = true; } else B.rg.style.opacity = 0;
     { const lb = el.querySelector('.cpn[data-p="9"]'), tx = !n.sar && rn && rn.on ? 'Pause Graph' : 'Run Graph'; if (lb && lb.textContent !== tx) lb.textContent = tx; }
-    if (list._n !== c.pts.length) { list._n = c.pts.length; list.innerHTML = c.pts.map((_, i) => '<button type="button" data-i="' + i + '">Point ' + (i + 1) + '</button>').join('') + '<button type="button" class="add" data-add="1" title="Add a point in the middle of the view"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>'; list._sel = -1; }
+    if (list._n !== c.pts.length) { list._n = c.pts.length; list.innerHTML = c.pts.map((_, i) => '<button type="button" data-i="' + i + '">Point ' + (i + 1) + '<span class="del" title="Delete this point"><svg viewBox="0 0 24 24"><path d="M6 12h12"/></svg></span></button>').join('') + '<button type="button" class="add" data-add="1" title="Add a point in the middle of the view"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>'; list._sel = -1; }
+    list.classList.toggle('min', c.pts.length <= 2);
     if (list._sel !== c.sel) { list._sel = c.sel; [...list.children].forEach((b, i) => b.classList.toggle('on', i === c.sel)); const on = list.children[c.sel]; if (on && (on.offsetTop + on.offsetHeight > list.scrollTop + list.clientHeight || on.offsetTop < list.scrollTop)) list.scrollTo({ top: on.offsetTop - 4, behavior: 'smooth' }); }
     return busy;
   }
@@ -2863,6 +2869,7 @@ $('#copy').addEventListener('click', async () => {
           c.pts.splice(i, 0, { x, y, c: 0, a: 45, l: CVH }); c.sel = i; const D = cvD[n.id]; if (D) D.splice(i, 0, { x, y, a: 45, l: CVH, k: 0, s: 0 });
           save(); cvDraw(n); return;
         }
+        if (e.target.closest('.del') && b.classList.contains('on')) { if (n.cv.pts.length > 2) curveSig(n, 4); return; }      // the minus on the selected point deletes it
         n.cv.sel = +b.dataset.i; save(); cvDraw(n);
       });
       const local = (ev, r) => [(ev.clientX - r.left) / r.width * CVW, (ev.clientY - r.top) / r.height * CVW];        // pointer in viewer pixels (works at any editor zoom)
