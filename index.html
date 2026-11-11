@@ -567,6 +567,19 @@
   .anode.t-curve .cvv span { position: absolute; right: 26px; bottom: 16px; font: 500 12.5px 'Montserrat', sans-serif; color: rgba(255,255,255,.6); }
   .anode.t-curve .cvs .gn { fill: rgba(255,255,255,.38); font: 600 10.5px 'Montserrat', sans-serif; pointer-events: none; }
   svg.gi { display: inline-block; width: 15px; height: 15px; fill: currentColor; stroke: none; vertical-align: -3px; }
+  .anode.t-expr { display: block; width: 256px; height: 88px; padding: 11px 18px 0 25px; box-sizing: border-box; border-radius: 24px; }
+  .anode.t-expr .ex { display: flex; flex-direction: column; gap: 6px; }
+  .anode.t-expr .er { height: 34px; border-radius: 17px; background: #3c3c3c; display: flex; align-items: center; justify-content: space-between; padding: 0 17px 0 19px; gap: 8px; min-width: 0; }
+  .anode.t-expr .er span { font: 400 13px 'Major Mono Display', monospace; color: rgba(255,255,255,.6); }
+  .anode.t-expr .er b { font: 400 19.5px 'Major Mono Display', monospace; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: .06em; }
+  .anode.t-expr .eb2 { display: flex; gap: 11px; height: 26px; }
+  .anode.t-expr .nk.eop, .anode.t-expr .eb { height: 26px; border-radius: 13px; background: #565656; color: #fff; font: 500 14.5px 'Montserrat', sans-serif; }
+  .anode.t-expr .eop { flex: 0 0 117px; min-width: 0; padding: 0 8px; white-space: nowrap; }
+  .anode.t-expr .nk.eop:hover { background: #626262; }
+  .anode.t-expr .eb { flex: 1; min-width: 0; text-align: center; transition: opacity .2s; }
+  .anode.t-expr.one .eb { opacity: .35; pointer-events: none; }
+  .anode.t-expr .ip[data-p="0"] { top: 64px; } .anode.t-expr .port { top: 64px; }
+  .anode.t-expr .ip[data-p="1"], .anode.t-expr .ip[data-p="2"] { top: 100%; margin: -8px 0 0 -8px; }
   .anode.t-cgate.gopen { box-shadow: 0 0 0 2px rgba(90,120,255,.55); }
   .anode.t-print .ip[data-p="1"] { top: 100%; margin: -8px 0 0 -8px; }
   .anode.t-print .ni.pt { width: 150px; text-align: left; padding: 0 12px; }
@@ -907,7 +920,7 @@
       <svg class="awires" id="awires"></svg>
     </div>
     <div class="amaps" id="amaps"><div class="mlist" id="mlist"><div class="minner" id="minner"></div></div><div class="mctl"><button id="mminus" title="Remove the last mapped button"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><button id="mplus" title="Add a mapped button"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></svg></button></div></div>
-    <div class="apal" id="apal"><button data-t="ui">UI Button</button><button data-t="audio">Audio</button><button data-t="key">Button Input</button><button data-t="counter">Counter</button><button data-t="wait">Wait</button><button data-t="number">Number</button><button data-t="value">VALUE</button><button data-t="and">AND</button><button data-t="if">IF</button><button data-t="nor">NOR</button><button data-t="or">OR</button><button data-t="xor">XOR</button><button data-t="xand">XAND</button><button data-t="random">RANDOM</button><button data-t="loop">LOOP</button><button data-t="cgate">Gate</button><button data-t="curve">Grapher <small>(Beta)</small></button><button data-t="print">Print</button><button data-t="split">Splitter</button><button data-t="light">Light</button><button data-t="prop">Property Changer</button><button data-t="rgb">RGB</button><button data-t="matrix">LED Matrix</button><button data-t="mover">Mover</button><button data-t="mvset">Mover Setter</button></div>
+    <div class="apal" id="apal"><button data-t="ui">UI Button</button><button data-t="audio">Audio</button><button data-t="key">Button Input</button><button data-t="counter">Counter</button><button data-t="wait">Wait</button><button data-t="number">Number</button><button data-t="value">VALUE</button><button data-t="and">AND</button><button data-t="if">IF</button><button data-t="nor">NOR</button><button data-t="or">OR</button><button data-t="xor">XOR</button><button data-t="xand">XAND</button><button data-t="random">RANDOM</button><button data-t="loop">LOOP</button><button data-t="cgate">Gate</button><button data-t="expr">Expression</button><button data-t="curve">Grapher <small>(Beta)</small></button><button data-t="print">Print</button><button data-t="split">Splitter</button><button data-t="light">Light</button><button data-t="prop">Property Changer</button><button data-t="rgb">RGB</button><button data-t="matrix">LED Matrix</button><button data-t="mover">Mover</button><button data-t="mvset">Mover Setter</button></div>
   </div>
 </div>
 
@@ -2397,7 +2410,7 @@ $('#copy').addEventListener('click', async () => {
   const autoDock = $('#autoDock'), acanvas = $('#acanvas'), aworld = $('#aworld'), awires = $('#awires'), amaps = $('#amaps'), mlist = $('#mlist'), minner = $('#minner'), azp = $('#azp'), autoin = autoDock.querySelector('.autoin');
   const RY0 = 24, RPITCH = 46, GAPX = 0, MAXB = 200, PURPLE = '#e0a8f0', VALC = 'cornflowerblue', STOPC = '#ff9a9a', DARK = '#3d3d3d';
   const SPEC = {
-    cgate: { ins: 4, out: true, multiPins: [0, 1] }, curve: { ins: 21, out: true, outs: 3, multiPins: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 16, 18, 19, 20] }, audio: { ins: 6, out: true, multi: true }, value: { ins: 5, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, ui: { ins: 0, out: true }, counter: { ins: 3, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
+    expr: { ins: 3, out: true }, cgate: { ins: 4, out: true, multiPins: [0, 1] }, curve: { ins: 21, out: true, outs: 3, multiPins: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 16, 18, 19, 20] }, audio: { ins: 6, out: true, multi: true }, value: { ins: 5, out: true, multi: true }, number: { ins: 2, out: true, multi: true }, key: { ins: 0, out: true }, ui: { ins: 0, out: true }, counter: { ins: 3, out: true, multi: true }, wait: { ins: 2, out: true, multi: true },
     and: { ins: 2, out: true, multi: true, gate: true }, or: { ins: 2, out: true, multi: true, gate: true }, nor: { ins: 2, out: true, multi: true, gate: true },
     xor: { ins: 2, out: true, multi: true, gate: true }, xand: { ins: 2, out: true, multi: true, gate: true },
     if: { ins: 5, out: true, multi: true }, prop: { ins: 1, out: true, multi: true }, loop: { ins: 5, out: true, outs: 2, multi: true }, random: { ins: 3, out: true, multi: true }, print: { ins: 2, out: true, multi: true }, light: { ins: 1, out: false, multi: true }, rgb: { ins: 3, out: true, multi: true }, matrix: { ins: 34, out: false, multi: true }, mover: { ins: 18, out: true, outs: 16, multi: true }, mvset: { ins: 2, out: true, outs: 2, multi: true }, split: { ins: 1, out: true, outs: 1, multi: true }
@@ -2563,11 +2576,20 @@ $('#copy').addEventListener('click', async () => {
     cvDraw(n);
   }
   const GIC = { value: '<svg class="gi" viewBox="0 0 24 24"><path d="M9,16L8.18,19.27Q8.1,19.6 7.85,19.8T7.25,20q-0.47,0-0.77-0.38T6.3,18.8L7,16H4.28q-0.5,0-0.8-0.39q-0.3-0.39-0.17-0.86Q3.38,14.4 3.65,14.2T4.28,14H7.5l1-4H5.78q-0.5,0-0.8-0.39Q4.68,9.23 4.8,8.75Q4.88,8.4 5.15,8.2T5.78,8H9L9.83,4.72Q9.9,4.4 10.15,4.2T10.75,4q0.48,0 0.78,0.38T11.7,5.2L11,8h4l0.83-3.28Q15.9,4.4 16.15,4.2T16.75,4q0.48,0 0.78,0.38T17.7,5.2L17,8h2.73q0.5,0 0.8,0.39T20.7,9.25Q20.63,9.6 20.35,9.8T19.73,10H16.5l-1,4h2.73q0.5,0 0.8,0.39q0.3,0.39 0.18,0.86q-0.08,0.35-0.35,0.55T18.23,16H15l-0.82,3.27Q14.1,19.6 13.85,19.8T13.25,20q-0.47,0-0.77-0.38T12.3,18.8L13,16H9Zm0.5-2h4l1-4h-4l-1,4Z"/></svg>', signal: '<svg class="gi" viewBox="0 0 24 24"><path d="M5,21q-0.42,0-0.71-0.29Q4,20.43 4,20V19q-0.27-0.27-0.64-0.44T3,18V15q0-0.43 0.29-0.71T4,14H5V7Q5,5.35 6.18,4.17T9,3t2.83,1.17T13,7V17q0,0.82 0.59,1.41T15,19t1.41-0.59T17,17V10H16q-0.42,0-0.71-0.29T15,9V6q0-0.4 0.36-0.56Q15.73,5.27 16,5V4q0-0.43 0.29-0.71T17,3h2q0.43,0 0.71,0.29T20,4V5q0.28,0.27 0.64,0.44T21,6V9q0,0.42-0.29,0.71T20,10H19v7q0,1.65-1.18,2.82T15,21t-2.82-1.18T11,17V7q0-0.82-0.59-1.41T9,5Q8.18,5 7.59,5.59Q7,6.18 7,7v7H8q0.43,0 0.71,0.29T9,15v3q0,0.4-0.36,0.56T8,19v1q0,0.43-0.29,0.71T7,21H5Z"/></svg>', toggle: '<svg class="gi" viewBox="0 0 24 24"><path d="M7,18q-2.5,0-4.25-1.75T1,12T2.75,7.75T7,6H17q2.5,0 4.25,1.75T23,12t-1.75,4.25T17,18H7Zm12.13-3.88Q20,13.25 20,12T19.13,9.88T17,9T14.88,9.88T14,12t0.88,2.13T17,15t2.13-0.88Z"/></svg>', hold: '<svg class="gi" viewBox="0 0 24 24"><path d="M8.48,0q2.5,0 4.25,1.75T14.48,6q0,0.63-0.13,1.21T13.98,8.38q-0.13,0.27-0.39,0.35T13.05,8.67T12.66,8.25t0.01-0.63q0.15-0.4 0.22-0.8T12.98,6q0-1.88-1.31-3.19T8.48,1.5T5.29,2.81T3.98,6q0,0.43 0.06,0.84T4.25,7.63Q4.38,7.95 4.26,8.25T3.88,8.67T3.34,8.71Q3.08,8.63 2.95,8.35Q2.73,7.8 2.6,7.21Q2.48,6.63 2.48,6q0-2.5 1.75-4.25T8.48,0Zm0,2.5q1.45,0 2.48,1.02T11.98,6q0,0.25-0.04,0.47T11.85,6.93q-0.1,0.32-0.38,0.47T10.9,7.45T10.44,7.07Q10.28,6.8 10.38,6.5Q10.4,6.43 10.45,6q0-0.82-0.59-1.41T8.45,4T7.04,4.57T6.45,6q0,0.13 0.01,0.26T6.53,6.52Q6.6,6.82 6.45,7.07T6,7.4T5.44,7.32T5.08,6.88Q5.03,6.7 5,6.49Q4.98,6.27 4.98,6Q4.98,4.52 6,3.51T8.48,2.5Zm2,19.5q-0.7,0-1.31-0.3T8.13,20.85L3.1,14.48q-0.2-0.22-0.17-0.54t0.23-0.51q0.5-0.53 1.2-0.63t1.3,0.28L7.5,14.2V6q0-0.43 0.29-0.71T8.5,5Q8.93,5 9.23,5.29Q9.53,5.57 9.53,6v5H17q1.25,0 2.13,0.88T20,14v4q0,1.65-1.18,2.82T16,22H10.48Z"/></svg>' };      // Google icons for the Gate modes
+  /* Expression: does a sum with the number coming in. b is the second number (box or wire). Trig works in degrees */
+  const EOPS = [['add', '+', 'Add'], ['sub', '−', 'Subtract'], ['mul', '×', 'Multiply'], ['div', '÷', 'Divide'], ['root', '^', 'Root'], ['sin', 'sin', 'Sine'], ['cos', 'cos', 'Cosine'], ['tan', 'tan', 'Tangent'], ['none', '=', 'None (just show it)']];
+  const eOne = o => o === 'sin' || o === 'cos' || o === 'tan' || o === 'none';           // these only use the incoming number
+  function exprCalc(n, seen) {
+    const sn = new Set(seen || []).add(n.id), la = inputsL(n.id, 0)[0], lb = inputsL(n.id, 2)[0];
+    const a = la ? +numOf(la[0], sn, la[3]) || 0 : 0, bw = lb ? +numOf(lb[0], sn, lb[3]) : NaN, b = isFinite(bw) ? bw : (isFinite(n.eb) ? +n.eb : 0), r = Math.PI / 180;
+    const v = { add: a + b, sub: a - b, mul: a * b, div: a / b, root: b === 0 ? NaN : (a < 0 && Math.abs(Math.round(b) % 2) === 1 ? -Math.pow(-a, 1 / b) : Math.pow(a, 1 / b)), sin: Math.sin(a * r), cos: Math.cos(a * r), tan: Math.tan(a * r), none: a }[n.eo] ?? a;
+    return isFinite(v) ? Math.round(v * 1e9) / 1e9 : NaN;
+  }
   const gst = {};
   const gs = id => gst[id] || (gst[id] = { open: false, ls: 0, v: 0, was: false });
   const gOpen = n => { const s = gs(n.id); return n.bm === 'hold' ? performance.now() - s.ls < 300 : !!s.open; };      // Hold Mode: open while signals keep coming (a source with Allow Holding), otherwise only a moment
   const gIn = (n, seen) => { const l = inputsL(n.id, 0)[0]; return l ? +numOf(l[0], new Set(seen || []).add(n.id), l[3]) || 0 : 0; };
-  const VP = { curve: 10, mvset: 1, audio: 3, value: 2, loop: 2, counter: 2, wait: 1, if: 1, number: 1, random: 1, print: 1 };      // first input pin of each node that carries a value (not a signal)
+  const VP = { expr: 0, curve: 10, mvset: 1, audio: 3, value: 2, loop: 2, counter: 2, wait: 1, if: 1, number: 1, random: 1, print: 1 };      // first input pin of each node that carries a value (not a signal)
   const OPS = [['<', 'less than'], ['>', 'greater than'], ['=', 'equal to'], ['≤', 'at most'], ['≥', 'at least'], ['≠', 'not equal to']];
   const CMP = { '<': (a, b) => a < b, '>': (a, b) => a > b, '=': (a, b) => a === b, '≤': (a, b) => a <= b, '≥': (a, b) => a >= b, '≠': (a, b) => a !== b };
   const TOPS = [['is', 'Is', '='], ['isnt', 'Isn’t', '≠'], ['has', 'Contains', '∋']];
@@ -2575,20 +2597,21 @@ $('#copy').addEventListener('click', async () => {
   /* property pins: a node's mode (VALUE's Add, IF's comparison, LOOP's until / forever) can be set by a wire. A Property node picks the mode; a plain number picks by position (0 = first option) */
   const PROPC = '#ffc15e';
   const PROPS = [...VMODES.map(m => ({ id: m[0], label: 'VALUE: ' + m[1], sm: m[2], short: m[1] })), ...OPS.map(o => ({ id: o[0], label: 'IF: ' + o[1], sm: o[0], short: o[1] })), ...TOPS.map(o => ({ id: o[0], label: 'IF text: ' + o[1], sm: o[2], short: o[1] })),
-    { id: 'value', label: 'IF: compare a Value', sm: '#', short: 'Value' }, { id: 'text', label: 'IF: compare Text', sm: 'Aa', short: 'Text' }, { id: 'gvalue', label: 'GATE: Value Mode', get sm() { return GIC.value; }, short: 'Value' }, { id: 'gsignal', label: 'GATE: Signal Mode', get sm() { return GIC.signal; }, short: 'Signal' }, { id: 'gtoggle', label: 'GATE: Toggle Mode', get sm() { return GIC.toggle; }, short: 'Toggle' }, { id: 'ghold', label: 'GATE: Hold Mode', get sm() { return GIC.hold; }, short: 'Hold' },
+    { id: 'value', label: 'IF: compare a Value', sm: '#', short: 'Value' }, { id: 'text', label: 'IF: compare Text', sm: 'Aa', short: 'Text' }, ...EOPS.map(o => ({ id: 'e_' + o[0], label: 'EXPRESSION: ' + o[2], sm: o[1], short: o[2] })), { id: 'gvalue', label: 'GATE: Value Mode', get sm() { return GIC.value; }, short: 'Value' }, { id: 'gsignal', label: 'GATE: Signal Mode', get sm() { return GIC.signal; }, short: 'Signal' }, { id: 'gtoggle', label: 'GATE: Toggle Mode', get sm() { return GIC.toggle; }, short: 'Toggle' }, { id: 'ghold', label: 'GATE: Hold Mode', get sm() { return GIC.hold; }, short: 'Hold' },
     { id: 'until', label: 'LOOP: until', sm: '↻', short: 'Until' }, { id: 'forever', label: 'LOOP: forever', sm: '∞', short: 'Forever' }];
-  const PPIN = { cgate: [[2, '.rm'], [3, '.bm']], value: [[4, '.vm']], loop: [[4, '.lm']], if: [[2, '.op'], [3, '.im']] };       // [pin, the chip it sits under]
+  const PPIN = { expr: [[1, '.eop']], cgate: [[2, '.rm'], [3, '.bm']], value: [[4, '.vm']], loop: [[4, '.lm']], if: [[2, '.op'], [3, '.im']] };       // [pin, the chip it sits under]
   const OPTFOR = { value: VMODES.map(m => m[0]), loop: ['until', 'forever'], if: [...OPS.map(o => o[0]), ...TOPS.map(o => o[0]), 'value', 'text'] };
-  const optsAt = (t, p) => t.t === 'cgate' ? (p === 2 ? ['gvalue', 'gsignal'] : ['gtoggle', 'ghold']) : t.t === 'if' ? (p === 3 ? ['value', 'text'] : [...OPS.map(o => o[0]), ...TOPS.map(o => o[0])]) : OPTFOR[t.t];
+  const optsAt = (t, p) => t.t === 'expr' ? EOPS.map(o => 'e_' + o[0]) : t.t === 'cgate' ? (p === 2 ? ['gvalue', 'gsignal'] : ['gtoggle', 'ghold']) : t.t === 'if' ? (p === 3 ? ['value', 'text'] : [...OPS.map(o => o[0]), ...TOPS.map(o => o[0])]) : OPTFOR[t.t];
   const propOpts = src => {                                          // a Property Changer only offers what the pins it is wired into can use
     const ids = new Set(); let any = false;
     auto.links.filter(l => l[0] === src.id).forEach(l => { const t = nodeById(l[1]); if (t && isPropPin(t, l[2])) { any = true; optsAt(t, l[2]).forEach(x => ids.add(x)); } });
     return any ? PROPS.filter(o => ids.has(o.id)) : PROPS;
   };
   const isPropPin = (n, p) => !!n && !!PPIN[n.t] && PPIN[n.t].some(x => x[0] === p);
-  const PLIST = { value: VMODES.map(m => m[0]), if: OPS.map(o => o[0]), loop: ['until', 'forever'] }, plistAt = (n, p) => n.t === 'cgate' ? (p === 2 ? ['gvalue', 'gsignal'] : ['gtoggle', 'ghold']) : n.t === 'if' && p === 3 ? ['value', 'text'] : PLIST[n.t];
+  const PLIST = { value: VMODES.map(m => m[0]), if: OPS.map(o => o[0]), loop: ['until', 'forever'] }, plistAt = (n, p) => n.t === 'expr' ? EOPS.map(o => 'e_' + o[0]) : n.t === 'cgate' ? (p === 2 ? ['gvalue', 'gsignal'] : ['gtoggle', 'ghold']) : n.t === 'if' && p === 3 ? ['value', 'text'] : PLIST[n.t];
   function applyOpt(n, id) {                                         // true if that changed the node
     if (n.t === 'value' && VMODES.some(m => m[0] === id) && n.vm !== id) { n.vm = id; return true; }
+    if (n.t === 'expr' && id.startsWith('e_')) { const o = id.slice(2); if (n.eo !== o && EOPS.some(x => x[0] === o)) { n.eo = o; return true; } return false; }
     if (n.t === 'cgate') {
       if ((id === 'gvalue' || id === 'gsignal') && n.rm !== id.slice(1)) { n.rm = id.slice(1); return true; }
       if ((id === 'gtoggle' || id === 'ghold') && n.bm !== id.slice(1)) { n.bm = id.slice(1); return true; }
@@ -2611,7 +2634,7 @@ $('#copy').addEventListener('click', async () => {
         const l = inputsL(n.id, pp)[0]; if (!l) return; const src = nodeById(l[0]); if (!src) return;
         let id = null;
         if (src.t === 'prop') return;                                  // a Property Changer only acts when a signal comes through it
-        else { const L = plistAt(n, pp), i = Math.round(+numOf(l[0], new Set([n.id]), l[3]) || 0); id = L[((i % L.length) + L.length) % L.length]; }
+        else { const x = +numOf(l[0], new Set([n.id]), l[3]); if (!isFinite(x)) return; const L = plistAt(n, pp), i = Math.round(x); id = L[((i % L.length) + L.length) % L.length]; }
         if (id && applyOpt(n, id)) ch = true;
       });
     });
@@ -2630,6 +2653,7 @@ $('#copy').addEventListener('click', async () => {
   const wSec = n => Math.max(0, Math.min(3600, liveIn(n, 1, n.sec)));
   const mvV = n => liveIn(n, 1, n.v);
   const ifK = n => liveIn(n, 1, n.k), numV = n => liveIn(n, 1, n.v);
+  const numSent = {};                                       // NUMBER: what it last sent out. Nothing until a signal reaches its left pin, so plugging it in changes nothing by itself
   const lEvery = n => Math.max(.05, Math.min(3600, liveIn(n, 3, n.lt)));
   const rRange = n => { const a = Math.round(liveIn(n, 1, n.rmin)), b = Math.round(liveIn(n, 2, n.rmax)); return [Math.min(a, b), Math.max(a, b)]; };
   const vcur = n => valCur[n.id] === undefined ? vstart(n) : valCur[n.id];
@@ -2662,7 +2686,7 @@ $('#copy').addEventListener('click', async () => {
       if (Array.isArray(a.nodes)) a.nodes.slice(0, 120).forEach(n => {
         if (!n || !idOk(n.id) || !SPEC[n.t] || seenN.has(n.id) || out.btns.some(b => b.id === n.id)) return; seenN.add(n.id);
         const pc = {}; if (n.pc && typeof n.pc === 'object') Object.keys(n.pc).slice(0, 200).forEach(k => { if (/^(o\d{0,2}|\d{1,2})$/.test(k) && HEX.test(n.pc[k])) pc[k] = n.pc[k]; });
-        out.nodes.push({ id: n.id, t: n.t, x: isFinite(n.x) ? num(n.x, 5000) : 30, y: isFinite(n.y) ? num(n.y, 5000) : 30, cue: idOk(n.cue) ? n.cue : '', btn: idOk(n.btn) ? n.btn : '', hold: (n.t === 'ui' || n.t === 'key') && n.hold ? 1 : 0, cm: isFinite(n.cm) ? num(n.cm, 1e6) : 1, gr: isFinite(n.gr) ? num(n.gr, 1e6) : 45, ct: isFinite(n.ct) ? Math.max(0, Math.min(1e4, +n.ct)) : 2, cs: isFinite(n.cs) ? Math.max(0, Math.min(1e4, +n.cs)) : .5, rd: isFinite(n.rd) ? Math.max(0, Math.min(5, Math.round(+n.rd))) : 2, elp: n.elp ? 1 : 0, sar: n.sar ? 1 : 0, cv: cvNorm(n.cv), rm: n.rm === 'signal' ? 'signal' : 'value', bm: n.bm === 'hold' ? 'hold' : 'toggle',
+        out.nodes.push({ id: n.id, t: n.t, x: isFinite(n.x) ? num(n.x, 5000) : 30, y: isFinite(n.y) ? num(n.y, 5000) : 30, cue: idOk(n.cue) ? n.cue : '', btn: idOk(n.btn) ? n.btn : '', hold: (n.t === 'ui' || n.t === 'key') && n.hold ? 1 : 0, eo: EOPS.some(o => o[0] === n.eo) ? n.eo : 'add', eb: isFinite(n.eb) ? Math.max(-1e9, Math.min(1e9, +n.eb)) : 1, cm: isFinite(n.cm) ? num(n.cm, 1e6) : 1, gr: isFinite(n.gr) ? num(n.gr, 1e6) : 45, ct: isFinite(n.ct) ? Math.max(0, Math.min(1e4, +n.ct)) : 2, cs: isFinite(n.cs) ? Math.max(0, Math.min(1e4, +n.cs)) : .5, rd: isFinite(n.rd) ? Math.max(0, Math.min(5, Math.round(+n.rd))) : 2, elp: n.elp ? 1 : 0, sar: n.sar ? 1 : 0, cv: cvNorm(n.cv), rm: n.rm === 'signal' ? 'signal' : 'value', bm: n.bm === 'hold' ? 'hold' : 'toggle',
           n: Math.max(1, Math.min(99, Math.round(+n.n) || 2)), vm: ['add', 'sub', 'mul', 'div'].includes(n.vm) ? n.vm : 'add', vx: isFinite(n.vx) ? num(n.vx, 1e9) : 1, vs: isFinite(n.vs) ? num(n.vs, 1e9) : 0, vol: isFinite(n.vol) ? Math.max(0, Math.min(100, +n.vol)) : 100, pitch: isFinite(n.pitch) ? Math.max(-24, Math.min(24, +n.pitch)) : 0, v: isFinite(n.v) ? num(n.v, 1e6) : 100, op: OPS.some(o => o[0] === n.op) ? n.op : '>', k: isFinite(n.k) ? num(n.k, 1e6) : 0, sec: isFinite(n.sec) ? Math.max(0, Math.min(3600, +n.sec)) : 1, rmin: isFinite(n.rmin) ? num(n.rmin, 1e6) : 0, rmax: isFinite(n.rmax) ? num(n.rmax, 1e6) : 100, im: n.im === 'text' ? 'text' : 'value', it: ['is', 'isnt', 'has'].includes(n.it) ? n.it : 'is', tx: typeof n.tx === 'string' ? n.tx.slice(0, 60) : '', g: typeof n.g === 'string' && /^[a-z0-9]{1,16}$/.test(n.g) ? n.g : '', txt: typeof n.txt === 'string' ? n.txt.slice(0, 80) : 'Hello!', lm: n.lm === 'forever' ? 'forever' : 'until', lc: isFinite(n.lc) ? Math.max(0, Math.min(99999, Math.round(+n.lc))) : 3, lt: isFinite(n.lt) ? Math.max(.05, Math.min(3600, +n.lt)) : 1, cr: isFinite(n.cr) ? Math.max(0, Math.min(255, Math.round(+n.cr))) : 0, cg: isFinite(n.cg) ? Math.max(0, Math.min(255, Math.round(+n.cg))) : 0, cb: isFinite(n.cb) ? Math.max(0, Math.min(255, Math.round(+n.cb))) : 0, mw: Math.max(1, Math.min(16, Math.round(+n.mw) || 8)), mh: Math.max(1, Math.min(16, Math.round(+n.mh) || 8)), mx: Array.from({ length: 16 }, (_, i) => Array.isArray(n.mx) ? (n.mx[i] | 0) & 65535 : 0), pr: PROPS.some(o => o.id === n.pr) ? n.pr : 'add', cap: typeof n.cap === 'string' ? n.cap.slice(0, 60) : '', mvw: Math.max(1, Math.min(16, Math.round(+n.mvw) || 5)), mvk: Math.max(0, Math.min(15, Math.round(+n.mvk) || 0)), mvs: n.mvs ? 1 : 0, mvr: n.mvr ? 1 : 0, mtg: n.mtg ? 1 : 0, mcl: n.mcl && typeof n.mcl === 'object' ? Object.fromEntries(Object.entries(n.mcl).filter(([k, c]) => /^\d{1,3}$/.test(k) && +k < 256 && HEX.test(c)).slice(0, 256)) : {}, pc, ...cleanSplit(n) });
       });
       if (Array.isArray(a.links)) {
@@ -2692,8 +2716,8 @@ $('#copy').addEventListener('click', async () => {
   const norm = k => k.length === 1 ? k.toLowerCase() : k;
   const keyLabel = k => !k ? 'key' : k.length === 1 ? k.toUpperCase() : ({ ' ': 'Space', ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→', Control: 'Ctrl' }[k] || k);
   const rowY = i => RY0 + i * RPITCH;
-  const RGBPIN = ['#ff5a5a', '#c4ff6a', '#5a78ff'], inDef = (n, p) => n && n.t === 'rgb' ? RGBPIN[p] : n && ((n.t === 'counter' && p === 1) || (n.t === 'audio' && p === 2)) ? '#ff7b7b' : n && n.t === 'cgate' && p === 0 ? VALC : n && n.t === 'curve' && p === 9 ? VALC : n && n.t === 'curve' && p === 20 ? '#ff7b7b' : n && n.t === 'curve' && p < 5 ? ['#ff7a2a', '#6a1bff', '#6a1bff', '#c4ff6a', '#ff5a5a'][p] : isPropPin(n, p) ? PROPC : isValIn(n, p) ? VALC : '';
-  const isValSrc = n => n && (n.t === 'number' || n.t === 'value' || n.t === 'curve'), isValIn = (n, p) => n && (n.t === 'curve' ? [10, 11, 12, 17].includes(p) : VP[n.t] !== undefined && p >= VP[n.t]) && VP[n.t] !== undefined && p >= VP[n.t];     // value pins default to cornflower blue
+  const RGBPIN = ['#ff5a5a', '#c4ff6a', '#5a78ff'], inDef = (n, p) => n && n.t === 'rgb' ? RGBPIN[p] : n && ((n.t === 'counter' && p === 1) || (n.t === 'audio' && p === 2)) ? '#ff7b7b' : n && n.t === 'cgate' && p === 0 ? VALC : n && n.t === 'expr' && p === 1 ? '#ffd84a' : n && n.t === 'curve' && p === 9 ? VALC : n && n.t === 'curve' && p === 20 ? '#ff7b7b' : n && n.t === 'curve' && p < 5 ? ['#ff7a2a', '#6a1bff', '#6a1bff', '#c4ff6a', '#ff5a5a'][p] : isPropPin(n, p) ? PROPC : isValIn(n, p) ? VALC : '';
+  const isValSrc = n => n && (n.t === 'number' || n.t === 'value' || n.t === 'curve' || n.t === 'expr'), isValIn = (n, p) => n && (n.t === 'curve' ? [10, 11, 12, 17].includes(p) : VP[n.t] !== undefined && p >= VP[n.t]) && VP[n.t] !== undefined && p >= VP[n.t];     // value pins default to cornflower blue
   const CHGC = '#ffd84a';
   const pinColor = (n, k) => (n && n.pc && n.pc[k]) || (n && n.t === 'curve' && k === 'o2' ? CHGC : null) || (k === 'o' ? (n && n.t === 'prop' ? PROPC : isValSrc(n) ? VALC : PURPLE) : k === 'o1' ? (n && (n.t === 'split' || n.t === 'mvset' || n.t === 'mover') ? PURPLE : STOPC) : /^o\d+$/.test(k) ? PURPLE : DARK);
   function autoDropCue(id) {
@@ -2739,7 +2763,7 @@ $('#copy').addEventListener('click', async () => {
   /* nodes */
   const selSet = new Set();
   const nodeEls = {}, cnt = {}, SVG_X = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>', SVG_PEN = '<svg viewBox="0 0 24 24"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19z"/></svg>';
-  const LABEL = { ui: 'UI Button', split: 'Splitter', value: 'VALUE', number: 'Number', wait: 'Wait', and: 'AND', or: 'OR', nor: 'NOR', xor: 'XOR', xand: 'XAND', if: 'IF', random: 'RANDOM', counter: 'Counter', light: 'Light', prop: 'Property Changer', rgb: 'RGB', matrix: 'LED Matrix', mover: 'Mover', mvset: 'Mover Setter', loop: 'LOOP', print: 'Print', key: 'Button Input', cgate: 'Gate', curve: 'Grapher' };
+  const LABEL = { ui: 'UI Button', split: 'Splitter', value: 'VALUE', number: 'Number', wait: 'Wait', and: 'AND', or: 'OR', nor: 'NOR', xor: 'XOR', xand: 'XAND', if: 'IF', random: 'RANDOM', counter: 'Counter', light: 'Light', prop: 'Property Changer', rgb: 'RGB', matrix: 'LED Matrix', mover: 'Mover', mvset: 'Mover Setter', loop: 'LOOP', print: 'Print', key: 'Button Input', cgate: 'Gate', curve: 'Grapher', expr: 'Expression' };
   function reachBtns(id) {
     const seen = new Set(), out = new Set();
     (function go(c) { if (seen.has(c)) return; seen.add(c); auto.links.forEach(l => { if (l[0] !== c) return; const bi = auto.btns.findIndex(b => b.id === l[1]); if (bi >= 0) out.add(bi + 1); else go(l[1]); }); })(id);
@@ -2817,6 +2841,7 @@ $('#copy').addEventListener('click', async () => {
     else if (n.t === 'print') h += '<span class="nm">Print</span><input class="ni pt" type="text" maxlength="80" placeholder="message" title="Text to pop up. Wire a value into the pin below to show it after the text">';
     else if (n.t === 'mvset') h += '<span class="ml l">L</span><span class="ml r">R</span><input class="ni nv" type="number" min="0" step="1" title="Which pin the line jumps to (0 is the first). Or wire a number into the bottom pin. Wire L and R to the same Mover&#39;s left and right pins, then send a signal into the top pin">';
     else if (n.t === 'number') h += '<span class="nm">Number</span><input class="ni nv" type="number" step="any" title="A number other nodes can read">';
+    else if (n.t === 'expr') h += '<div class="ex"><div class="er"><span>=</span><b class="ev">0</b></div><div class="eb2"><button class="nk op eop" title="What to do with the number coming in"></button><input class="ni eb" type="number" step="any" title="The second number (or wire one into the pin below)"></div></div>';
     else if (n.t === 'curve') {
       h += '<span class="nm">Grapher</span><div class="cpl"></div><svg class="cvs" viewBox="0 0 310 310"></svg><div class="cvb"><button type="button" class="vfit" title="Fit everything in view"><svg viewBox="0 0 24 24"><path d="M20,8V6H18q-0.43,0-0.71-0.29Q17,5.43 17,5t0.29-0.71T18,4h2q0.83,0 1.41,0.59Q22,5.18 22,6V8q0,0.42-0.29,0.71T21,9T20.29,8.71T20,8ZM2,8V6Q2,5.18 2.59,4.59T4,4H6Q6.43,4 6.71,4.29T7,5T6.71,5.71T6,6H4V8Q4,8.42 3.71,8.71T3,9T2.29,8.71T2,8ZM20,20H18q-0.43,0-0.71-0.29Q17,19.43 17,19t0.29-0.71T18,18h2V16q0-0.43 0.29-0.71T21,15q0.43,0 0.71,0.29T22,16v2q0,0.82-0.59,1.41T20,20ZM4,20q-0.82,0-1.41-0.59T2,18V16q0-0.43 0.29-0.71T3,15t0.71,0.29T4,16v2H6q0.43,0 0.71,0.29T7,19T6.71,19.71T6,20H4Zm2-6V10Q6,9.17 6.59,8.59T8,8h8q0.82,0 1.41,0.59T18,10v4q0,0.82-0.59,1.41T16,16H8q-0.82,0-1.41-0.59T6,14Z"/></svg></button><button type="button" class="vhome" title="Back to 0, 0"><svg viewBox="0 0 24 24"><path d="M13,18.83V22q0,0.43-0.29,0.71T12,23t-0.71-0.29Q11,22.43 11,22V18.83l-0.4,0.4Q10.33,19.5 9.91,19.5T9.2,19.2q-0.28-0.27-0.28-0.7T9.2,17.8l2.1-2.1q0.3-0.3 0.7-0.3t0.7,0.3l2.1,2.1q0.28,0.27 0.29,0.69T14.8,19.2q-0.28,0.28-0.69,0.29T13.4,19.23L13,18.83ZM5.18,13H2q-0.42,0-0.71-0.29Q1,12.43 1,12t0.29-0.71T2,11H5.18l-0.4-0.4Q4.5,10.33 4.5,9.91T4.8,9.2Q5.08,8.92 5.5,8.92T6.2,9.2l2.1,2.1Q8.6,11.6 8.6,12T8.3,12.7L6.2,14.8q-0.27,0.28-0.69,0.29T4.8,14.8q-0.28-0.27-0.29-0.69T4.78,13.4L5.18,13Zm13.65,0l0.4,0.4q0.27,0.28 0.27,0.69T19.2,14.8q-0.28,0.28-0.7,0.28T17.8,14.8l-2.1-2.1q-0.3-0.3-0.3-0.7t0.3-0.7l2.1-2.1q0.27-0.28 0.69-0.29T19.2,9.2q0.27,0.28 0.29,0.69T19.23,10.6L18.83,11H22q0.43,0 0.71,0.29T23,12t-0.29,0.71T22,13H18.83ZM12,13.5q-0.63,0-1.06-0.44T10.5,12t0.44-1.06T12,10.5t1.06,0.44T13.5,12t-0.44,1.06T12,13.5ZM11,5.18V2q0-0.43 0.29-0.71T12,1t0.71,0.29T13,2V5.18l0.4-0.4Q13.68,4.5 14.09,4.5T14.8,4.8q0.28,0.28 0.28,0.7T14.8,6.2L12.7,8.3Q12.4,8.6 12,8.6T11.3,8.3L9.2,6.2Q8.93,5.93 8.91,5.51T9.2,4.8Q9.48,4.52 9.89,4.51T10.6,4.77L11,5.18Z"/></svg></button></div><span class="cpo" style="top:530px">Value Output</span><span class="cpo" style="top:556px">Done</span><span class="cpo" style="top:582px">Change</span><div class="cvv"><b>0</b><div class="cvd" title="Digits after the point"><button type="button" class="dl" aria-label="Fewer digits"><svg viewBox="0 0 24 24"><path d="M14.5 6.5 9 12l5.5 5.5"/></svg></button><i>2</i><button type="button" class="dr" aria-label="More digits"><svg viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5"/></svg></button></div><span>Value</span></div>' + Object.keys(CVLBL).map(p => '<span class="cpn" data-p="' + p + '" style="top:' + CVY[p] + 'px">' + CVLBL[p] + '</span>').join('')
         + '<label class="cvl" style="left:110px"><span>Rotate Amount</span><input class="ni cvr" type="number" min="0" max="360"></label><label class="cvl" style="left:212px"><span>Move Amount</span><input class="ni cvm" type="number" min="0" step="0.1"></label><label class="cvl" style="left:314px"><span>Stop Line Time</span><input class="ni cvt" type="number" min="0" step="0.1"></label><label class="cvl" style="left:416px"><span>Curve Snap</span><input class="ni cvq" type="number" min="0" step="0.1"></label>';
@@ -2841,6 +2866,9 @@ $('#copy').addEventListener('click', async () => {
     const nk = el.querySelector('.nk'); if (nk && n.t === 'prop') nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, propOpts(n).map(o => ({ id: o.id, sm: o.sm, label: o.label })), id => { n.pr = id; save(); applyProps(); }); });
     else if (nk && n.t === 'loop') nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, [{ id: 'until', sm: '↻', label: 'Loop Until…' }, { id: 'forever', sm: '∞', label: 'Loop Forever' }], id => { n.lm = id; save(); }); });
     else if (nk && n.t === 'value') nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, VMODES.map(m => ({ id: m[0], sm: m[2], label: m[1] })), id => { n.vm = id; save(); }); });
+    else if (nk && n.t === 'expr') {
+      nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, EOPS.map(o => ({ id: o[0], sm: o[1], label: o[2] })), id => { n.eo = id; save(); syncNodes(); }); });
+    }
     else if (nk && n.t === 'cgate') {
       nk.addEventListener('click', e => { e.stopPropagation(); pickList(nk, [{ id: 'value', sm: GIC.value, label: 'Value Mode' }, { id: 'signal', sm: GIC.signal, label: 'Signal Mode' }], id => { n.rm = id; save(); }); });
       const bm = el.querySelector('.bm');
@@ -2989,6 +3017,7 @@ $('#copy').addEventListener('click', async () => {
         else if (c.contains('as')) { const it = get(n.cue); if (it && ok) { it.speed = Math.max(.1, Math.min(4, x)); const pl = players[it.id]; if (pl) pl.playbackRate = it.speed; } }      // speed belongs to the cue itself, so the board's Speed changes with it
         else if (c.contains('nv')) n.v = ok ? x : 0;
         else if (c.contains('cvm')) n.cm = ok ? Math.max(0, Math.min(100, x)) : 1;
+        else if (c.contains('eb') && n.t === 'expr') n.eb = ok ? Math.max(-1e9, Math.min(1e9, x)) : 0;
         else if (c.contains('cvq')) n.cs = ok ? Math.max(0, Math.min(1e4, x)) : .5;
         else if (c.contains('cvt')) { n.ct = ok ? Math.max(0, Math.min(1e4, x)) : 2; cvDraw(); }
         else if (c.contains('cvr')) n.gr = ok ? Math.max(0, Math.min(360, x)) : 45;
@@ -3164,6 +3193,7 @@ $('#copy').addEventListener('click', async () => {
         if (document.activeElement !== ni && !ni.classList.contains('driven')) ni.value = n.k; if (document.activeElement !== tx) tx.value = n.tx;
         el.querySelectorAll('.ip')[1].classList.toggle('off', tm && !inputsL(n.id, 1).length);                         // the number pin is only for Value mode
       }
+      else if (n.t === 'expr') { const o = EOPS.find(x => x[0] === n.eo) || EOPS[0]; el.querySelector('.eop').textContent = o[0] === 'none' ? 'None' : ['sin', 'cos', 'tan'].includes(o[0]) ? o[1] : o[1] + ' ' + o[2]; el.classList.toggle('one', eOne(n.eo)); const eb = el.querySelector('.eb'); if (document.activeElement !== eb && !eb.classList.contains('driven')) eb.value = n.eb; }
       else if (n.t === 'curve') { [18, 19, 20].forEach(p => { const dis = p === 20 ? !!n.sar : !n.elp, ip = el.querySelector('.ip[data-p="' + p + '"]'), lb = el.querySelector('.cpn[data-p="' + p + '"]'); if (ip) ip.classList.toggle('off', dis && !inputsL(n.id, p).length); if (lb) lb.classList.toggle('off', dis); }); [['.cvm', n.cm], ['.cvr', n.gr], ['.cvt', n.ct], ['.cvq', n.cs]].forEach(([q, val]) => { const ni = el.querySelector(q); if (document.activeElement !== ni && !ni.classList.contains('driven')) ni.value = val; }); cvDraw(n); }
       else if (n.t === 'cgate') { el.querySelector('.rm').textContent = n.rm === 'signal' ? 'Signal Mode' : 'Value Mode'; el.querySelector('.bm').textContent = n.bm === 'hold' ? 'Hold Mode' : 'Toggle Mode'; }
       else if (n.t === 'prop') { const o = PROPS.find(x => x.id === n.pr) || PROPS[0]; el.querySelector('.pp').innerHTML = '<i>' + o.sm + '</i>' + o.short; }
@@ -3176,7 +3206,7 @@ $('#copy').addEventListener('click', async () => {
   function removeNode(id) { clearWaits(id); auto.nodes = auto.nodes.filter(n => n.id !== id); auto.links = auto.links.filter(l => l[0] !== id && l[1] !== id); save(); }
   function addNode(t, cue) {
     const n = auto.nodes.length, col = n % 2, row = Math.floor(n / 2) % 3;     // drop new nodes on a loose grid so they never stack
-    auto.nodes.push({ id: uid(), t, x: Math.round((30 - v.x) / v.z + col * 320 + Math.floor(n / 6) * 26), y: Math.round((24 - v.y) / v.z + row * 70 + Math.floor(n / 6) * 26), cue: cue || '', btn: '', n: 2, sec: 1, vol: 100, pitch: 0, v: t === 'mvset' ? 0 : 100, vm: 'add', vx: 1, vs: t === 'value' ? 100 : 0, op: '>', k: 0, lm: 'until', lc: 3, lt: 1, rmin: 0, rmax: 100, txt: 'Hello!', im: 'value', it: 'is', tx: '', si: 1, so: 1, sc: [[0, 0]], sw: 38, sh: 66, sp: null, cr: 0, cg: 0, cb: 0, mw: 5, mh: 5, mx: Array(16).fill(0), mcl: {}, mvw: 5, mvk: 0, mvr: 0, mvs: 0, mtg: 0, pr: 'add', rm: 'value', bm: 'toggle', cm: 1, gr: 45, ct: 2, cs: .5, rd: 2, elp: 0, sar: 0, cv: cvDef(), pc: {} });
+    auto.nodes.push({ id: uid(), t, x: Math.round((30 - v.x) / v.z + col * 320 + Math.floor(n / 6) * 26), y: Math.round((24 - v.y) / v.z + row * 70 + Math.floor(n / 6) * 26), cue: cue || '', btn: '', n: 2, sec: 1, vol: 100, pitch: 0, v: t === 'mvset' ? 0 : 100, vm: 'add', vx: 1, vs: t === 'value' ? 100 : 0, op: '>', k: 0, lm: 'until', lc: 3, lt: 1, rmin: 0, rmax: 100, txt: 'Hello!', im: 'value', it: 'is', tx: '', si: 1, so: 1, sc: [[0, 0]], sw: 38, sh: 66, sp: null, cr: 0, cg: 0, cb: 0, mw: 5, mh: 5, mx: Array(16).fill(0), mcl: {}, mvw: 5, mvk: 0, mvr: 0, mvs: 0, mtg: 0, pr: 'add', rm: 'value', bm: 'toggle', cm: 1, gr: 45, ct: 2, cs: .5, rd: 2, elp: 0, sar: 0, eo: 'add', eb: 1, cv: cvDef(), pc: {} });
     save();
   }
 
@@ -3396,7 +3426,7 @@ $('#copy').addEventListener('click', async () => {
   const outPos = (id, fp) => { const el = nodeEls[id], pt = el && el.querySelectorAll('.port')[fp || 0]; return pt ? [v.x + (parseFloat(el.style.left) + pt.offsetLeft + pt.offsetWidth / 2) * v.z, v.y + (parseFloat(el.style.top) + pt.offsetTop + pt.offsetHeight / 2) * v.z, pt.dataset.s || (nodeById(id) && nodeById(id).t === 'prop' ? 't' : nodeById(id) && nodeById(id).t === 'mvset' && !fp ? 'l' : 'r')] : null; };
   function inPos(to, p, W) {
     const el = nodeEls[to], ip = el && el.querySelector('.ip[data-p="' + p + '"]'); if (!ip) return null;
-    const nn = nodeById(to), dir = !nn ? 'l' : nn.t === 'split' ? (ip.dataset.s || 'l') : nn.t === 'matrix' ? (p < 2 ? 'b' : p < 18 ? 't' : 'l') : (nn.t === 'if' && p === 4) || (nn.t === 'mvset' && p === 0) || (nn.t === 'counter' && p === 1) ? 't' : nn.t === 'mover' ? (p === 16 ? (nn.mvr ? 't' : 'l') : p === 17 ? (nn.mvr ? 'b' : 'r') : nn.mvr ? 'l' : 't') : nn.t === 'loop' ? (p >= 2 ? 'b' : 'l') : nn.t === 'cgate' ? (p === 0 ? 'l' : p === 1 ? 'b' : 't') : nn.t === 'curve' ? ([10, 11, 12, 17].includes(p) ? 'b' : 'l') : VP[nn.t] !== undefined && p >= VP[nn.t] ? 'b' : 'l';
+    const nn = nodeById(to), dir = !nn ? 'l' : nn.t === 'split' ? (ip.dataset.s || 'l') : nn.t === 'matrix' ? (p < 2 ? 'b' : p < 18 ? 't' : 'l') : (nn.t === 'if' && p === 4) || (nn.t === 'mvset' && p === 0) || (nn.t === 'counter' && p === 1) ? 't' : nn.t === 'mover' ? (p === 16 ? (nn.mvr ? 't' : 'l') : p === 17 ? (nn.mvr ? 'b' : 'r') : nn.mvr ? 'l' : 't') : nn.t === 'loop' ? (p >= 2 ? 'b' : 'l') : nn.t === 'cgate' ? (p === 0 ? 'l' : p === 1 ? 'b' : 't') : nn.t === 'expr' ? (p === 0 ? 'l' : 'b') : nn.t === 'curve' ? ([10, 11, 12, 17].includes(p) ? 'b' : 'l') : VP[nn.t] !== undefined && p >= VP[nn.t] ? 'b' : 'l';
     return [v.x + (parseFloat(el.style.left) + ip.offsetLeft + ip.offsetWidth / 2) * v.z, v.y + (parseFloat(el.style.top) + ip.offsetTop + ip.offsetHeight / 2) * v.z, dir];
   }
   /* dynamic wires: a wire runs as its normal loose curve, but if that curve would cross a node it is re-routed around the nodes in the way.
@@ -3731,11 +3761,12 @@ $('#copy').addEventListener('click', async () => {
     const n = nodeById(id); if (!n || seen.has(id)) return false; seen = new Set(seen).add(id);
     if (n.t === 'audio') { const p = players[n.cue]; return !!(p && !p.paused); }
     if (n.t === 'wait') return (n.pend || 0) > 0;
-    if (n.t === 'number') return numV(n) !== 0;
+    if (n.t === 'number') return id in numSent && numSent[id] !== 0;
     if (n.t === 'loop') return !!loops[id];
     if (n.t === 'value') return vcur(n) !== 0;
     if (n.t === 'key' || n.t === 'ui') return !!n.btn && !!n.hold && (n.t === 'ui' ? ubHeld.has(n.btn) : isHeld(n.btn));      // only a node with Allow Holding counts as held; without it a press is one signal
     if (n.t === 'cgate') return gOpen(n);
+    if (n.t === 'expr') { if (seen.has(id)) return false; const v = exprCalc(n, seen); return isFinite(v) && v !== 0; }
     if (n.t === 'curve') return !!(cvRun[id] && cvRun[id].on);
     if (n.t === 'counter') return (cnt[id] || 0) > 0;
     if (n.t === 'random') { const [lo, hi] = rRange(n); return (n.rv || 0) >= (lo + hi) / 2 && n.rv !== undefined; }
@@ -3765,11 +3796,12 @@ $('#copy').addEventListener('click', async () => {
       return l ? numOf(l[0], s2, l[3]) : 0;
     }
     if (n.t === 'curve') return cvVal(n);
+    if (n.t === 'expr') { if (seen.has(id)) return 0; const v = exprCalc(n, seen); return isFinite(v) ? v : 0; }
     if (n.t === 'cgate') { if (seen.has(id)) return gs(id).v; const s = gs(id); if (n.rm === 'signal') return gOpen(n) ? 1 : 0; if (gOpen(n)) s.v = gIn(n, seen); return s.v; }
     if (n.t === 'counter') return cnt[id] || 0;
     if (n.t === 'random') return n.rv || 0;
     if (n.t === 'wait') return n.pend || 0;
-    if (n.t === 'number') return numV(n);
+    if (n.t === 'number') return id in numSent ? numSent[id] : NaN;
     if (n.t === 'loop') return loops[id] ? loops[id].i : 0;
     if (n.t === 'value') return vcur(n);
     if (n.t === 'audio') { const p = players[n.cue]; return p ? Math.round(p.currentTime * 10) / 10 : 0; }
@@ -3779,9 +3811,9 @@ $('#copy').addEventListener('click', async () => {
   /* volume and pitch: set in the node, or driven by whatever is wired into its top (volume) / bottom (pitch) pin */
   function applyAudio(n, it, pl) {
     const vl = inputsL(n.id, 3)[0], pt = inputsL(n.id, 4)[0], sp = inputsL(n.id, 5)[0];
-    const speed = Math.max(.1, Math.min(4, +(sp ? numOf(sp[0], new Set([n.id]), sp[3]) : it.speed || 1) || 1));
-    const vol = Math.max(0, Math.min(100, +(vl ? numOf(vl[0], new Set([n.id]), vl[3]) : n.vol) || 0));
-    const st = Math.max(-24, Math.min(24, +(pt ? numOf(pt[0], new Set([n.id]), pt[3]) : n.pitch) || 0));
+    const speed = Math.max(.1, Math.min(4, +liveIn(n, 5, it.speed || 1) || 1));      // a wire that has nothing to say (e.g. a Number not sent yet) leaves the node's own value
+    const vol = Math.max(0, Math.min(100, +liveIn(n, 3, n.vol) || 0));
+    const st = Math.max(-24, Math.min(24, +liveIn(n, 4, n.pitch) || 0));
     pl.volume = vol / 100; pl.playbackRate = Math.max(.0625, Math.min(16, speed * Math.pow(2, st / 12)));
     pl.preservesPitch = pl.mozPreservesPitch = pl.webkitPreservesPitch = st !== 0 ? false : it.keepPitch !== false;
   }
@@ -3795,7 +3827,7 @@ $('#copy').addEventListener('click', async () => {
     const el = n && nodeEls[n.id], cc = el && el.querySelector('.t-loop .cc, .cc'); if (!cc || n.t !== 'loop') return;
     const L = loops[n.id]; cc.textContent = (L ? L.i : 0) + (n.lm === 'forever' ? ' / ∞' : ' / ' + loopTotal(n));
   }
-  function loopTotal(n) { const l = inputsL(n.id, 2)[0]; return l ? Math.max(0, Math.min(99999, Math.round(+numOf(l[0], new Set([n.id]), l[3]) || 0))) : n.lc; }
+  function loopTotal(n) { return Math.max(0, Math.min(99999, Math.round(+liveIn(n, 2, n.lc) || 0))); }
   function endLoop(id, broken) {                               // finished: stop, then fire the "done" pin. Broken: just stop, Done stays quiet
     const L = loops[id], n = nodeById(id); if (!L || !n) return;
     clearTimeout(L.t); delete loops[id]; updLoop(n); flash(id); if (!broken) emit(id, new Set([id]), blank(), 1);
@@ -3869,6 +3901,7 @@ $('#copy').addEventListener('click', async () => {
       if (loops[to]) clearTimeout(loops[to].t); loops[to] = { i: 0, t: 0 }; loopStep(to);        // start (or restart)
     }
     else if (n.t === 'number') {                                                                  // run: push this number into whatever it is wired to
+      numSent[to] = numV(n);
       auto.links.filter(l => l[0] === to).forEach(l => {
         const t = nodeById(l[1]); if (!t) return; glowLink(l);
         if (t.t === 'value') { if (l[2] === 0) { valCur[t.id] = numV(n); updValue(t); flash(t.id); } }     // VALUE: set it to this number
@@ -3913,8 +3946,8 @@ $('#copy').addEventListener('click', async () => {
     if (srcs.length && st.miss && !st.played && !st.stopped && !st.delayed) toast('That cue has no audio file yet');
     const row = only ? null : minner.querySelector('.mrow[data-id="' + b.id + '"]'); if (row) { row.classList.remove('ran'); void row.offsetWidth; row.classList.add('ran'); }
   }
-  const VPIN = { curve: [[10, '.cvm', cvM], [11, '.cvr', cvR], [12, '.cvt', cvT], [17, '.cvq', cvS]], loop: [[2, '.lc', n => loopTotal(n)], [3, '.lt', lEvery]], counter: [[2, '.ni', cN]], wait: [[1, '.ni', wSec]], if: [[1, n => n.im === 'text' ? '.tx' : '.ik', n => n.im === 'text' ? null : ifK(n)], [4, '.nm', null]], number: [[1, '.ni', numV]], mvset: [[1, '.ni', n => mvV(n)]], print: [[1, '.pt', null]], random: [[1, '.rmin', n => rRange(n)[0]], [2, '.rmax', n => rRange(n)[1]]] };
-  const rgbVal = n => [0, 1, 2].map(i => { const l = inputsL(n.id, i)[0]; return Math.max(0, Math.min(255, Math.round(l ? +numOf(l[0], new Set([n.id]), l[3]) || 0 : n['c' + 'rgb'[i]] || 0))); });
+  const VPIN = { expr: [[2, '.eb', n => liveIn(n, 2, n.eb)]], curve: [[10, '.cvm', cvM], [11, '.cvr', cvR], [12, '.cvt', cvT], [17, '.cvq', cvS]], loop: [[2, '.lc', n => loopTotal(n)], [3, '.lt', lEvery]], counter: [[2, '.ni', cN]], wait: [[1, '.ni', wSec]], if: [[1, n => n.im === 'text' ? '.tx' : '.ik', n => n.im === 'text' ? null : ifK(n)], [4, '.nm', null]], number: [[1, '.ni', numV]], mvset: [[1, '.ni', n => mvV(n)]], print: [[1, '.pt', null]], random: [[1, '.rmin', n => rRange(n)[0]], [2, '.rmax', n => rRange(n)[1]]] };
+  const rgbVal = n => [0, 1, 2].map(i => Math.max(0, Math.min(255, Math.round(+liveIn(n, i, n['c' + 'rgb'[i]] || 0) || 0))));
   let lightRaf = 0;
   function lightTick() {
     if (!autoOpen) { lightRaf = 0; return; }
@@ -3934,6 +3967,7 @@ $('#copy').addEventListener('click', async () => {
         const box = el.querySelector(pp[1]), ip = el.querySelector('.ip[data-p="' + pp[0] + '"]');
         if (box && ip) { const lx = (box.offsetLeft + box.offsetWidth / 2) + 'px'; if (ip.style.left !== lx) { ip.style.left = lx; moved = true; } box.classList.toggle('plink', !!inputsL(n.id, pp[0]).length); }
       });
+      if (n.t === 'expr') { const v = exprCalc(n), ev = el.querySelector('.ev'), tx = isFinite(v) ? String(Math.round(v * 1e6) / 1e6) : 'undefined'; if (ev && ev.textContent !== tx) ev.textContent = tx; }
       if (n.t === 'curve') { const sv = el.querySelector('.cvs'); if (sv && sv._b && sv._b.st !== cvT(n)) cvDraw(); }
       if (n.t === 'cgate') { const o = gOpen(n); el.classList.toggle('gopen', o); const gv = el.querySelector('.gv'), tx = n.rm === 'signal' ? (o ? 'Open' : 'Closed') : fmtV(numOf(n.id, new Set())); if (gv && gv.textContent !== tx) gv.textContent = tx; }
       else if (n.t === 'light') el.querySelector('.lamp').classList.toggle('on', pin(n.id, 0, new Set()) || (n.lit || 0) > now);
@@ -3943,7 +3977,7 @@ $('#copy').addEventListener('click', async () => {
         [['.av', 3, 0, 100, n.vol], ['.ap', 4, -24, 24, n.pitch], ['.as', 5, .1, 4, it ? it.speed || 1 : 1]].forEach(([sel, pn, lo, hi, own]) => {
           const box = el.querySelector(sel), l = inputsL(n.id, pn)[0];
           box.classList.toggle('driven', !!l); box.readOnly = !!l;
-          const str = String(l ? Math.round(Math.max(lo, Math.min(hi, +numOf(l[0], new Set([n.id]), l[3]) || 0)) * 100) / 100 : own);
+          const str = String(l ? Math.round(Math.max(lo, Math.min(hi, +liveIn(n, pn, own) || 0)) * 100) / 100 : own);
           if (document.activeElement !== box && box.value !== str) box.value = str;
         });
       }
@@ -4092,7 +4126,7 @@ $('#copy').addEventListener('click', async () => {
   /* what's new: edit this list when something ships (newest first) */
   const CHANGES = [
     { id: '2026-11-09', date: '9 Nov 2026', title: 'Polish and Toggle Mode', groups: [
-      ['New', ['Output button next to Copy save: choose which speaker or headphones the board plays through (Chrome and Edge on a computer). ', 'New [[Grapher]] (Beta) node: a curve editor you control with signals. Curved points are squares and straight ones circles (filled when selected); move points up, down, left and right, turn their handles and push them further or closer, and everything glides smoothly. The graph runs in seconds: Run Graph plays a blue line from 0s to the dark blue Stop Line (set its time in seconds) in real time, and the height of the curve under it comes out of the Value pin. Drag empty space to pan, Ctrl + scroll to zoom; the guide numbers follow. Right-click it and pick Enable Ending Line Pins to use the +1s / -1s pins that move the Stop Line. Run Graph plays and pauses (it reads Pause Graph while playing) and Restart jumps back to 0s; turn on Semi-Auto Repeat from the right-click menu to make every Run signal start again from 0 instead. ', 'New [[Gate]] node: lets signals and changing values through only while it is open. The blue pin opens it (Toggle Mode flips it open / shut, Hold Mode keeps it open while the pin is held), and the two orange pins pick Value Mode (repeats the value coming in whenever it changes) or Signal Mode (repeats signals). ', '[[UI Button]] and [[Button Input]] nodes have an Allow Holding option in their selection bar: hold the button (or its key) and it keeps sending signals until you let go. ', '[[Audio]] has a red Restart pin (rewinds the sound to the beginning and stops it) and its Stop pin is now Pause: it holds the sound where it is, and Play carries on from there. Volume and pitch pins moved down one, old saves are updated for you', '[[LOOP]]: a signal into Break stops the loop without sending anything out of Done (Done only fires when the loop finishes)', 'Loops: a wire may now lead back to a node it already passed (even to its own input), and the signal goes round again a moment later, so loops keep running', 'A small red Stop everything button at the bottom-left of the node editor stops every sound, wait and loop at once', '[[Counter]] has a Reset pin on top: a signal into it sets the count back to 0. Old saves keep working, a wire into the count pin moves to its new place at the bottom', '[[LED Matrix]] Toggle Mode (on its bar): a signal at an LED that is already on turns it off. It fires once per signal, so one signal can\'t flip an LED on and straight back off', 'The Mover\'s rotate button moved from the node to the bar above the selection']],
+      ['New', ['New [[Expression]] node: does a sum with the number coming in (+, −, ×, ÷, root, sin, cos, tan in degrees) and shows the answer live; set it to None to just view a number. ', 'Output button next to Copy save: choose which speaker or headphones the board plays through (Chrome and Edge on a computer). ', 'New [[Grapher]] (Beta) node: a curve editor you control with signals. Curved points are squares and straight ones circles (filled when selected); move points up, down, left and right, turn their handles and push them further or closer, and everything glides smoothly. The graph runs in seconds: Run Graph plays a blue line from 0s to the dark blue Stop Line (set its time in seconds) in real time, and the height of the curve under it comes out of the Value pin. Drag empty space to pan, Ctrl + scroll to zoom; the guide numbers follow. Right-click it and pick Enable Ending Line Pins to use the +1s / -1s pins that move the Stop Line. Run Graph plays and pauses (it reads Pause Graph while playing) and Restart jumps back to 0s; turn on Semi-Auto Repeat from the right-click menu to make every Run signal start again from 0 instead. ', 'New [[Gate]] node: lets signals and changing values through only while it is open. The blue pin opens it (Toggle Mode flips it open / shut, Hold Mode keeps it open while the pin is held), and the two orange pins pick Value Mode (repeats the value coming in whenever it changes) or Signal Mode (repeats signals). ', '[[UI Button]] and [[Button Input]] nodes have an Allow Holding option in their selection bar: hold the button (or its key) and it keeps sending signals until you let go. ', '[[Audio]] has a red Restart pin (rewinds the sound to the beginning and stops it) and its Stop pin is now Pause: it holds the sound where it is, and Play carries on from there. Volume and pitch pins moved down one, old saves are updated for you', '[[LOOP]]: a signal into Break stops the loop without sending anything out of Done (Done only fires when the loop finishes)', 'Loops: a wire may now lead back to a node it already passed (even to its own input), and the signal goes round again a moment later, so loops keep running', 'A small red Stop everything button at the bottom-left of the node editor stops every sound, wait and loop at once', '[[Counter]] has a Reset pin on top: a signal into it sets the count back to 0. Old saves keep working, a wire into the count pin moves to its new place at the bottom', '[[LED Matrix]] Toggle Mode (on its bar): a signal at an LED that is already on turns it off. It fires once per signal, so one signal can\'t flip an LED on and straight back off', 'The Mover\'s rotate button moved from the node to the bar above the selection']],
       ['Look and feel', ['A motion blur button above the sun / moon: things blur in the direction they move. A green dot shows when it is on, and it remembers your choice', 'The sun / moon button moved to the bottom-right and animates: the sun sucks in its rays and curls into the moon, and back the other way, always turning clockwise', 'Switching theme fades the whole board, the dotted grid and every panel instead of snapping', 'The reset-view button is a glass button with a white icon, in light and dark', 'Dialogs (What\'s new, Edit length, sharing, naming) follow the dark theme', 'The theme button sits behind everything else, so it never covers the node editor or menus', 'The icon picker no longer clips the corner of the "None" tile and the tile edges', 'The [[Mover]] pin-mode button now reads "Single-Pin Mode" / "Multi-Pin Mode"']],
       ['Live sharing', ['Cursors follow the page each person has open: if I open a page, people on the board go behind it; if we both have the same page open I see their cursor on it; if they have a page open and I don\'t, I can\'t see it']],
       ['Changelog', ['This list now covers every change so far, and the newest entry is marked (latest)']]
