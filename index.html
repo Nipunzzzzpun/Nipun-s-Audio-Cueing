@@ -1156,6 +1156,15 @@
   }
 
   const ALLOWED = new Set(['B', 'I', 'U', 'STRONG', 'EM', 'BR', 'DIV', 'SPAN', 'P']);
+  function spanStyle(el) {
+    const st = el.style, out = [];
+    const ff = st.fontFamily && FONTS.find(f => fam(f.n) === st.fontFamily || st.fontFamily.replace(/["']/g, '').startsWith(f.n)); if (ff) out.push('font-family:' + fam(ff.n));
+    const fs = /^(\d+(?:\.\d+)?)px$/.exec(st.fontSize || ''); if (fs && +fs[1] >= 8 && +fs[1] <= 300) out.push('font-size:' + (+fs[1]) + 'px');
+    if (/^(#[0-9a-f]{3,8}|rgba?\([\d.,\s%]+\))$/i.test(st.color || '')) out.push('color:' + st.color);
+    if (/^(normal|bold|[1-9]00)$/.test(st.fontWeight || '')) out.push('font-weight:' + st.fontWeight);
+    if (/^(normal|italic)$/.test(st.fontStyle || '')) out.push('font-style:' + st.fontStyle);
+    return out.join(';');
+  }
   function clean(html) {
     const t = document.createElement('template'); t.innerHTML = html;
     (function walk(n) {
@@ -1163,7 +1172,10 @@
         if (c.nodeType === 1) {
           walk(c);
           if (!ALLOWED.has(c.tagName)) c.replaceWith(...c.childNodes);
-          else [...c.attributes].forEach(a => c.removeAttribute(a.name));
+          else {
+            const keep = c.tagName === 'SPAN' ? spanStyle(c) : '';            // formatting done on a selection lives on spans
+            [...c.attributes].forEach(a => c.removeAttribute(a.name)); if (keep) c.setAttribute('style', keep);
+          }
         } else if (c.nodeType !== 3) c.remove();
       });
     })(t.content);
@@ -1420,7 +1432,7 @@
     /* vertical anchor: when the text gets taller or shorter, the box grows down (top), both ways (middle) or up (bottom) */
     let lastH = 0; new ResizeObserver(() => {
       const h = el.offsetHeight; if (!h) return; const d = lastH ? h - lastH : 0; lastH = h;
-      if (!d || !it.va || it.va === 'top' || selId !== it.id) return;
+      if (!d || !it.va || it.va === 'top' || selId !== it.id || (drag && drag.mode === 'resize' && drag.el === el)) return;
       it.y = Math.round(it.y - (it.va === 'bottom' ? d : d / 2)); position(it, el); syncSel(); clearTimeout(el._vat); el._vat = setTimeout(save, 300);
     }).observe(el);
     c.addEventListener('blur', () => { it.html = clean(c.innerHTML) || 'Text'; c.contentEditable = 'false'; editingId = null; save(); });
@@ -1593,8 +1605,7 @@
         position(it, drag.el); drag.el.style.width = it.w + 'px'; drag.el.style.height = it.h + 'px';
       } else if (it.type === 'text') {
         it.x = L; it.w = R - L;
-        if (dir.length === 2) { it.fs = Math.max(8, drag.ofs * it.w / drag.ow); $('#fs').value = Math.round(it.fs); }   // corners scale the text
-        styleText(it, drag.el);                                    // side handles only change the wrapping width
+        styleText(it, drag.el);                                    // every handle only changes the wrapping width; the text keeps its size
         if (dir.includes('n')) it.y = Math.max(0, drag.oy + drag.oh - drag.el.offsetHeight);
         position(it, drag.el);
       }
@@ -1799,6 +1810,26 @@
 
   /* ---------- text toolbar ---------- */
   const fbtn = $('#fontBtn'), fmenu = $('#fmenu'), picker = $('#picker'), cbtn = $('#colorBtn');
+  /* formatting a selection: remember the highlighted words (even after the cursor leaves the box for the size box or colour picker) and wrap just them */
+  let selMem = null, fmtSpan = null, selQuiet = false;
+  document.addEventListener('selectionchange', () => {
+    if (selQuiet || !editingId) return; const s = getSelection(), c = els[editingId] && els[editingId].querySelector('.content'); if (!c || !s.rangeCount) return;
+    if (!c.contains(s.anchorNode) || !c.contains(s.focusNode)) return;
+    if (s.isCollapsed) { selMem = null; fmtSpan = null; return; }
+    selMem = { id: editingId, r: s.getRangeAt(0).cloneRange() }; fmtSpan = null;
+  });
+  addEventListener('pointerdown', e => { if (!e.target.closest('#bar, .pop, .item.text .content[contenteditable="true"]')) { selMem = null; fmtSpan = null; } }, true);
+  function styleSel(prop, val) {
+    const it = get(selId); if (!it || it.type !== 'text' || !selMem || selMem.id !== it.id) return false;
+    const c = els[it.id].querySelector('.content'); let span = fmtSpan && fmtSpan.isConnected && c.contains(fmtSpan) ? fmtSpan : null;
+    if (!span) { const r = selMem.r; if (!c.contains(r.commonAncestorContainer)) return false; span = document.createElement('span'); span.appendChild(r.extractContents()); r.insertNode(span); fmtSpan = span; }
+    span.style[prop] = val;
+    span.querySelectorAll('span').forEach(x => { x.style[prop] = ''; if (!x.getAttribute('style')) x.replaceWith(...x.childNodes); });      // the new choice wins inside the selection
+    const nr = document.createRange(); nr.selectNodeContents(span); selMem.r = nr;
+    if (editingId === it.id && !/INPUT/.test(document.activeElement.tagName)) { selQuiet = true; const s = getSelection(); s.removeAllRanges(); s.addRange(nr.cloneRange()); setTimeout(() => { selQuiet = false; }); }
+    it.html = clean(c.innerHTML); clearTimeout(c._st); c._st = setTimeout(save, 250); syncSel(); netLive();
+    return true;
+  }
   function fadeSwap(c, fn) {
     c.style.opacity = '0';
     setTimeout(() => { fn(); requestAnimationFrame(() => { c.style.opacity = ''; syncSel(); }); }, 150);
@@ -1829,7 +1860,10 @@
       const partial = editingId === it.id && sl.rangeCount && !sl.isCollapsed && c.contains(sl.anchorNode);
       if (partial) document.execCommand(cmd);                       // only the highlighted words
       else if (cmd === 'bold') { it.bold = !it.bold; styleText(it, els[it.id]); }   // weight glides (variable fonts)
-      else { it.italic = !it.italic; fadeSwap(c, () => styleText(it, els[it.id])); }
+      else {                                                          // italic: swap the style straight away, then let the slant ease in (or out) instead of fading
+        it.italic = !it.italic; styleText(it, els[it.id]); syncSel();
+        if (c.animate) c.animate([{ transform: 'skewX(' + (it.italic ? 11 : -11) + 'deg)' }, { transform: 'skewX(0deg)' }], { duration: 340, easing: 'cubic-bezier(.22,.9,.28,1)' });
+      }
       syncBar(it); save(); syncSel();
     });
   });
@@ -1841,7 +1875,7 @@
     b.addEventListener('pointerdown', () => { bump(); t = setTimeout(() => { iv = setInterval(bump, 60); }, 380); });
     ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, stop));
   });
-  $('#fs').addEventListener('input', e => { const it = get(selId), v = +e.target.value; if (v >= 8 && v <= 300) { it.fs = v; styleText(it, els[it.id]); save(); syncSel(); } });
+  $('#fs').addEventListener('input', e => { const it = get(selId), v = +e.target.value; if (v >= 8 && v <= 300 && styleSel('fontSize', v + 'px')) return; if (v >= 8 && v <= 300) { it.fs = v; styleText(it, els[it.id]); save(); syncSel(); } });
 
   /* font list */
   FONTS.forEach((f, i) => {
@@ -1850,6 +1884,7 @@
     b.addEventListener('mousedown', e => e.preventDefault());
     b.addEventListener('click', () => {
       const it = get(selId); if (!it) return; closePops();
+      if (styleSel('fontFamily', fam(f.n))) return;                  // only the highlighted words
       if (it.font === f.n) return;
       const c = els[it.id].querySelector('.content');
       fadeSwap(c, () => { it.font = f.n; styleText(it, els[it.id]); });
@@ -1916,6 +1951,7 @@
   function commitColor(skip, live) {
     const h = pickerRender(skip); if (pickCb) { pickCb(h); return; }
     const it = get(selId); if (!it || it.type !== 'text') return;
+    if (styleSel('color', h)) { cbtn.style.setProperty('--c', h); return; }
     it.color = h; const c = els[it.id].querySelector('.content');
     if (live) c.style.transition = 'opacity .14s ease';      // no lag while dragging
     c.style.color = h; cbtn.style.setProperty('--c', h); save();
@@ -3569,7 +3605,7 @@ $('#copy').addEventListener('click', async () => {
     auto.links.forEach((l, n) => {
       const a = outPos(l[0], l[3]), b = inPos(l[1], l[2], W); if (!a || !b) return;
       const d = routeWire(a, b, rects, l[0] + '>' + l[1] + ':' + l[2] + '/' + (l[3] || 0));
-      s += '<g class="wg' + (badLink(l) ? ' bad' : '') + ((lglow.get(l[0] + l[1] + l[2]) || 0) > nowT ? ' on' : '') + '" data-n="' + n + '" style="--wc:' + wireFill(l, n, a, b, (x) => { defs += x; }) + '"><path class="hit" d="' + d + '"/><path class="vis" d="' + d + '"/></g>';
+      s += '<g class="wg' + (badLink(l) ? ' bad' : '') + ((lglow.get(l[0] + l[1] + l[2]) || 0) > nowT ? ' on' : '') + '" data-n="' + n + '" data-k="' + l.join('|') + '" style="--wc:' + wireFill(l, n, a, b, (x) => { defs += x; }) + '"><path class="hit" d="' + d + '"/><path class="vis" d="' + d + '"/></g>';
     });
     if (wd) { const a = outPos(wd.id, wd.fp); if (a) s += '<path class="tmp" style="--wc:' + pinColor(nodeById(wd.id), outKey(wd.fp)) + '" d="' + wirePath(a[0], a[1], wd.cx, wd.cy, wd.snapB ? wd.snapB[2] : undefined, a[2]) + '"/>'; }
     wep.clear(); wepNext.forEach((x, k) => wep.set(k, x)); wepNext.clear();
@@ -3592,7 +3628,14 @@ $('#copy').addEventListener('click', async () => {
   function badLink(l) { const t = nodeById(l[1]); return !!t && ((t.t === 'curve' && (((l[2] === 18 || l[2] === 19) && !t.elp) || (l[2] === 20 && t.sar))) || (t.t === 'loop' && l[2] === 2 && t.lm === 'forever') || (t.t === 'if' && l[2] === 1 && t.im === 'text')); }
   new ResizeObserver(drawWires).observe(acanvas);
   mlist.addEventListener('scroll', drawWires);
-  awires.addEventListener('click', e => { const g = e.target.closest('.wg'); if (!g) return; auto.links.splice(+g.dataset.n, 1); save(); toast('Disconnected'); });
+  /* clicking a wire disconnects it. Wires are redrawn while signals glow along them, so the click is matched by which wire it is (not by the element), on pointer down + up */
+  let wDown = null;
+  awires.addEventListener('pointerdown', e => { const g = e.target.closest('.wg'); wDown = g ? { k: g.dataset.k, x: e.clientX, y: e.clientY } : null; });
+  addEventListener('pointerup', e => {
+    const d = wDown; wDown = null; if (!d || Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6) return;
+    const i = auto.links.findIndex(l => l.join('|') === d.k); if (i < 0) return;
+    auto.links.splice(i, 1); save(); drawWires(); toast('Disconnected');
+  });
 
   function rowAt(cx, cy) {
     const r = mlist.getBoundingClientRect();
