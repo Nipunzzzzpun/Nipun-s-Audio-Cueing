@@ -869,6 +869,17 @@
   body.dark .dialog .row button, body.dark .dialog .presets button { background: #444448; color: #f1f1f3; }
   body.dark .dialog .presets button:hover { background: #55555a; }
   body.dark .dialog .row .go, body.dark .dialog .presets button.on { background: #fff; color: #111; }
+  .dialog.len { width: min(600px, calc(100vw - 32px)); padding: 32px 36px 28px; border-radius: 26px; }
+  .dialog.len h3 { font-size: 24px; font-weight: 500; margin-bottom: 8px; }
+  .dialog.len p { font-size: 13.5px; color: #777; margin-bottom: 14px; }
+  .dialog.len canvas { display: block; width: calc(100% + 16px); margin: 0 -8px; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .dialog.len .lwave { height: 158px; cursor: grab; } .dialog.len .lwave.grab { cursor: grabbing; } .dialog.len .lwave.edge { cursor: ew-resize; }
+  .dialog.len .lmini { height: 40px; margin-top: 10px; cursor: pointer; } .dialog.len .lmini.edge { cursor: ew-resize; } .dialog.len .lmini.grab { cursor: grabbing; }
+  .dialog.len .lscale { display: flex; justify-content: space-between; margin-top: 6px; font-size: 12px; font-weight: 500; color: #8a8a8f; user-select: none; }
+  .dialog.len .lfoot { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; }
+  .dialog.len .lfoot .chk { margin: 0; font-size: 15px; } .dialog.len .lfoot .row { margin: 0; }
+  .dialog.len .row button { height: 40px; padding: 0 26px; border-radius: 20px; font: 500 16.5px 'Montserrat', sans-serif; }
+  body.dark .dialog.len p { color: #9a9aa0; } body.dark .dialog.len .row button:not(.go) { background: #555559; }
   body.dark .dialog.cl .tg { background: #444448; color: #f1f1f3; }
   .toast { position: fixed; left: 50%; bottom: 28px; z-index: 300; transform: translate(-50%, 20px); padding: 10px 18px; border-radius: 20px;
     background: #000; color: #fff; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .35s var(--ease); }
@@ -981,6 +992,14 @@
   </div>
 </div>
 
+<div class="overlay" id="warnOverlay">
+  <div class="dialog">
+    <h3 id="warnTitle"></h3>
+    <p id="warnMsg"></p>
+    <div class="row"><button id="warnCancel">Cancel</button><button class="go" id="warnGo">Continue</button></div>
+  </div>
+</div>
+
 <div class="overlay" id="codeOverlay"><div class="bigcode" id="bigCode"></div></div>
 
 <button class="gh wn" id="wn" type="button" title="See what's new"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.1 6.1.5-4.7 4 1.5 6.2L12 15.6 6.7 18.8l1.5-6.2-4.7-4 6.1-.5z"/></svg>What's new<i class="wdot" id="wdot"></i></button>
@@ -1018,13 +1037,13 @@
 </div>
 
 <div class="overlay" id="lenOverlay">
-  <div class="dialog">
-    <h3>Edit length</h3>
+  <div class="dialog len">
+    <h3>Edit Length</h3>
     <p id="lenInfo"></p>
-    <label class="lbl">Start <b id="lenS"></b><input type="range" id="lenStart" min="0" step="0.01" value="0"></label>
-    <label class="lbl">End <b id="lenE"></b><input type="range" id="lenEnd" min="0" step="0.01" value="0"></label>
-    <label class="chk"><input type="checkbox" id="lenLoop"> Loop</label>
-    <div class="row"><button id="lenPreview">Preview</button><button class="go" id="lenDone">Done</button></div>
+    <canvas class="lwave" id="lenWave" title="Scroll to zoom, drag to move along, double-click to see it all"></canvas>
+    <canvas class="lmini" id="lenMini"></canvas>
+    <div class="lscale"><span>0s</span><span id="lenTot"></span></div>
+    <div class="lfoot"><label class="chk"><input type="checkbox" id="lenLoop"> Loop</label><div class="row"><button id="lenPreview">Preview</button><button class="go" id="lenDone">Done</button></div></div>
   </div>
 </div>
 
@@ -1175,7 +1194,7 @@
   const uid = () => Math.random().toString(36).slice(2, 9);
   const get = id => items.find(i => i.id === id);
   const net = { role: null, peer: null, conn: null, conns: new Set(), me: null, users: [], code: '', pending: '', joinCode: '', joining: false, backup: null };
-  const lastSent = new Map();
+  const lastSent = new Map(); let lastAuto = '';
   let applying = false;
 
   let toastT;
@@ -1762,19 +1781,92 @@
   $('#spdDone').addEventListener('click', closeSpeed);
   spdOverlay.addEventListener('pointerdown', e => { if (e.target === spdOverlay) closeSpeed(); });
 
-  /* ---------- edit length ---------- */
-  const lenOverlay = $('#lenOverlay'), lenStart = $('#lenStart'), lenEnd = $('#lenEnd');
+  /* ---------- edit length: a zoomable pill waveform with start / end handles, and an overview strip under it ---------- */
+  const lenOverlay = $('#lenOverlay'), lwave = $('#lenWave'), lmini = $('#lenMini');
   let lenId = null, lenDur = 0;
+  const L = { s: 0, e: 0, v0: 0, sp: 1, tv0: 0, tsp: 1, pk: null, mini: null, drag: null, raf: 0, dirty: true };
   const fmtT = v => (+v).toFixed(2) + 's';
+  const fmtS = v => { const r = Math.round(v * 100) / 100; return (r % 1 ? r.toFixed(2).replace(/0$/, '') : String(r)) + 's'; };
+  const peakCache = new Map();
+  async function lenPeaks(it, src) {                      // loudest sample in each small slice of time, worked out once per file
+    const c = peakCache.get(it.id); if (c && c.src === src) return c.pk;
+    const buf = await (await fetch(src)).arrayBuffer();
+    const AC = window.OfflineAudioContext || window.webkitOfflineAudioContext, ab = await new AC(1, 2, 44100).decodeAudioData(buf);
+    const n = Math.max(1000, Math.min(120000, Math.ceil(ab.duration * 400))), pk = new Float32Array(n);
+    for (let ch = 0; ch < ab.numberOfChannels; ch++) {
+      const d = ab.getChannelData(ch), k = n / d.length;
+      for (let i = 0; i < d.length; i++) { const a = d[i] < 0 ? -d[i] : d[i], b = (i * k) | 0; if (a > pk[b]) pk[b] = a; }
+    }
+    let mx = 0; for (let i = 0; i < n; i++) if (pk[i] > mx) mx = pk[i]; if (mx > 0) for (let i = 0; i < n; i++) pk[i] /= mx;
+    peakCache.set(it.id, { src, pk }); return pk;
+  }
+  const pkAt = (t0, t1) => { const pk = L.pk; if (!pk) return .18; const n = pk.length, b0 = Math.max(0, Math.floor(t0 / lenDur * n)), b1 = Math.min(n, Math.max(b0 + 1, Math.ceil(t1 / lenDur * n))); let m = 0; for (let i = b0; i < b1; i++) if (pk[i] > m) m = pk[i]; return m; };
+  const LPAD = 8;
+  function lenCols() {
+    const dk = document.body.classList.contains('dark');
+    return dk ? { box: '#38383c', sel: '#59595d', pin: '#7d7d82', pout: '#47474b', win: '#5c5c60', wpin: '#8e8e93', mout: '#4a4a4e', ink: '#fff', bg: '#2b2b2e', ph: '#6495ed' }
+              : { box: '#f4f4f4', sel: '#d6d6d6', pin: '#a9a9a9', pout: '#e3e3e3', win: '#d6d6d6', wpin: '#a3a3a3', mout: '#dedede', ink: '#000', bg: '#fff', ph: '#6495ed' };
+  }
+  function fitCanvas(cv) { const r = cv.getBoundingClientRect(), d = devicePixelRatio || 1, w = Math.round(r.width * d), h = Math.round(r.height * d); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; } const x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return [x, r.width, r.height]; }
+  const rr = (x, X, Y, W, H, r) => { x.beginPath(); x.roundRect ? x.roundRect(X, Y, W, H, r) : x.rect(X, Y, W, H); };
+  const lenX = (t, W) => LPAD + (t - L.v0) / L.sp * W;
+  function lenDraw() {
+    const C = lenCols(), p = players[lenId], playing = p && !p.paused, pt = p ? p.currentTime : 0;
+    { /* main waveform */
+      const [x, cw, ch] = fitCanvas(lwave), W = cw - LPAD * 2, TOP = 30, H = ch - TOP, mid = TOP + H / 2; x.clearRect(0, 0, cw, ch);
+      x.save(); rr(x, LPAD, TOP, W, H, 12); x.fillStyle = C.box; x.fill(); x.clip();
+      const xs = lenX(L.s, W), xe = lenX(L.e, W); if (xe > xs) { x.fillStyle = C.sel; x.fillRect(xs, TOP, xe - xs, H); }
+      const P = 16, pw = 7, nP = Math.ceil(W / P) + 1, tpp = L.sp * P / W, first = Math.floor(L.v0 / tpp);
+      for (let i = first; i < first + nP; i++) {
+        const t0 = i * tpp, t1 = t0 + tpp; if (t0 >= lenDur) break; if (t1 <= 0) continue;
+        const cx = lenX(t0 + tpp / 2, W), v = Math.pow(pkAt(t0, t1), .8), h = Math.max(pw, v * (H - 36));
+        x.fillStyle = t0 + tpp / 2 >= L.s && t0 + tpp / 2 <= L.e ? C.pin : C.pout; rr(x, cx - pw / 2, mid - h / 2, pw, h, pw / 2); x.fill();
+      }
+      if (playing || (pt > L.s + .001 && pt < L.e)) { const px = lenX(pt, W); x.fillStyle = C.ph; x.fillRect(px - 1, TOP, 2, H); }
+      x.restore();
+      x.font = "600 12px 'Montserrat', sans-serif"; x.textBaseline = 'middle';
+      const cy = TOP - 15, close = xe - xs < 90;
+      [[xs, 0, fmtS(L.s)], [xe, 1, fmtS(L.e)]].forEach(([hx, k, lab]) => {
+        if (hx < LPAD - 10 || hx > LPAD + W + 10) return;
+        x.fillStyle = C.ink; x.fillRect(hx - 1.5, cy, 3, ch - cy);
+        x.beginPath(); x.arc(hx, cy, 6.5, 0, Math.PI * 2); x.fillStyle = C.ink; x.fill();
+        if (!k) { x.beginPath(); x.arc(hx, cy, 3.5, 0, Math.PI * 2); x.fillStyle = C.bg; x.fill(); }
+        const right = k ? close : !close; x.textAlign = right ? 'left' : 'right'; x.fillStyle = C.ink; x.fillText(lab, hx + (right ? 12 : -12), cy + 1);
+      });
+    }
+    { /* overview strip: the whole file, with the part you are zoomed into lit up */
+      const [x, cw, ch] = fitCanvas(lmini), W = cw - LPAD * 2, mid = ch / 2; x.clearRect(0, 0, cw, ch);
+      x.save(); rr(x, LPAD, 0, W, ch, 10); x.fillStyle = C.box; x.fill(); x.clip();
+      const wx = LPAD + L.v0 / lenDur * W, ww = Math.max(6, L.sp / lenDur * W); rr(x, wx, 0, ww, ch, 10); x.fillStyle = C.win; x.fill();
+      const P = 5, pw = 2.4, nP = Math.floor(W / P);
+      if (!L.mini || L.mini.length !== nP || L.mini.pk !== L.pk) { L.mini = new Float32Array(nP); L.mini.pk = L.pk; for (let i = 0; i < nP; i++) L.mini[i] = Math.pow(pkAt(i / nP * lenDur, (i + 1) / nP * lenDur), .8); }
+      for (let i = 0; i < nP; i++) { const cx = LPAD + (i + .5) * P, h = Math.max(pw, L.mini[i] * (ch - 14)); x.fillStyle = cx >= wx && cx <= wx + ww ? C.wpin : C.mout; rr(x, cx - pw / 2, mid - h / 2, pw, h, pw / 2); x.fill(); }
+      if (playing) { const px = LPAD + pt / lenDur * W; x.fillStyle = C.ph; x.fillRect(px - 1, 0, 2, ch); }
+      x.restore();
+    }
+  }
+  function lenLoop() {
+    L.raf = 0; if (!lenOverlay.classList.contains('show')) return;
+    const dv = L.tv0 - L.v0, ds = L.tsp - L.sp, moving = Math.abs(dv) > L.sp * 1e-4 || Math.abs(ds) > L.sp * 1e-4;
+    if (moving) { L.v0 += dv * .3; L.sp += ds * .3; L.dirty = true; } else if (L.v0 !== L.tv0 || L.sp !== L.tsp) { L.v0 = L.tv0; L.sp = L.tsp; L.dirty = true; }
+    const p = players[lenId]; if (p && !p.paused) L.dirty = true;
+    if (L.dirty) { L.dirty = false; lenDraw(); }
+    L.raf = requestAnimationFrame(lenLoop);
+  }
+  function lenView(v0, sp, now) {
+    sp = Math.max(Math.min(lenDur, .25), Math.min(lenDur, sp)); v0 = Math.max(0, Math.min(lenDur - sp, v0));
+    L.tv0 = v0; L.tsp = sp; if (now) { L.v0 = v0; L.sp = sp; } L.dirty = true;
+  }
   function openLength(it) {
     const p = player(it); if (!p) return; lenId = it.id;
     const show = () => {
       lenDur = p.duration;
       if (!isFinite(lenDur) || lenDur <= 0) { toast('Could not read this file’s length'); return; }
-      lenStart.max = lenEnd.max = lenDur;
-      lenStart.value = it.trimStart || 0; lenEnd.value = it.trimEnd || lenDur;
+      L.s = Math.min(lenDur, it.trimStart || 0); L.e = it.trimEnd ? Math.min(lenDur, it.trimEnd) : lenDur; L.pk = null; L.mini = null; lenView(0, lenDur, true);
       $('#lenLoop').checked = !!it.loop; $('#lenInfo').textContent = 'Full length: ' + fmtT(lenDur) + '. Drag the sliders to choose which part plays.';
-      updLen(); lenOverlay.classList.add('show');
+      $('#lenTot').textContent = fmtS(lenDur);
+      lenOverlay.classList.add('show'); if (!L.raf) L.raf = requestAnimationFrame(lenLoop);
+      const id = it.id; lenPeaks(it, p.src).then(pk => { if (lenId === id) { L.pk = pk; L.dirty = true; } }).catch(() => {});
     };
     if (isFinite(p.duration) && p.duration > 0) { show(); return; }
     let done = false; const go = () => { if (done) return; done = true; clearTimeout(tm); ['loadedmetadata', 'durationchange', 'canplay'].forEach(ev => p.removeEventListener(ev, chk)); p.removeEventListener('error', bad); show(); };
@@ -1783,19 +1875,60 @@
     ['loadedmetadata', 'durationchange', 'canplay'].forEach(ev => p.addEventListener(ev, chk)); p.addEventListener('error', bad, { once: true });
     if (p.error) bad(); else if (p.readyState === 0) { try { p.load(); } catch (e) {} }
   }
-  function updLen(from) {
-    let s = +lenStart.value, e = +lenEnd.value;
-    if (from === 'start' && s > e - 0.05) { s = Math.max(0, e - 0.05); lenStart.value = s; }
-    if (from === 'end' && e < s + 0.05) { e = Math.min(lenDur, s + 0.05); lenEnd.value = e; }
-    $('#lenS').textContent = fmtT(s); $('#lenE').textContent = fmtT(e);
-    const it = get(lenId); if (!it) return;
-    it.trimStart = s; it.trimEnd = e >= lenDur - 0.01 ? 0 : e; updateSeek(it);
+  function updLen() {
+    const it = get(lenId); L.dirty = true; if (!it) return;
+    it.trimStart = +L.s.toFixed(3); it.trimEnd = L.e >= lenDur - 0.01 ? 0 : +L.e.toFixed(3); updateSeek(it);
   }
-  lenStart.addEventListener('input', () => updLen('start'));
-  lenEnd.addEventListener('input', () => updLen('end'));
+  const lenT = (ev, cv) => { const r = cv.getBoundingClientRect(), W = r.width - LPAD * 2; return [ev.clientX - r.left - LPAD, W]; };
+  function lenHit(ev) { const [mx, W] = lenT(ev, lwave), xs = (L.s - L.v0) / L.sp * W, xe = (L.e - L.v0) / L.sp * W, ds = Math.abs(mx - xs), de = Math.abs(mx - xe); return Math.min(ds, de) < 12 ? (ds < de || (ds === de && mx < xs) ? 's' : 'e') : null; }
+  lwave.addEventListener('pointermove', e => { if (!L.drag) lwave.classList.toggle('edge', !!lenHit(e)); });
+  lwave.addEventListener('pointerdown', e => {
+    if (e.button) return; e.preventDefault(); lwave.setPointerCapture(e.pointerId);
+    const h = lenHit(e), [mx] = lenT(e, lwave); L.drag = h ? { h } : { pan: 1, mx, v0: L.tv0 }; if (!h) lwave.classList.add('grab');
+  });
+  lwave.addEventListener('pointermove', e => {
+    const d = L.drag; if (!d) return; const [mx, W] = lenT(e, lwave);
+    if (d.pan) { lenView(d.v0 - (mx - d.mx) / W * L.sp, L.tsp); return; }
+    const t = Math.max(0, Math.min(lenDur, L.v0 + mx / W * L.sp));
+    if (d.h === 's') L.s = Math.min(t, L.e - .05); else L.e = Math.max(t, L.s + .05);
+    if (mx < 0 || mx > W) lenView(L.tv0 + (mx < 0 ? mx : mx - W) / W * L.sp * .15, L.tsp);       // dragging past an edge scrolls the view along
+    updLen();
+  });
+  const lenUp = () => { if (!L.drag) return; L.drag = null; lwave.classList.remove('grab'); };
+  lwave.addEventListener('pointerup', lenUp); lwave.addEventListener('pointercancel', lenUp);
+  lwave.addEventListener('wheel', e => {
+    e.preventDefault(); const [mx, W] = lenT(e, lwave);
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey) { lenView(L.tv0 + (e.deltaX || e.deltaY) / W * L.tsp, L.tsp); return; }
+    const at = L.tv0 + Math.max(0, Math.min(1, mx / W)) * L.tsp, sp = L.tsp * Math.exp(e.deltaY * .0025);
+    lenView(at - Math.max(0, Math.min(1, mx / W)) * Math.max(Math.min(lenDur, .25), Math.min(lenDur, sp)), sp);
+  }, { passive: false });
+  lwave.addEventListener('dblclick', () => lenView(0, lenDur));              // double-click: see the whole file again
+  const miniHit = ev => {                                  // which edge of the lit window (if any) is under the pointer
+    const [mx, W] = lenT(ev, lmini), a = L.tv0 / lenDur * W, b = (L.tv0 + L.tsp) / lenDur * W;
+    if (Math.abs(mx - a) < 9 && Math.abs(mx - a) <= Math.abs(mx - b)) return 'a'; if (Math.abs(mx - b) < 9) return 'b'; return null;
+  };
+  lmini.addEventListener('pointermove', e => { if (!lmini.classList.contains('grab')) lmini.classList.toggle('edge', !!miniHit(e)); });
+  lmini.addEventListener('pointerdown', e => {                            // overview: drag the lit window, drag its edges to zoom, or click to jump there
+    if (e.button) return; e.preventDefault(); lmini.setPointerCapture(e.pointerId);
+    const [mx, W] = lenT(e, lmini), t = mx / W * lenDur, edge = miniHit(e), inWin = t >= L.tv0 && t <= L.tv0 + L.tsp, MIN = Math.min(lenDur, .25);
+    let mv;
+    if (edge) {                                                           // stretch / squeeze the window: the big view zooms to match
+      const fixA = L.tv0, fixB = L.tv0 + L.tsp;
+      mv = ev => { const [x2] = lenT(ev, lmini), u = Math.max(0, Math.min(lenDur, x2 / W * lenDur));
+        if (edge === 'a') { const a = Math.min(u, fixB - MIN); lenView(a, fixB - a, true); } else { const b = Math.max(u, fixA + MIN); lenView(fixA, b - fixA, true); } };
+    } else {
+      if (!inWin) lenView(t - L.tsp / 2, L.tsp);
+      const off = inWin ? t - L.tv0 : L.tsp / 2;
+      mv = ev => { const [x2] = lenT(ev, lmini); lenView(x2 / W * lenDur - off, L.tsp); };
+    }
+    lmini.classList.add('grab');
+    const up = () => { lmini.classList.remove('grab'); lmini.removeEventListener('pointermove', mv); lmini.removeEventListener('pointerup', up); lmini.removeEventListener('pointercancel', up); };
+    lmini.addEventListener('pointermove', mv); lmini.addEventListener('pointerup', up); lmini.addEventListener('pointercancel', up);
+  });
+  lmini.addEventListener('wheel', e => { e.preventDefault(); const sp = L.tsp * Math.exp(e.deltaY * .0025), c = L.tv0 + L.tsp / 2; lenView(c - Math.min(lenDur, sp) / 2, sp); }, { passive: false });
   $('#lenLoop').addEventListener('change', e => { const it = get(lenId); if (it) it.loop = e.target.checked; });
-  $('#lenPreview').addEventListener('click', () => { const it = get(lenId), p = it && player(it); if (!p) return; p.pause(); p.currentTime = it.trimStart || 0; p.play(); });
-  function closeLength() { lenOverlay.classList.remove('show'); const it = get(lenId); const p = it && players[it.id]; if (p) { p.pause(); p.currentTime = it.trimStart || 0; } save(); }
+  $('#lenPreview').addEventListener('click', () => { const it = get(lenId), p = it && player(it); if (!p) return; p.pause(); p.currentTime = it.trimStart || 0; p.play(); L.dirty = true; });
+  function closeLength() { lenOverlay.classList.remove('show'); L.drag = null; const it = get(lenId); const p = it && players[it.id]; if (p) { p.pause(); p.currentTime = it.trimStart || 0; } save(); }
   $('#lenDone').addEventListener('click', closeLength);
   lenOverlay.addEventListener('pointerdown', e => { if (e.target === lenOverlay) closeLength(); });
   function closeMenu() { menu.classList.remove('show'); }
@@ -2083,7 +2216,7 @@
 
   /* ---------- keyboard ---------- */
   addEventListener('keydown', e => {
-    if (e.key === 'Escape') { if (placing) stopPlacing(); else if (dock.classList.contains('open')) closeDock(); else if (shareDock.classList.contains('open')) closeShare(); else if (autoDock.classList.contains('open')) closeAuto(); else if (!editingId) select(null); closeMenu(); $('#overlay').classList.remove('show'); if (lenOverlay.classList.contains('show')) closeLength(); if (spdOverlay.classList.contains('show')) closeSpeed(); codeOverlay.classList.remove('show'); if (joinOverlay.classList.contains('show')) $('#pfCancel').click(); }
+    if (e.key === 'Escape') { if (placing) stopPlacing(); else if (dock.classList.contains('open')) closeDock(); else if (shareDock.classList.contains('open')) closeShare(); else if (autoDock.classList.contains('open')) closeAuto(); else if (!editingId) select(null); closeMenu(); $('#overlay').classList.remove('show'); if (lenOverlay.classList.contains('show')) closeLength(); if (spdOverlay.classList.contains('show')) closeSpeed(); codeOverlay.classList.remove('show'); if (joinOverlay.classList.contains('show')) $('#pfCancel').click(); const wo = $('#warnOverlay'); if (wo && wo.classList.contains('show')) $('#warnCancel').click(); }
     const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || editingId || document.activeElement.isContentEditable;
     if ((e.key === 'Delete' || e.key === 'Backspace') && selId && !typing) { e.preventDefault(); removeItem(selId); }
   });
@@ -2192,7 +2325,7 @@ $('#copy').addEventListener('click', async () => {
     return (Array.isArray(list) ? list : []).slice(0, 16).map(u => ({ id: String(u.id).slice(0, 80), name: String(u.name).slice(0, 24), color: /^#[0-9a-f]{6}$/i.test(u.color) ? u.color : '#888888' }));
   }
   const snap1 = it => { const { src, ...rest } = it; return JSON.stringify(rest); };
-  function resetLast() { lastSent.clear(); items.forEach(it => lastSent.set(it.id, { j: snap1(it), src: it.src })); }
+  function resetLast() { lastSent.clear(); items.forEach(it => lastSent.set(it.id, { j: snap1(it), src: it.src })); lastAuto = autoJSON(); }
 
   /* WebRTC data channels choke on big messages, so anything large (audio / image files) is cut into small numbered
      chunks, sent at a pace the connection can take, and stitched back together on the other side. */
@@ -2241,6 +2374,7 @@ $('#copy').addEventListener('click', async () => {
       }
     });
     lastSent.forEach((v, id) => { if (!seen.has(id)) { lastSent.delete(id); send({ t: 'del', id }); } });
+    const aj = autoJSON(); if (aj !== lastAuto) { lastAuto = aj; send({ t: 'auto', a: JSON.parse(aj) }); }      // the node editor travels too
   }
   let netT = 0;
   function netLive() { const n = performance.now(); if (net.role && n - netT > 40) { netT = n; netSync(); } }
@@ -2310,7 +2444,7 @@ $('#copy').addEventListener('click', async () => {
       if (!color || colorClash(color, net.users.filter(u => u !== from._u))) { from.send({ t: 'colortaken' }); return; }
       if (from._u) { Object.assign(from._u, { name, color }); }
       else { from._u = { id: from.peer, name, color }; net.conns.add(from); net.users.push(from._u); toast(name + ' joined'); }
-      tx(from, { t: 'welcome', you: from._u, users: net.users, items: JSON.parse(JSON.stringify(items)) });
+      tx(from, { t: 'welcome', you: from._u, users: net.users, items: JSON.parse(JSON.stringify(items)), auto: JSON.parse(autoJSON()) });
       tx(from, { t: 'tabs', list: [...tabs].filter(([id]) => id !== from._u.id).map(([id, p]) => ({ u: id, tab: p.tab, ago: Date.now() - p.at })) });
       relay({ t: 'users', users: net.users }, from); renderUsers();
     }
@@ -2321,6 +2455,7 @@ $('#copy').addEventListener('click', async () => {
       if (get(m.id)) { applying = true; removeItem(m.id); applying = false; }
       if (net.role === 'host') relay(m, from);
     }
+    else if (m.t === 'auto' && m.a && typeof m.a === 'object') { applyAuto(m.a); if (net.role === 'host') relay(m, from); }
     else if (m.t === 'cur') { showCursor(m); if (net.role === 'host') relay(m, from); }
     else if (m.t === 'tab' && TABS.includes(m.tab) && (net.role === 'host' ? from && from._u : typeof m.u === 'string')) {
       if (net.role === 'host') m.u = from._u.id;                                     // a guest can only speak for themselves
@@ -2334,8 +2469,9 @@ $('#copy').addEventListener('click', async () => {
     else if (m.t === 'welcome' && net.joining) {
       net.role = 'guest'; net.joining = false; net.code = net.joinCode; codeText.textContent = net.joinCode; codeText.classList.remove('empty');
       net.me = cleanUsers([m.you])[0]; net.users = cleanUsers(m.users);
-      net.backup = JSON.parse(JSON.stringify(items));                 // your own board comes back when you leave
+      net.backup = JSON.parse(JSON.stringify(items)); net.backupAuto = autoJSON();                 // your own board comes back when you leave
       applying = true; loadItems(Array.isArray(m.items) ? m.items : []); applying = false;
+      if (m.auto && typeof m.auto === 'object') applyAuto(m.auto);
       resetLast(); live(true); toast('Joined room ' + net.joinCode); announceTab(true);
     }
   }
@@ -2437,10 +2573,10 @@ $('#copy').addEventListener('click', async () => {
     if (net.conn) { try { net.conn.close(); } catch (e) {} }
     if (net.peer) { try { net.peer.destroy(); } catch (e) {} }
     Object.values(cursors).forEach(dropCursor); cursors = {}; tabs.clear(); tabsChanged();
-    const backup = net.backup;
+    const backup = net.backup, backupAuto = net.backupAuto; net.backupAuto = null;
     net.role = null; net.peer = null; net.conn = null; net.me = null; net.users = []; net.joining = false; net.backup = null;
     lastSent.clear();
-    if (was === 'guest' && backup) { applying = true; loadItems(backup); applying = false; save(); }
+    if (was === 'guest' && backup) { applying = true; loadItems(backup); if (backupAuto) { auto.nodes.forEach(n => clearWaits(n.id)); loadAuto(JSON.parse(backupAuto)); renderRows(); } applying = false; save(); }
     live(false); newCode();
     if (!silent && was) toast(was === 'host' ? 'Sharing stopped' : 'Left the room');
   }
@@ -2463,7 +2599,7 @@ $('#copy').addEventListener('click', async () => {
     if (net.role || net.joining) return;
     if (!RELAY && !window.Peer) { toast('Sharing needs an internet connection'); return; }
     if (!CODE_RE.test(code)) { toast('Codes are 6 letters or numbers'); return; }
-    net.joinCode = code; openProfile(code, '');
+    warnFirst('join', () => { net.joinCode = code; openProfile(code, ''); });
   }
   pfColor.addEventListener('click', () => {
     const open = picker.classList.contains('show'); closePops(); if (open) return;
@@ -2496,10 +2632,19 @@ $('#copy').addEventListener('click', async () => {
   stopBtn.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) { e.preventDefault(); if (net.role === 'host') holdStart(); else if (net.role === 'guest') stopShare(); } });
   stopBtn.addEventListener('keyup', holdEnd);
 
+  /* a warning first: hosting lets everyone edit your work, joining swaps your board for the host's */
+  const warnOverlay = $('#warnOverlay'); let warnNext = null;
+  function warnFirst(mode, next) {
+    $('#warnTitle').textContent = mode === 'host' ? 'Before you share' : 'Before you join';
+    $('#warnMsg').textContent = mode === 'host' ? 'When you share this session, everyone who joins will be able to edit, change and delete anything in your current work, including the board and the node editor.' : 'When you join a session, your current work will be replaced by the host’s board while you are in the room. Your own work comes back when you leave.';
+    warnNext = next; warnOverlay.classList.add('show'); setTimeout(() => $('#warnGo').focus(), 60);
+  }
+  $('#warnCancel').addEventListener('click', () => { warnOverlay.classList.remove('show'); warnNext = null; });
+  $('#warnGo').addEventListener('click', () => { warnOverlay.classList.remove('show'); const f = warnNext; warnNext = null; if (f) f(); });
   $('#startShare').addEventListener('click', () => {
     if (net.role || net.joining) return;
     if (!RELAY && !window.Peer) { toast('Sharing needs an internet connection'); return; }
-    openProfile('', '', 'host');
+    warnFirst('host', () => openProfile('', '', 'host'));
   });
   $('#joinBtn').addEventListener('click', () => joinFlow($('#joinCode').value.trim().toLowerCase()));
   $('#joinCode').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') $('#joinBtn').click(); });
@@ -3787,7 +3932,7 @@ $('#copy').addEventListener('click', async () => {
   });
   /* dragging a wire or a node near an edge of the editor slides the view that way, faster the closer you get */
   let edgeRaf = 0, edgePt = null;
-  function nodeDragTo(cx, cy) { const dx = cx - nd.sx, dy = cy - nd.sy; (nd.grp || [{ n: nd.n, el: nd.el, ox: nd.ox, oy: nd.oy }]).forEach(g => { g.n.x = g.ox + dx / v.z; g.n.y = g.oy + dy / v.z; g.el.style.left = g.n.x + 'px'; g.el.style.top = g.n.y + 'px'; }); }
+  function nodeDragTo(cx, cy) { const dx = cx - nd.sx, dy = cy - nd.sy; (nd.grp || [{ n: nd.n, el: nd.el, ox: nd.ox, oy: nd.oy }]).forEach(g => { g.n.x = g.ox + dx / v.z; g.n.y = g.oy + dy / v.z; g.el.style.left = g.n.x + 'px'; g.el.style.top = g.n.y + 'px'; }); netLive(); }
   function edgeTick() {
     edgeRaf = 0; if (!edgePt || !(wd || (nd && nd.moved)) || !autoOpen) return;
     const r = acanvas.getBoundingClientRect(), M = 56, SP = 16, f = d => d < M ? Math.min(1, (M - d) / M) : 0;
@@ -4183,6 +4328,13 @@ $('#copy').addEventListener('click', async () => {
 
   /* undo / redo for the node editor (keeps the last HIST_MAX changes) */
   const HIST_MAX = 200, hist = { u: [], r: [], cur: '' };
+  function applyAuto(a) {                    /* someone else changed the node editor: swap in their version, keeping unchanged nodes (and anything they are running) as they are */
+    const old = auto; let oldNorm;
+    try { loadAuto(JSON.parse(autoJSON())); oldNorm = new Map(auto.nodes.map(n => [n.id, JSON.stringify(n)])); loadAuto(a); } catch (e) { auto = old; return; }
+    auto.nodes = auto.nodes.map(n => { const o = old.nodes.find(x => x.id === n.id); return o && oldNorm.get(n.id) === JSON.stringify(n) ? o : n; });
+    old.nodes.forEach(o => { if (!auto.nodes.some(n => n.id === o.id)) clearWaits(o.id); });
+    lastAuto = autoJSON(); applying = true; try { renderRows(); save(); } finally { applying = false; }
+  }
   const autoJSON = () => JSON.stringify({ btns: auto.btns, nodes: auto.nodes.map(({ pend, rv, lit, ...n }) => n), links: auto.links, gn: auto.gn, ifm: 1, ctm: 1, aum: 1, gm: 1 });
   function updHist() { $('#aundo').disabled = !hist.u.length; $('#aredo').disabled = !hist.r.length; }
   function autoHist() {
@@ -4267,8 +4419,9 @@ $('#copy').addEventListener('click', async () => {
   hist.cur = autoJSON();
   /* what's new: edit this list when something ships (newest first) */
   const CHANGES = [
-    { id: '2026-11-12', date: '12 Nov 2026', title: 'Motion blur on scrolling lists', groups: [
-      ['Fixes', ['Sharing now always goes through the Cloudflare relay, so it works between any devices, not just ones on the same network']],
+    { id: '2026-11-12', date: '12 Nov 2026', title: 'Shared node editor and a new Edit Length', groups: [
+      ['New', ['A new [[Edit Length]] window: a pill waveform you can zoom into (scroll on it, drag to move along, double-click to see it all), start and end handles with their times, a strip of the whole file underneath showing where you are zoomed in, and a blue line while it previews. Drag the edges of the lit part of that strip to zoom the big view to match', 'A warning pops up before you start or join a sharing session: sharing lets everyone edit your work, and joining swaps your board for the host board until you leave']],
+      ['Fixes', ['Sharing now always goes through the Cloudflare relay, so it works between any devices, not just ones on the same network', 'The node editor is shared too: nodes, wires and settings now update for everyone in the room, and a guest gets their own nodes back when they leave']],
       ['Changes', ['Motion blur now works on scrolling lists too, like this What is new window: the text blurs up and down as you scroll and settles when you stop']]
     ] },
     { id: '2026-11-11', date: '11 Nov 2026', title: 'Expression, drag and drop and text tools', groups: [
