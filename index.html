@@ -2347,7 +2347,7 @@ $('#copy').addEventListener('click', async () => {
   ] } };
   /* Cloudflare relay: when RELAY is set, rooms go through a small Cloudflare Worker over a normal WebSocket (works on every network and device).
      With RELAY empty it falls back to PeerJS device-to-device links. The Worker is in relay/ */
-  const RELAY_URL = '';       // paste your Worker address here once it is deployed, like 'wss://cueboard-relay.YOURNAME.workers.dev' (see relay/README.md)
+  const RELAY_URL = 'wss://cueboard-relay.81150.workers.dev';       // paste your Worker address here once it is deployed, like 'wss://cueboard-relay.YOURNAME.workers.dev' (see relay/README.md)
   const RELAY = (() => { try { return (localStorage.cueRelay || RELAY_URL).replace(/\/$/, ''); } catch (e) { return RELAY_URL; } })();
   function relayLink(id) {                                  // looks like a PeerJS connection, so the rest of the sharing code works unchanged
     const h = {}, c = { peer: id, open: true, on(ev, f) { (h[ev] = h[ev] || []).push(f); }, emit(ev, a) { (h[ev] || []).forEach(f => f(a)); }, close() { if (!c.open) return; c.open = false; c.emit('close'); if (c._close) c._close(); } };
@@ -4268,6 +4268,7 @@ $('#copy').addEventListener('click', async () => {
   /* what's new: edit this list when something ships (newest first) */
   const CHANGES = [
     { id: '2026-11-12', date: '12 Nov 2026', title: 'Motion blur on scrolling lists', groups: [
+      ['Fixes', ['Sharing now always goes through the Cloudflare relay, so it works between any devices, not just ones on the same network']],
       ['Changes', ['Motion blur now works on scrolling lists too, like this What is new window: the text blurs up and down as you scroll and settles when you stop']]
     ] },
     { id: '2026-11-11', date: '11 Nov 2026', title: 'Expression, drag and drop and text tools', groups: [
